@@ -196,3 +196,126 @@ Como logramos ver, los cinco patrones, en base al análisis de la aplicación, s
 
 # Diagrama de Clases:
 ![diagrama_clases](pictures/diagrama_clases.png)
+
+# Diagrama de Esquemas
+
+![diagrama_esquemas](pictures/diagrama_esquemas.png)
+
+El modelo de datos presentado está diseñado para una base de datos NoSQL basada en MongoDB, utilizando un enfoque orientado a documentos y relaciones a través de referencias. A continuación, se detalla la estructura y las relaciones entre las colecciones:
+
+1. **Colecciones Principales**:
+    - **ColeccionAeronaves**: Almacena información sobre las aeronaves, incluyendo un identificador único (id_ObjectId), capacidad (capacidad), horas acumuladas (horas_acumuladas), estado (estado_vuelo), y un límite de horas (limite_horas). Esta colección sirve como fuente de datos para asignar aeronaves a vuelos.
+    - **ColeccionVuelos**: Contiene detalles de los vuelos, como identificador único (id_ObjectId), origen, destino, fechas de salida y llegada (fecha_salida, fecha_llegada), estado (estado_vuelo), piloto (piloto_id), y sobrecargos (sobrecargos). Incluye referencias a ColeccionAeronaves y ColeccionEstados mediante sus respectivos id_ObjectId.
+    - **ColeccionEstados**: Registra los estados posibles de los vuelos u otros elementos, con campos como id_ObjectId, estado, y tipo. Se utiliza como referencia para mantener consistencia en los estados a través de las colecciones.
+    - **ColeccionUsuarios**: Almacena datos de los usuarios, incluyendo id_ObjectId, nombre completo, correo, teléfono, dirección, género, fecha de nacimiento, usuario, contraseña, tipo, y un array de vuelos completados (vuelos_completados). Incluye referencias a ColeccionVuelos.
+    - **ColeccionReservasBoletos**: Gestiona las reservas y boletos, con campos como id_ObjectId, pasajero (pasajero_id), vuelo (vuelo_id), código, estado, maleta, peso, y tipo. Contiene referencias a ColeccionUsuarios y ColeccionVuelos.
+2. **Relaciones y Referencias**:
+    - Las relaciones entre colecciones se establecen mediante referencias usando el campo ObjectId de los documentos. Por ejemplo, ColeccionVuelos referencia a ColeccionAeronaves y ColeccionEstados para asociar una aeronave y su estado a un vuelo específico.
+    - ColeccionUsuarios y ColeccionReservasBoletos mantienen referencias bidireccionales: los usuarios pueden tener múltiples reservas, mientras que cada reserva está vinculada a un usuario y un vuelo.
+    - Esta estructura permite una flexibilidad típica de MongoDB, evitando la necesidad de un esquema relacional rígido, y facilita la denormalización cuando sea necesario.
+
+# Matrices de trazabilidad
+
+## Identificación de Stakeholders
+
+| **Stakeholder** | **Descripción** |
+| --- | --- |
+| **SkyLink Technologies** | Empresa solicitante del sistema; interesada en mejorar la experiencia del pasajero y la eficiencia operativa. |
+| **Aerolíneas** | Empresas que operan vuelos y utilizan la plataforma para gestionar tripulación, flota, reservas y check-in. |
+| **Pasajeros** | Usuarios finales que registran perfiles, reservan vuelos, hacen check-in, abordan y reciben notificaciones del sistema. |
+| **Pilotos y Copilotos** | Personal autorizado para iniciar/finalizar vuelos y registrar horas de vuelo acumuladas. |
+| **Sobrecargos** | Tripulación encargada de la seguridad y atención a bordo; su asignación depende del número de pasajeros. |
+| **Personal de Operaciones** | Encargados de planificar vuelos, asignar tripulación y gestionar la disponibilidad de aeronaves. |
+| **Equipo de Mantenimiento** | Técnicos responsables de las revisiones y certificación de aeronaves tras alcanzar límites de horas de vuelo. |
+| **Agentes de Seguridad/Aeropuerto** | Personal que asiste en check-in presencial y control en la puerta de embarque. |
+| **Departamento de TI / Desarrolladores** | Encargados de diseñar, implementar y mantener el sistema AirFlow. |
+| **Autoridades Aeronáuticas** | Entidades regulatorias que exigen el cumplimiento de normas de seguridad y operación aérea. |
+| **Administradores del Programa de Fidelización** | Responsables de gestionar puntos, beneficios y notificaciones a pasajeros frecuentes. |
+
+## Stakeholders vrs Requerimientos
+
+### Stakeholders vrs Requerimientos funcionales
+
+|  | RF1 | RF2 | RF3 | RF4 | RF5 | RF6 |
+| --- | --- | --- | --- | --- | --- | --- |
+| **SkyLink Technologies** | **X** | **X** | **X** | **X** | **X** | **X** |
+| **Aerolíneas** | **X** | **X** | **X** | **X** | **X** | **X** |
+| **Pasajeros** | **X** | - | - | **X** | **X** | **X** |
+| **Pilotos y Copilotos** | **X** | **X** | - | - | - | - |
+| **Sobrecargos** | - | **X** | - | - | - | - |
+| **Personal de Operaciones** | **X** | **X** | **X** | - | - | - |
+| **Equipo de Mantenimiento** | - | - | **X** | - | - | - |
+| **Agentes de Seguridad/Aeropuerto** | - | - | - | - | **X** | - |
+| **Departamento de TI / Desarrolladores** | - | - | - | - | **X** | - |
+| **Autoridades Aeronáuticas** | **X** | **X** | **X** | **X** | **X** | - |
+| **Administradores del Programa de Fidelización** | - | - | - | - | - | **X** |
+
+### Stakeholders vrs Requerimientos No funcionales
+
+|  | RNF - Rendimiento y Escalabilidad | RNF -Seguridad y Roles | RNF - Usabilidad y Accesibilidad | RNF - Disponibilidad y Recuperación | RNF - Arquitectura y Metodología | RNF - Integración Externa |
+| --- | --- | --- | --- | --- | --- | --- |
+| **SkyLink Technologies** | **X** | **X** | **X** | **X** | **X** | **X** |
+| **Aerolíneas** | **X** | **X** | **X** | **X** | **X** | **X** |
+| **Pasajeros** | **X** | **X** | **X** | **X** |  | **X** |
+| **Pilotos y Copilotos** | **X** | **X** | **X** | **X** | - | - |
+| **Sobrecargos** | **X** | **X** | - | - | - | - |
+| **Personal de Operaciones** | **X** | **X** | **X** | **X** | **X** | **X** |
+| **Equipo de Mantenimiento** | **X** | **X** | - | **X** | - | - |
+| **Agentes de Seguridad/Aeropuerto** | - | **X** | **X** | **X** | - | - |
+| **Departamento de TI / Desarrolladores** | **X** | **X** | **X** | **X** | **X** | **X** |
+| **Autoridades Aeronáuticas** | **X** | **X** | **X** | **X** | **X** | **X** |
+| **Administradores del Programa de Fidelización** | **X** | **X** | **X** | **X** | - | **X** |
+
+## Stakeholders vrs CDU
+
+|  | CDU001 | CDU002 | CDU003 | CDU004 | CDU005 | CDU006 |
+| --- | --- | --- | --- | --- | --- | --- |
+| **SkyLink Technologies** | **X** | **X** | **X** | **X** | **X** | **X** |
+| **Aerolíneas** | **X** | **X** | **X** | **X** | **X** | **X** |
+| **Pasajeros** | **X** | - | - | **X** | **X** | **X** |
+| **Pilotos y Copilotos** | **X** | **X** | - | - | - | - |
+| **Sobrecargos** | - | **X** | - | - | - | - |
+| **Personal de Operaciones** | **X** | **X** | **X** | - | - | - |
+| **Equipo de Mantenimiento** | - | - | **X** | - | - | - |
+| **Agentes de Seguridad/Aeropuerto** | - | - | - | - | **X** | - |
+| **Departamento de TI / Desarrolladores** | - | - | - | - | - | - |
+| **Autoridades Aeronáuticas** | **X** | **X** | **X** | **X** | **X** | - |
+| **Administradores del Programa de Fidelización** | - | - | - | - | - | **X** |
+
+## Requerimientos vrs CDU
+
+### Requerimientos Funcionales vrs CDU
+
+|  | **CDU001** | **CDU002**  | **CDU003** | **CDU004**  | **CDU005** | **CDU006** |
+| --- | --- | --- | --- | --- | --- | --- |
+| **RF – Definir vuelo (origen, destino, fechas, tripulación, aeronave)** | X | X | X | - | - | - |
+| **RF – Cancelar vuelo (anular reservas y notificar)** | X | - | - | X | - | - |
+| **RF – Cambiar estados de vuelo**  | X | - | - | - | X | - |
+| **RF – Pilotos marcan inicio y fin del vuelo** | X | X | X | - | - | - |
+| **RF – Registro de tripulación (pilotos y sobrecargos)** | - | X | - | - | - | - |
+| **RF – Asignación de tripulación a vuelo** | X | X | - | - | - | - |
+| **RF – Actualizar experiencia post-vuelo** | - | X | - | - | - | - |
+| **RF – Registro de aeronaves** | - | - | X | - | - | - |
+| **RF – Acumular horas de vuelo aeronave** | X | - | X | - | - | - |
+| **RF – Verificar límites y bloquear aeronave** | - | - | X | - | - | - |
+| **RF – Certificación de mantenimiento** | - | - | X | - | - | - |
+| **RF – Registro de pasajeros y perfiles** | - | - | - | X | - | - |
+| **RF – Modificación de perfiles** | - | - | - | X | - | - |
+| **RF – Reservar vuelo y asiento (boleto QR, 2 maletas)** | - | - | - | X | - | - |
+| **RF – Check-in online o en aeropuerto** | - | - | - | - | X | - |
+| **RF – Embarque (escaneo QR)** | - | - | - | - | X | - |
+| **RF – Notificaciones a pasajeros** | X | - | - | X | X | X |
+| **RF – Maletas extra (hasta 3)** | - | - | - | - | X | X |
+| **RF – Programa de fidelización (puntos por vuelo, historial)** | - | - | - | - | - | X |
+
+### Requerimientos No Funcionales vrs CDU
+
+| **Requerimiento No Funcional** | **CDU001** | **CDU002** | **CDU003** | **CDU004** | **CDU005** | **CDU006** |
+| --- | --- | --- | --- | --- | --- | --- |
+| **RNF – Procesamiento rápido** | X | X | X | X | X | X |
+| **RNF – Seguridad** | X | X | X | X | X | X |
+| **RNF – Escalabilidad** | X | X | X | X | X | X |
+| **RNF – Usabilidad y accesibilidad**  | X | X | X | X | X | X |
+| **RNF – Disponibilidad 99.9% y recuperación de fallos** | X | X | X | X | X | X |
+| **RNF – Arquitectura modular y patrones de diseño** | X | X | X | X | X | X |
+| **RNF – Integración con externos**  | X | - | - | X | X | X |
