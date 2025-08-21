@@ -389,7 +389,7 @@ El modelo de datos presentado está diseñado para una base de datos NoSQL basad
 
 # Caso de uso de alto nivel
 
-![alt text](image.png)
+![alt text](pictures/casos_uso_alto_nivel.png)
 
 # Primera descomposición
 
@@ -400,7 +400,7 @@ El modelo de datos presentado está diseñado para una base de datos NoSQL basad
 - **CDU005: Procesos de Check-in y Embarque** (Check-in, embarque y seguimiento).
 - **CDU006: Servicios Adicionales y Fidelización** (Maletas extra, puntos y notificaciones).
 
-![alt text](image-1.png)
+![alt text](pictures/primera_descomposicion.png)
 
 # Casos de uso expandidos
 
@@ -412,7 +412,7 @@ El modelo de datos presentado está diseñado para una base de datos NoSQL basad
 
 ● CDU001.3: Cancelar Vuelo
 
-![alt text](image-2.png)
+![alt text](pictures/casos_uso_expandidos.png)
 
 | **Campo** | **Detalle** |
 | --- | --- |
@@ -454,7 +454,7 @@ FA3.2 Fin del flujo |
 
 ● CDU002.3: Actualizar Experiencia Post-Vuelo
 
-![alt text](image-3.png)
+![alt text](pictures/CDU002.png)
 
 | **Campo** | **Detalle** |
 | --- | --- |
@@ -495,7 +495,7 @@ FA3.2 Se continúa con el flujo principal (5) |
 
 ● CDU003.3: Verificar y Certificar Mantenimiento
 
-![alt text](image-4.png)
+![alt text](pictures/CDU003.png)
 
 | **Campo** | **Detalle** |
 | --- | --- |
@@ -535,7 +535,7 @@ FA3.2 Fin del flujo |
 
 ● CDU004.3: Reservar Vuelo y Asiento
 
-![alt text](image-5.png)
+![alt text](pictures/CDU004.png)
 
 | **Campo** | **Detalle** |
 | --- | --- |
@@ -577,7 +577,7 @@ FA3.2 Timeout tras 24h |
 
 ● CDU005.3: Seguimiento de Vuelo
 
-![alt text](image-6.png)
+![alt text](pictures/CDU005.png)
 
 | **Campo** | **Detalle** |
 | --- | --- |
@@ -617,7 +617,7 @@ FA3.2 Se continúa con el flujo principal (6) |
 
 ● CDU006.3: Gestionar Historial y Notificaciones
 
-![alt text](image-7.png)
+![alt text](pictures/CDU006.png)
 
 | **Campo** | **Detalle** |
 | --- | --- |
