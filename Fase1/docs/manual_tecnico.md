@@ -182,5 +182,17 @@ module.exports = BookingFacade;
 
 Como logramos ver, los cinco patrones, en base al análisis de la aplicación, son los mejores para poder trabajar. Los cinco patrones son compatibles, ya que trabajan en distintas capas del diseño de la aplicación y el modelo de negocio. Ambos se pueden trabajar sin necesidad de desacoplar o crear conflictos con los demás patrones de diseño elegidos.
 
+# Diagrama de Bloques:
+![diagrama_bloques](pictures/diagramaBloques.png)
+
+# Diagrama de Despliegue:
+![diagrama_despliegue](pictures/diagramaDespliegue.png)
+
+# Diagrama de Componentes:
+![diagrama_componentes](pictures/diagramaComponentes.png)
+
+# Diagrama de Distribución:
+![diagrama_distribucion](pictures/diagramaDistribucion.png)
+
 # Diagrama de Clases:
 ![diagrama_clases](pictures/diagrama_clases.png)
