@@ -184,15 +184,19 @@ Como logramos ver, los cinco patrones, en base al análisis de la aplicación, s
 
 # Diagrama de Bloques:
 ![diagrama_bloques](pictures/diagramaBloques.png)
+Muestra el flujo general del sistema AirFlow desde la perspectiva del usuario. Representa cómo los datos viajan desde el usuario a través de sus dispositivos, pasando por el frontend React, el middleware de Node.js, y distribuyéndose entre tres servicios especializados: gestión de usuarios, vuelos y reservas. Cada servicio se conecta a la base de datos MongoDB y algunos utilizan servicios de mensajería externa para notificaciones.
 
 # Diagrama de Despliegue:
 ![diagrama_despliegue](pictures/diagramaDespliegue.png)
+Describe la infraestructura física y tecnológica donde opera AirFlow System. Muestra la distribución de componentes en diferentes servidores: cliente con navegador, servidor web con Nginx, servidores de aplicación con Node.js, base de datos MongoDB con replicación, y servicios cloud externos. Incluye aspectos de alta disponibilidad y balanceadores de carga.
 
 # Diagrama de Componentes:
 ![diagrama_componentes](pictures/diagramaComponentes.png)
+Representa la arquitectura interna del software organizada en capas. Desde el frontend con React hasta la capa de datos con MongoDB, pasando por la API, lógica de negocio y patrones de diseño. Muestra cómo interactúan los diferentes módulos del sistema y cómo se implementan los patrones Facade, Factory y Observer dentro de la arquitectura.
 
 # Diagrama de Distribución:
 ![diagrama_distribucion](pictures/diagramaDistribucion.png)
+Ilustra la arquitectura completa del sistema distribuido con separación clara en tiers (cliente, web, aplicación, datos). Enfatiza aspectos de escalabilidad con múltiples servidores de aplicación, alta disponibilidad con MongoDB en Replica Set, CDN para contenido estático, y integración con servicios cloud. Incluye componentes de monitoreo y logging para operaciones.
 
 # Diagrama de Clases:
 ![diagrama_clases](pictures/diagrama_clases.png)
