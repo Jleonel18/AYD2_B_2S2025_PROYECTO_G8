@@ -422,29 +422,10 @@ El modelo de datos presentado está diseñado para una base de datos NoSQL basad
 | **Descripción** | Administra la planificación, actualización de estados y cancelación de vuelos, asegurando operaciones seguras, notificaciones oportunas a pasajeros y gestión eficiente de recursos como aeronaves y tripulación para cumplir con normativas y horarios establecidos. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
 | **Precondiciones** | Aeronaves y tripulación disponibles, sistema autenticado para operaciones, vuelos en estados válidos para modificaciones o actualizaciones. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
 | **Post Condiciones** | Vuelos planificados, estados actualizados (Planificado, Iniciado, En tiempo, Retrasado, Cancelado, Aterrizado), reservas anuladas si aplica, notificaciones enviadas. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
-| **Flujo principal** | 1. Personal planifica vuelo ingresando origen, destino, fechas, aeronave y tripulación.
-2. Sistema valida disponibilidad.
-3. Vuelo se marca como "Planificado".
-4. Piloto/Copiloto actualiza estado (e.g., "Iniciado", "Aterrizado") durante el ciclo.
-5. Personal cancela vuelo si es necesario.
-6. Sistema notifica a pasajeros y actualiza recursos. |
-| **Flujos alternos** | FA1: Conflicto de asignación (aeronave/tripulación) (FA = Flujo Alterno)
-FA1.1 Notificación de error
-FA1.2 Reasignar recursos
-FA1.3 Se continúa con el flujo principal (2)
-FA2: Estado inválido
-FA2.1 Notificación
-FA2.2 Seleccionar estado válido
-FA2.3 Se continúa con el flujo principal (4)
-FA3: Cancelación no permitida (vuelo iniciado)
-FA3.1 Error
-FA3.2 Fin del flujo |
-| **Reglas de negocio** | ● Vuelo requiere piloto, copiloto y sobrecargos suficientes (1 por 50 pasajeros).
-● Cancelable si <50% capacidad o sin tripulación.
-● Notificar cambios por email. |
-| **Reglas de calidad** | ● Procesos (planificación, actualización) no excedan 5 minutos.
-● Interfaz responsive con indicadores visuales (verde #00FF00 para éxito, rojo #FF0000 para errores).
-● Notificaciones en <30 segundos. |
+| **Flujo principal** | 1. Personal planifica vuelo ingresando origen, destino, fechas, aeronave y tripulación.<br>2. Sistema valida disponibilidad.<br>3. Vuelo se marca como "Planificado".<br>4. Piloto/Copiloto actualiza estado (e.g., "Iniciado", "Aterrizado") durante el ciclo.<br>5. Personal cancela vuelo si es necesario.<br>6. Sistema notifica a pasajeros y actualiza recursos. |
+| **Flujos alternos** | FA1: Conflicto de asignación (aeronave/tripulación) (FA = Flujo Alterno)<br>FA1.1 Notificación de error<br>FA1.2 Reasignar recursos<br>FA1.3 Se continúa con el flujo principal (2)<br>FA2: Estado inválido<br>FA2.1 Notificación<br>FA2.2 Seleccionar estado válido<br>FA2.3 Se continúa con el flujo principal (4)<br>FA3: Cancelación no permitida (vuelo iniciado)<br>FA3.1 Error<br>FA3.2 Fin del flujo |
+| **Reglas de negocio** | ● Vuelo requiere piloto, copiloto y sobrecargos suficientes (1 por 50 pasajeros).<br>● Cancelable si <50% capacidad o sin tripulación.<br>● Notificar cambios por email. |
+| **Reglas de calidad** | ● Procesos (planificación, actualización) no excedan 5 minutos.<br>● Interfaz responsive con indicadores visuales (verde #00FF00 para éxito, rojo #FF0000 para errores).<br>● Notificaciones en <30 segundos. |
 
 ## Caso de Uso CDU002: Gestión de Tripulación
 
@@ -464,28 +445,10 @@ FA3.2 Fin del flujo |
 | **Descripción** | Administra el registro, asignación y actualización de datos de la tripulación, incluyendo pilotos y sobrecargos, para garantizar asignaciones seguras y cumplimiento de normativas mediante un registro preciso de experiencia y disponibilidad. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
 | **Precondiciones** | Datos de tripulación válidos, vuelo planificado para asignaciones, sistema autenticado, vuelo aterrizado para actualizaciones automáticas. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
 | **Post Condiciones** | Tripulación registrada, asignada a vuelos, experiencia actualizada (horas de vuelo para pilotos, conteo para sobrecargos), o proceso fallido. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
-| **Flujo principal** | 1. Personal registra datos de tripulación (nombre, identificación, tipo).
-2. Asigna piloto, copiloto y sobrecargos a vuelo.
-3. Sistema valida disponibilidad.
-4. Asignación confirmada.
-5. Sistema actualiza experiencia al aterrizar vuelo. |
-| **Flujos alternos** | FA1: Datos inválidos/duplicados (FA = Flujo Alterno)
-FA1.1 Notificación
-FA1.2 Corregir datos
-FA1.3 Se continúa con el flujo principal (1)
-FA2: Tripulación no disponible
-FA2.1 Buscar alternativas
-FA2.2 Reasignar
-FA2.3 Se continúa con el flujo principal (3)
-FA3: Error en actualización automática
-FA3.1 Ingreso manual por piloto
-FA3.2 Se continúa con el flujo principal (5) |
-| **Reglas de negocio** | ● Pilotos requieren horas de vuelo, sobrecargos conteo de vuelos.
-● Un sobrecargo por 50 pasajeros.
-● No asignaciones simultáneas. |
-| **Reglas de calidad** | ● Registro <3 minutos, asignación <2 minutos.
-● Actualizaciones automáticas <10 segundos.
-● Botones en azul (#0000FF), campos obligatorios en rojo. |
+| **Flujo principal** | 1. Personal registra datos de tripulación (nombre, identificación, tipo).<br>2. Asigna piloto, copiloto y sobrecargos a vuelo.<br>3. Sistema valida disponibilidad.<br>4. Asignación confirmada.<br>5. Sistema actualiza experiencia al aterrizar vuelo. |
+| **Flujos alternos** | FA1: Datos inválidos/duplicados (FA = Flujo Alterno)<br>FA1.1 Notificación<br>FA1.2 Corregir datos<br>FA1.3 Se continúa con el flujo principal (1)<br>FA2: Tripulación no disponible<br>FA2.1 Buscar alternativas<br>FA2.2 Reasignar<br>FA2.3 Se continúa con el flujo principal (3)<br>FA3: Error en actualización automática<br>FA3.1 Ingreso manual por piloto<br>FA3.2 Se continúa con el flujo principal (5) |
+| **Reglas de negocio** | ● Pilotos requieren horas de vuelo, sobrecargos conteo de vuelos.<br>● Un sobrecargo por 50 pasajeros.<br>● No asignaciones simultáneas. |
+| **Reglas de calidad** | ● Registro <3 minutos, asignación <2 minutos.<br>● Actualizaciones automáticas <10 segundos.<br>● Botones en azul (#0000FF), campos obligatorios en rojo. |
 
 ## Caso de Uso CDU003: Gestión de Flota Aérea
 
@@ -505,27 +468,10 @@ FA3.2 Se continúa con el flujo principal (5) |
 | **Descripción** | Administra el registro, monitoreo de horas de vuelo y certificación de mantenimiento de aeronaves, asegurando su disponibilidad, seguridad operativa y cumplimiento de límites de mantenimiento para evitar riesgos. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
 | **Precondiciones** | Datos únicos para aeronaves, vuelos completados para monitoreo, inspección física para certificación, sistema autenticado. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
 | **Post Condiciones** | Aeronaves registradas, horas acumuladas actualizadas, mantenimiento certificado o aeronave bloqueada, alertas generadas si aplica. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
-| **Flujo principal** | 1. Personal registra aeronave (modelo, capacidad, horas iniciales).
-2. Sistema monitorea horas tras cada vuelo.
-3. Genera alerta si excede límite.
-4. Técnico inspecciona y certifica.
-5. Aeronave liberada para vuelos. |
-| **Flujos alternos** | FA1: Datos duplicados (FA = Flujo Alterno)
-FA1.1 Editar datos
-FA1.2 Se continúa con el flujo principal (1)
-FA2: Inspección falla
-FA2.1 Mantener bloqueo
-FA2.2 Notificar operaciones
-FA2.3 Fin del flujo
-FA3: Límite no alcanzado
-FA3.1 No acción
-FA3.2 Fin del flujo |
-| **Reglas de negocio** | ● Límites de mantenimiento: 200 horas grandes, 150 medianas, 100 pequeñas.
-● Bloqueo si excede límite.
-● Certificación obligatoria para liberar. |
-| **Reglas de calidad** | ● Registro <3 minutos, certificación <15 minutos.
-● Actualización horas <5 segundos.
-● Botón "Certificar" verde (#00FF00). |
+| **Flujo principal** | 1. Personal registra aeronave (modelo, capacidad, horas iniciales).<br>2. Sistema monitorea horas tras cada vuelo.<br>3. Genera alerta si excede límite.<br>4. Técnico inspecciona y certifica.<br>5. Aeronave liberada para vuelos. |
+| **Flujos alternos** | FA1: Datos duplicados (FA = Flujo Alterno)<br>FA1.1 Editar datos<br>FA1.2 Se continúa con el flujo principal (1)<br>FA2: Inspección falla<br>FA2.1 Mantener bloqueo<br>FA2.2 Notificar operaciones<br>FA2.3 Fin del flujo<br>FA3: Límite no alcanzado<br>FA3.1 No acción<br>FA3.2 Fin del flujo |
+| **Reglas de negocio** | ● Límites de mantenimiento: 200 horas grandes, 150 medianas, 100 pequeñas.<br>● Bloqueo si excede límite.<br>● Certificación obligatoria para liberar. |
+| **Reglas de calidad** | ● Registro <3 minutos, certificación <15 minutos.<br>● Actualización horas <5 segundos.<br>● Botón "Certificar" verde (#00FF00). |
 
 ## Caso de Uso CDU004: Gestión de Pasajeros y Reservas
 
@@ -545,29 +491,10 @@ FA3.2 Fin del flujo |
 | **Descripción** | Permite a los pasajeros crear y modificar perfiles, reservar vuelos y asientos, generando boletos con códigos QR, validando datos y disponibilidad para cumplir con regulaciones y mejorar la experiencia del usuario. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
 | **Precondiciones** | Acceso a la web, datos personales válidos, vuelos planificados con asientos disponibles, autenticación para modificaciones. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
 | **Post Condiciones** | Perfil creado o modificado, reservas completadas con boletos QR en estado "Pendiente de Check-in", o proceso fallido. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
-| **Flujo principal** | 1. Pasajero registra perfil con datos (nombre, pasaporte).
-2. Sistema valida y envía email de verificación.
-3. Pasajero activa perfil.
-4. Selecciona vuelo y asiento.
-5. Sistema valida disponibilidad.
-6. Genera boleto QR. |
-| **Flujos alternos** | FA1: Datos inválidos (FA = Flujo Alterno)
-FA1.1 Notificación
-FA1.2 Corregir datos
-FA1.3 Se continúa con el flujo principal (1)
-FA2: Asiento ocupado
-FA2.1 Mostrar alternativas
-FA2.2 Re-elegir
-FA2.3 Se continúa con el flujo principal (4)
-FA3: Email no verificado
-FA3.1 Reenviar
-FA3.2 Timeout tras 24h |
-| **Reglas de negocio** | ● Datos obligatorios: nombre, nacimiento, pasaporte.
-● 2 maletas de 50 libras por asiento.
-● Verificación por email. |
-| **Reglas de calidad** | ● Registro/reserva <3 minutos.
-● Formularios seguros (HTTPS).
-● Botones en azul (#0000FF). |
+| **Flujo principal** | 1. Pasajero registra perfil con datos (nombre, pasaporte).<br>2. Sistema valida y envía email de verificación.<br>3. Pasajero activa perfil.<br>4. Selecciona vuelo y asiento.<br>5. Sistema valida disponibilidad.<br>6. Genera boleto QR. |
+| **Flujos alternos** | FA1: Datos inválidos (FA = Flujo Alterno)<br>FA1.1 Notificación<br>FA1.2 Corregir datos<br>FA1.3 Se continúa con el flujo principal (1)<br>FA2: Asiento ocupado<br>FA2.1 Mostrar alternativas<br>FA2.2 Re-elegir<br>FA2.3 Se continúa con el flujo principal (4)<br>FA3: Email no verificado<br>FA3.1 Reenviar<br>FA3.2 Timeout tras 24h |
+| **Reglas de negocio** | ● Datos obligatorios: nombre, nacimiento, pasaporte.<br>● 2 maletas de 50 libras por asiento.<br>● Verificación por email. |
+| **Reglas de calidad** | ● Registro/reserva <3 minutos.<br>● Formularios seguros (HTTPS).<br>● Botones en azul (#0000FF). |
 
 ## Caso de Uso CDU005: Procesos de Check-in y Embarque
 
@@ -587,27 +514,10 @@ FA3.2 Timeout tras 24h |
 | **Descripción** | Gestiona el check-in de pasajeros (online o en aeropuerto), embarque mediante escaneo de QR y seguimiento de vuelos, asegurando una experiencia fluida y notificaciones oportunas sobre el progreso del vuelo. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
 | **Precondiciones** | Reserva activa, dentro de 24h antes del vuelo para check-in, QR generado para embarque, cambios de estado para seguimiento. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
 | **Post Condiciones** | Check-in completado ("Pendiente de Abordaje"), pasajero abordado, notificaciones enviadas, o proceso fallido si no válido. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
-| **Flujo principal** | 1. Pasajero/Agente realiza check-in online o en aeropuerto.
-2. Documenta maletas.
-3. Estado cambia a "Pendiente de Abordaje".
-4. Agente escanea QR en puerta.
-5. Estado cambia a "Abordado".
-6. Sistema notifica estado del vuelo. |
-| **Flujos alternos** | FA1: Check-in fuera de tiempo (FA = Flujo Alterno)
-FA1.1 Error, solo en aeropuerto
-FA1.2 Fin del flujo
-FA2: Sin check-in en puerta
-FA2.1 Realizar check-in en sitio
-FA2.2 Se continúa con el flujo principal (4)
-FA3: Notificación fallida
-FA3.1 Reintento automático
-FA3.2 Se continúa con el flujo principal (6) |
-| **Reglas de negocio** | ● Check-in obligatorio para equipaje, disponible 24h antes.
-● Escaneo QR para embarque.
-● Notificar todos los cambios. |
-| **Reglas de calidad** | ● Check-in <5 minutos, embarque <2 segundos por QR.
-● Interfaz mobile-friendly.
-● Notificaciones <1 minuto. |
+| **Flujo principal** | 1. Pasajero/Agente realiza check-in online o en aeropuerto.<br>2. Documenta maletas.<br>3. Estado cambia a "Pendiente de Abordaje".<br>4. Agente escanea QR en puerta.<br>5. Estado cambia a "Abordado".<br>6. Sistema notifica estado del vuelo. |
+| **Flujos alternos** | FA1: Check-in fuera de tiempo (FA = Flujo Alterno)<br>FA1.1 Error, solo en aeropuerto<br>FA1.2 Fin del flujo<br>FA2: Sin check-in en puerta<br>FA2.1 Realizar check-in en sitio<br>FA2.2 Se continúa con el flujo principal (4)<br>FA3: Notificación fallida<br>FA3.1 Reintento automático<br>FA3.2 Se continúa con el flujo principal (6) |
+| **Reglas de negocio** | ● Check-in obligatorio para equipaje, disponible 24h antes.<br>● Escaneo QR para embarque.<br>● Notificar todos los cambios. |
+| **Reglas de calidad** | ● Check-in <5 minutos, embarque <2 segundos por QR.<br>● Interfaz mobile-friendly.<br>● Notificaciones <1 minuto. |
 
 ## Caso de Uso CDU006: Servicios Adicionales y Fidelización
 
@@ -627,24 +537,59 @@ FA3.2 Se continúa con el flujo principal (6) |
 | **Descripción** | Gestiona la compra de maletas extra, otorgamiento de puntos de fidelidad por vuelos y mantenimiento del historial de vuelos, enviando notificaciones para mejorar la lealtad y experiencia del pasajero. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
 | **Precondiciones** | Reserva activa para maletas, vuelo aterrizado para puntos, eventos de cambio para notificaciones, perfil autenticado. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
 | **Post Condiciones** | Maletas agregadas, puntos sumados, historial actualizado, notificaciones enviadas, o proceso fallido si no válido. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
-| **Flujo principal** | 1. Pasajero compra maletas extra durante reserva/check-in.
-2. Sistema procesa pago.
-3. Actualiza reserva.
-4. Sistema otorga 100 puntos por hora al aterrizar.
-5. Actualiza historial y notifica cambios. |
-| **Flujos alternos** | FA1: Límite de maletas excedido (FA = Flujo Alterno)
-FA1.1 Error
-FA1.2 Reducir cantidad
-FA1.3 Se continúa con el flujo principal (2)
-FA2: Error en cálculo de puntos
-FA2.1 Ajuste manual
-FA2.2 Se continúa con el flujo principal (4)
-FA3: Notificación fallida
-FA3.1 Reintento automático
-FA3.2 Se continúa con el flujo principal (5) |
-| **Reglas de negocio** | ● Máximo 3 maletas extra de 50 libras.
-● 100 puntos por hora de vuelo.
-● Notificar todos los cambios. |
-| **Reglas de calidad** | ● Pago <2 minutos, notificaciones <1 minuto.
-● Interfaz con dashboard de puntos.
-● Botones verdes (#00FF00) para compras. |
+| **Flujo principal** | 1. Pasajero compra maletas extra durante reserva/check-in.<br>2. Sistema procesa pago.<br>3. Actualiza reserva.<br>4. Sistema otorga 100 puntos por hora al aterrizar.<br>5. Actualiza historial y notifica cambios. |
+| **Flujos alternos** | FA1: Límite de maletas excedido (FA = Flujo Alterno)<br>FA1.1 Error<br>FA1.2 Reducir cantidad<br>FA1.3 Se continúa con el flujo principal (2)<br>FA2: Error en cálculo de puntos<br>FA2.1 Ajuste manual<br>FA2.2 Se continúa con el flujo principal (4)<br>FA3: Notificación fallida<br>FA3.1 Reintento automático<br>FA3.2 Se continúa con el flujo principal (5) |
+| **Reglas de negocio** | ● Máximo 3 maletas extra de 50 libras.<br>● 100 puntos por hora de vuelo.<br>● Notificar todos los cambios. |
+| **Reglas de calidad** | ● Pago <2 minutos, notificaciones <1 minuto.<br>● Interfaz con dashboard de puntos.<br>● Botones verdes (#00FF00) para compras. |
+
+# Tablero Kanban
+
+Para la gestión del flujo de trabajo del proyecto se utilizó Jira Software, haciendo uso de la metodología Kanban. Esta herramienta nos permite organizar las tareas de manera visual, darles seguimiento y facilitar la colaboración del equipo.
+
+El tablero Kanban del proyecto se encuentra dividido en las siguientes columnas:
+
+- TO-DO: Contiene el backlog de tareas pendientes por realizar. Actualmente el tablero se encuentra en esta fase debido a que estamos en la etapa de documentación del proyecto.
+
+- BLOCKED: Espacio destinado a registrar aquellas tareas que no pueden continuar por dependencias o impedimentos.
+
+- IN PROGRESS: Aquí se colocarán las tareas que estén en desarrollo activo por parte del equipo.
+
+- TEST/QA: Columna destinada a las actividades que están en fase de pruebas o validación de calidad.
+
+- READY FOR TESTING: Indica que la tarea fue completada en desarrollo y está lista para ser evaluada.
+
+- DONE: Representa las tareas finalizadas y aprobadas.
+
+En la fase actual, se han registrado las tareas iniciales relacionadas con la definición de funcionalidades principales del sistema, como:
+
+- Crear vuelos
+
+- Conexión a la base de datos
+
+- Creación de instancias en la nube
+
+- Cancelación de vuelos y envío de notificaciones
+
+- Ciclo de vida de los vuelos
+
+- Registro de piloto y tripulación
+
+Cada tarea está identificada con un código único (por ejemplo: KAN-5, KAN-6) que facilita su trazabilidad dentro de Jira.
+
+El uso del tablero Kanban en Jira nos permitirá en futuras fases:
+
+- Priorizar y organizar tareas según su importancia.
+
+- Dar seguimiento al progreso en tiempo real.
+
+- Identificar cuellos de botella en el flujo de trabajo.
+
+- Garantizar transparencia y colaboración entre los miembros del equipo.
+
+## Captura del tablero
+
+![Tablero kanban](pictures/tablero_kanban.png)
+
+## Link
+
+### [Tablero Kanban](https://ayd2fase1.atlassian.net/jira/software/projects/KAN/boards/1?atlOrigin=eyJpIjoiMzVhMGI3ODhhMTQ5NGYwZWFkMTA1NmUzOWEyNGZiZmMiLCJwIjoiaiJ9)
