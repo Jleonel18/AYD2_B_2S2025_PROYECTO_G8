@@ -593,3 +593,12 @@ El uso del tablero Kanban en Jira nos permitirá en futuras fases:
 ## Link
 
 ### [Tablero Kanban](https://ayd2fase1.atlassian.net/jira/software/projects/KAN/boards/1?atlOrigin=eyJpIjoiMzVhMGI3ODhhMTQ5NGYwZWFkMTA1NmUzOWEyNGZiZmMiLCJwIjoiaiJ9)
+
+# Evidencias comunicacion efectiva
+El dia 20 de agosto nos reunimos para terminar la documentacion
+![alt text](pictures/20Agosto.jpeg)
+
+
+
+El dia 21 de agosto nos reunimos para corregir y agregar lo ultimo de la documentacion
+![alt text](pictures/21Agosto.jpg)
