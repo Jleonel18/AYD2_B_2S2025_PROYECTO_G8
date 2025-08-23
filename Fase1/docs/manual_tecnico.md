@@ -61,6 +61,7 @@ Debido a que la aplicación Airflow maneja múltiples capas de operaciones, y op
 
 ### En la aplicación:
 
+
 Se tiene planeado usar en la aplicación como el intermedio entre las consultas y la implementación de la base de datos. Se crearán clases.repository para poder separar cada entidad de su lógica.
 
 ### Ejemplo de Aplicación:
