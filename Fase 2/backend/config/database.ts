@@ -1,0 +1,1 @@
+// Configuraciones generales (db, env, etc.)
