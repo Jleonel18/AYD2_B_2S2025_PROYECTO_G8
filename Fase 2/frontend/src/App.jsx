@@ -1,11 +1,17 @@
 import './App.css'
+import Login from './Pages/login'
+import Register from './Pages/register'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 function App() {
 
   return (
-    <>
-      <h1 className='text-3xl font-bold'>Hola mundo desde Airflow</h1>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
