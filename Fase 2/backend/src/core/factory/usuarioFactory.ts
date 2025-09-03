@@ -6,12 +6,13 @@ import Pasajero from "./pasajero"
 
 class UsuarioFactory {
     static crearUsuario(tipo: UsuarioType, datos: any): Usuario {
-        
-        if(!datos.nombre || !datos.edad || !datos.correo) {
+
+        if(!datos.nombre || !datos.edad || !datos.correo || !tipo) {
             throw new Error("Faltan datos requeridos")
         }
         switch (tipo) {
             case UsuarioType.PILOTO:
+                //console.log("Datos del piloto:", datos);
                 return new Piloto(datos.nombre, datos.edad, datos.correo, datos.horasVuelo)
             case UsuarioType.SOBRECARGO:
                 return new Sobrecargo(datos.nombre, datos.edad, datos.correo, datos.vuelos)
