@@ -1,15 +1,15 @@
 import { Schema, model, Document } from 'mongoose';
 
 export interface IUser extends Document {
-    name: string;
-    email: string;
-    age: number;
+    nombre: string;
+    correo: string;
+    edad: number;
 }
 
 const userSchema = new Schema<IUser>({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    age: { type: Number, required: true },
+    nombre: { type: String, required: true },
+    correo: { type: String, required: true },
+    edad: { type: Number, required: true },
 });
 
 export const UserModel = model<IUser>('User', userSchema);
