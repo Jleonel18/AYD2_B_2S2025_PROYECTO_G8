@@ -11,10 +11,9 @@ export class UserService {
         const usuario = UsuarioFactory.crearUsuario(tipo, datos)
 
         // 2. Persistir en Mongo (infraestructura)
-        return await this.userRepository.create({
-            nombre: usuario.nombre,
-            correo: usuario.correo,
-            edad: usuario.edad,
+        console.log("Usuario a guardar:", usuario.toJSON());
+        return await this.userRepository.create({ 
+            ...usuario.toJSON()
         })
     }
 
