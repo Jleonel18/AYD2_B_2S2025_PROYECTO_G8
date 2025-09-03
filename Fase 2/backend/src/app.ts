@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express, { Application, Request, Response } from "express";
 import { connectDB } from "./config/database.js";
-import { UserService } from './services/UserService';
+import { UserService } from './core/repository/services/UserService.js';
 
 const app: Application = express();
 const PORT = process.env.PORT || 4000;
