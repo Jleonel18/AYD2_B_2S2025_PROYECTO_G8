@@ -22,4 +22,11 @@ export class VueloRepository implements IVueloRepository {
   async delete(id: string): Promise<void> {
     await VueloModel.findByIdAndDelete(id);
   }
+
+  async updateEstado(id: string, nuevoEstado: string): Promise<IVuelo | null> {
+    return await VueloModel.findByIdAndUpdate(id, { estado: nuevoEstado }, { new: true });
+  }
+  async cancel(id: string): Promise<IVuelo | null> {
+    return await VueloModel.findByIdAndUpdate(id, { estado: "Cancelado" }, { new: true });
+  } 
 }

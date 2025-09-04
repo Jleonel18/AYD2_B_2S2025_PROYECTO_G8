@@ -6,4 +6,6 @@ export interface IVueloRepository {
   findAll(): Promise<IVuelo[]>;
   update(id: string, vuelo: Partial<IVuelo>): Promise<IVuelo | null>;
   delete(id: string): Promise<void>;
+  updateEstado(id: string, nuevoEstado: string): Promise<IVuelo | null>;
+  cancel(id: string): Promise<IVuelo | null>;
 }
