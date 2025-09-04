@@ -2,6 +2,7 @@ import "dotenv/config";
 import express, { Application, Request, Response } from "express";
 import { connectDB } from "./config/database";
 import { UsuarioRoutes } from "./routes/usuarioRoutes";
+import { AvionRoutes } from "./routes/avionRoutes";
 
 const app: Application = express();
 const PORT = process.env.PORT || 4000;
@@ -16,6 +17,10 @@ app.get("/api/", (req: Request, res: Response) => {
 // Rutas de usuarios
 const usuarioRoutes = new UsuarioRoutes();
 app.use("/api/users", usuarioRoutes.router);
+
+// Rutas de aviones
+const avionRoutes = new AvionRoutes();
+app.use("/api/aviones", avionRoutes.router);
 
 const startServer = async () => {
     try {
