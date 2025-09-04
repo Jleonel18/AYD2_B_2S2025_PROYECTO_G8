@@ -24,4 +24,15 @@ export class UserService {
     async listarUsuarios(): Promise<IUser[]> {
         return await this.userRepository.findAll()
     }
+
+    async agregarPass(id: string, datos: Partial<IUser>): Promise<IUser | null> {
+        if (!datos.contrasena) {
+            throw new Error("La contraseña es requerida para actualizar");
+        }
+        return await this.userRepository.verifyAndSetPassword(id, datos.contrasena)
+    }
+
+    async obtenerUsuarioPorToken(token: string): Promise<IUser | null> {
+        return await this.userRepository.findByToken(token)
+    }
 }

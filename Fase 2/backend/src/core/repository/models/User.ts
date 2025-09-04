@@ -6,7 +6,13 @@ export interface IPasaporte {
     pais_emision: string;
 }
 
+export interface IToken {
+    token: string;
+    expiracion: Date;
+}
+
 export interface IUser extends Document {
+    _id: string;
     nombre: string;
     correo: string;
     edad: number;
@@ -24,6 +30,7 @@ export interface IUser extends Document {
     pasaporte?: IPasaporte; // Pasajero
     verificacion_email?: boolean; // Pasajero
     puntos?: number; // Pasajero
+    token?: IToken; // Token de verificación de email
 }
 
 const userSchema = new Schema<IUser>({
@@ -36,7 +43,7 @@ const userSchema = new Schema<IUser>({
     fecha_nacimiento: { type: Date, required: true },
     dpi: { type: String, required: true },
     usuario: { type: String, required: true, unique: true },
-    contrasena: { type: String, required: true },
+    contrasena: { type: String, required: false },
     verificacion_email: { type: Boolean, required: false },
     puntos: { type: Number, required: false },
     tipo: { type: String, required: true },
@@ -47,7 +54,11 @@ const userSchema = new Schema<IUser>({
         fecha_vencimiento: { type: Date, required: false },
         pais_emision: { type: String, required: false }
     },
-    numero_licencia: { type: String, required: false }
+    numero_licencia: { type: String, required: false },
+    token: {
+        token: { type: String, required: false },
+        expiracion: { type: Date, required: false }
+    }
 });
 
 export const UserModel = model<IUser>('User', userSchema);

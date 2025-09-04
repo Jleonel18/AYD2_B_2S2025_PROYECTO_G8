@@ -16,9 +16,9 @@ abstract class Usuario {
         public readonly fecha_nacimiento: Date,
         public readonly dpi: string,
         public readonly usuario: string,
-        public readonly contrasena: string,
         public readonly tipo: UsuarioType,
-        public readonly vuelos: string[] = []
+        public readonly vuelos: string[] = [],
+        public readonly contrasena?: string,
     ) {}
     abstract toJSON(): Record<string, unknown>
 }

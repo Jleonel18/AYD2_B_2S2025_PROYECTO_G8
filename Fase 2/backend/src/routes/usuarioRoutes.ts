@@ -19,5 +19,6 @@ export class UsuarioRoutes {
     private initializeRoutes() {
         this.router.post("/", usuarioController.crearUsuario);
         this.router.get("/:id", usuarioController.obtenerUsuario);
+        this.router.post("/verificar", usuarioController.verificarCorreoGuardarPass)
     }
 }
