@@ -5,7 +5,7 @@ class Sobrecargo extends Usuario {
     constructor(nombre: string, edad: number, correo: string, telefono: string, direccion: string, 
         genero: string, fecha_nacimiento: Date, dpi: string, usuario: string, contrasena: string, vuelos: string[]
     ) {
-        super(nombre, edad, correo, telefono, direccion, genero, fecha_nacimiento, dpi, usuario, contrasena, UsuarioType.SOBRECARGO, vuelos)
+        super(nombre, edad, correo, telefono, direccion, genero, fecha_nacimiento, dpi, usuario, UsuarioType.SOBRECARGO, vuelos, contrasena)
     }
     toJSON() { return { 
         tipo: "sobrecargo",

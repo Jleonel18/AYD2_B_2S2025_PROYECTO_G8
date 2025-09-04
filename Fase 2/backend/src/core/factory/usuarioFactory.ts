@@ -30,7 +30,8 @@ class UsuarioFactory {
                     datos.genero, datos.fecha_nacimiento, datos.dpi, datos.usuario, datos.contrasena, [],
                     { numero: datos.pasaporte.numero, fecha_vencimiento: datos.pasaporte.fecha_vencimiento, pais_emision: datos.pasaporte.pais_emision },
                     false,
-                    0
+                    0,
+                    { token: datos.token.token, expiracion: datos.token.expiracion }
                 )
             default:
                 throw new Error("Tipo de usuario no válido")

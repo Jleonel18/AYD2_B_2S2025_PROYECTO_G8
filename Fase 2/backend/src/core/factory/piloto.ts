@@ -9,7 +9,7 @@ class Piloto extends Usuario {
         genero: string, fecha_nacimiento: Date, dpi: string, usuario: string, contrasena: string, vuelos: string[],
         numero_licencia: string, horasVuelo: number
     ) {
-        super(nombre, edad, correo, telefono, direccion, genero, fecha_nacimiento, dpi, usuario, contrasena, UsuarioType.PILOTO, vuelos);
+        super(nombre, edad, correo, telefono, direccion, genero, fecha_nacimiento, dpi, usuario, UsuarioType.PILOTO, vuelos, contrasena);
         this.numero_licencia = numero_licencia;
         this.horasVuelo = horasVuelo;
     }
