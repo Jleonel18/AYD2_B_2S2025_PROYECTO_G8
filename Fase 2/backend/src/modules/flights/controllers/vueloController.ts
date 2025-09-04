@@ -90,22 +90,23 @@ export class VueloController {
   };
 
   // Método para que pilotos/copilotos actualicen el estado
-  actualizarEstadoVuelo = async (req: Request, res: Response) => {
-    try {
-      const id = req.params.id;
-      const { estado } = req.body as { estado: string };
-      if (!estado) {
-        return res.status(400).json({ error: "Estado requerido" });
-      }
-      const vuelo = await this.vueloService.obtenerVuelo(id);
-      if (!vuelo) {
-        return res.status(404).json({ error: "Vuelo no encontrado" });
-      }
-      // Validar que el usuario sea piloto o copiloto (lógica de autenticación pendiente)
-      const vueloActualizado = await this.vueloService.crearVuelo({ ...vuelo, estado: new Types.ObjectId(estado) });
-      res.json(vueloActualizado);
-    } catch (error) {
-      res.status(500).json({ error: "Error al actualizar el estado" });
+  // Método para que pilotos/copilotos actualicen el estado
+actualizarEstadoVuelo = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const { estado } = req.body as { estado: string };
+    if (!estado) {
+      return res.status(400).json({ error: "Estado requerido" });
     }
-  };
+    const vuelo = await this.vueloService.obtenerVuelo(id);
+    if (!vuelo) {
+      return res.status(404).json({ error: "Vuelo no encontrado" });
+    }
+    // Validar que el usuario sea piloto o copiloto (lógica de autenticación pendiente)
+    const vueloActualizado = await this.vueloService.actualizarEstadoVuelo(id, estado);
+    res.json(vueloActualizado);
+  } catch (error) {
+    res.status(500).json({ error: "Error al actualizar el estado del vuelo" });
+  }
+};
 }
