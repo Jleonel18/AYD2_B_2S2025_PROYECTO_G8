@@ -13,14 +13,25 @@ class UsuarioFactory {
         switch (tipo) {
             case UsuarioType.PILOTO:
                 //console.log("Datos del piloto:", datos);
-                return new Piloto(datos.nombre, datos.edad, datos.correo, datos.horasVuelo)
+                return new Piloto(
+                    datos.nombre, datos.edad, datos.correo, datos.telefono, datos.direccion,
+                    datos.genero, datos.fecha_nacimiento, datos.dpi, datos.usuario, datos.contrasena, [],
+                    datos.numero_licencia, 0
+                )
             case UsuarioType.SOBRECARGO:
-                return new Sobrecargo(datos.nombre, datos.edad, datos.correo, datos.vuelos)
+                return new Sobrecargo(datos.nombre, datos.edad, datos.correo, datos.telefono, datos.direccion,
+                    datos.genero, datos.fecha_nacimiento, datos.dpi, datos.usuario, datos.contrasena, []
+                )
             case UsuarioType.PASAJERO:
-                if(!datos.numeroPasaporte) {
-                    throw new Error("El número de pasaporte es requerido para el pasajero")
+                if(!datos.pasaporte) {
+                    throw new Error("Es necesario un pasaporte")
                 }
-                return new Pasajero(datos.nombre, datos.edad, datos.correo, datos.numeroPasaporte)
+                return new Pasajero(datos.nombre, datos.edad, datos.correo, datos.telefono, datos.direccion, 
+                    datos.genero, datos.fecha_nacimiento, datos.dpi, datos.usuario, datos.contrasena, [],
+                    { numero: datos.pasaporte.numero, fecha_vencimiento: datos.pasaporte.fecha_vencimiento, pais_emision: datos.pasaporte.pais_emision },
+                    false,
+                    0
+                )
             default:
                 throw new Error("Tipo de usuario no válido")
         }
