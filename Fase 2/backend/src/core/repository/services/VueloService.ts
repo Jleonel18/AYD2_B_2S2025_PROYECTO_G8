@@ -1,17 +1,12 @@
 import { IVueloRepository } from '../repositories/IVueloRepository';
 import { IVuelo } from '../models/Vuelo';
-import { VueloType } from '../../factory/vuelo';
-import VueloFactory from '../../factory/vueloFactory';
 
 export class VueloService {
   constructor(private vueloRepository: IVueloRepository) {}
 
-  async crearVuelo(tipo: VueloType, datos: any): Promise<IVuelo> {
-    const vuelo = VueloFactory.crearVuelo(tipo, datos);
-    console.log("Vuelo a guardar:", vuelo.toJSON());
-    return await this.vueloRepository.create({
-      ...vuelo.toJSON()
-    });
+  async crearVuelo(datos: Partial<IVuelo>): Promise<IVuelo> {
+    console.log("Vuelo a guardar:", datos);
+    return await this.vueloRepository.create(datos as IVuelo);
   }
 
   async obtenerVuelo(id: string): Promise<IVuelo | null> {

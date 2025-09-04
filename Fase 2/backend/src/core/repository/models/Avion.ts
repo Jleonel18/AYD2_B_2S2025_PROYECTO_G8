@@ -1,6 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
 
 export interface IAvion extends Document {
+    _id: string;
     modelo: string;
     capacidadMaxima: number;
     estado: string;

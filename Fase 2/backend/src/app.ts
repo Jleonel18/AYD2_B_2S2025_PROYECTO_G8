@@ -3,6 +3,7 @@ import express, { Application, Request, Response } from "express";
 import { connectDB } from "./config/database";
 import { UsuarioRoutes } from "./routes/usuarioRoutes";
 import { AvionRoutes } from "./routes/avionRoutes";
+import { VueloRoutes } from "./routes/vueloRoutes";
 
 const app: Application = express();
 const PORT = process.env.PORT || 4000;
@@ -21,6 +22,10 @@ app.use("/api/users", usuarioRoutes.router);
 // Rutas de aviones
 const avionRoutes = new AvionRoutes();
 app.use("/api/aviones", avionRoutes.router);
+
+// Rutas de vuelos
+const vueloRoutes = new VueloRoutes();
+app.use("/api/vuelos", vueloRoutes.router);
 
 const startServer = async () => {
     try {
