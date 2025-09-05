@@ -4,6 +4,7 @@ import { UsuarioType } from "../../../core/factory/usuario"
 import { generarTokenVerificacion, generarUsuario } from "../../../utils/utils"
 import { enviarCorreoVerificacion } from "../../../utils/send_email"
 import jwt from 'jsonwebtoken';
+import { hashPassword } from "../../../utils/passwords"
 
 export class UsuarioController {
     constructor(private readonly usuarioService: UserService) {}
@@ -46,11 +47,18 @@ export class UsuarioController {
                 datos.token = {}
                 datos.token.token = generarTokenVerificacion()
                 datos.token.expiracion = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas
+            }else {
+                if(datos.contrasena.length < 8 || !/[A-Z]/.test(datos.contrasena) || !/[a-z]/.test(datos.contrasena) || !/[0-9]/.test(datos.contrasena)) {
+                    return res.status(400).json({ error: "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número" })
+                }
+                datos.contrasena = await hashPassword(datos.contrasena)
             }
-
+            
             const nuevoUsuario = await this.usuarioService.crearUsuario(tipo as UsuarioType, datos)
 
-            enviarCorreoVerificacion({correoDestino: nuevoUsuario.correo, nombre: nuevoUsuario.nombre, token: datos.token.token, usuario: usuario_unico})
+            if(tipo === "pasajero") {
+                enviarCorreoVerificacion({correoDestino: nuevoUsuario.correo, nombre: nuevoUsuario.nombre, token: datos.token.token, usuario: usuario_unico})
+            }
 
             res.status(201).json(nuevoUsuario)
         } catch (error) {

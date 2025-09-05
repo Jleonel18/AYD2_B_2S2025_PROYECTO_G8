@@ -2,7 +2,8 @@ export enum UsuarioType {
     PILOTO = "piloto",
     COPILOTO = "copiloto",
     SOBRECARGO = "sobrecargo",
-    PASAJERO = "pasajero"
+    PASAJERO = "pasajero",
+    OPERACIONES = "operaciones",
 }
 
 abstract class Usuario {
