@@ -3,6 +3,7 @@ import Usuario from "./usuario"
 import Piloto from "./piloto"
 import Sobrecargo from "./sobrecargo"
 import Pasajero from "./pasajero"
+import Operaciones from "./operaciones"
 
 class UsuarioFactory {
     static crearUsuario(tipo: UsuarioType, datos: any): Usuario {
@@ -32,6 +33,10 @@ class UsuarioFactory {
                     false,
                     0,
                     { token: datos.token.token, expiracion: datos.token.expiracion }
+                )
+            case UsuarioType.OPERACIONES:
+                return new Operaciones(datos.nombre, datos.edad, datos.correo, datos.telefono, datos.direccion,
+                    datos.genero, datos.fecha_nacimiento, datos.dpi, datos.usuario, datos.contrasena, []
                 )
             default:
                 throw new Error("Tipo de usuario no válido")

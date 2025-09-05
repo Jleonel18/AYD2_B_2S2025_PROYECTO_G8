@@ -21,3 +21,17 @@ export const tokenAuth = (req: AuthRequest, res: Response, next: NextFunction) =
         return res.status(403).json({ message: 'Token no válido' });
     }
 }
+
+export const authorizeRoles = (...roles: string[]) => {
+    return (req: AuthRequest, res: Response, next: NextFunction) => {
+        if (!req.user) {
+            return res.status(401).json({ message: "No autenticado" });
+        }
+
+        if (!roles.includes(req.user.tipo)) {
+            return res.status(403).json({ message: "No tienes permisos para esta acción" });
+        }
+
+        next();
+    };
+};
