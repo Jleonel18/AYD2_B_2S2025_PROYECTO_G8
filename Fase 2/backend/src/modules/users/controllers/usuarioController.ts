@@ -3,6 +3,7 @@ import {UserService} from "../../../core/repository/services/UserService"
 import { UsuarioType } from "../../../core/factory/usuario"
 import { generarTokenVerificacion, generarUsuario } from "../../../utils/utils"
 import { enviarCorreoVerificacion } from "../../../utils/send_email"
+import jwt from 'jsonwebtoken';
 
 export class UsuarioController {
     constructor(private readonly usuarioService: UserService) {}
@@ -74,6 +75,11 @@ export class UsuarioController {
                 return res.status(400).json({ error: "Faltan datos requeridos" })
             }
 
+            //validar contrasena
+            if(nueva_contrasena.length < 8 || !/[A-Z]/.test(nueva_contrasena) || !/[a-z]/.test(nueva_contrasena) || !/[0-9]/.test(nueva_contrasena)) {
+                return res.status(400).json({ error: "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número" })
+            }
+
             const usuario = await this.usuarioService.obtenerUsuarioPorToken(token)
             if (!usuario) {
                 return res.status(400).json({ error: "Token inválido o expirado" })
@@ -84,6 +90,37 @@ export class UsuarioController {
             res.json({ message: "Correo verificado y contraseña actualizada", usuario: userUpdated })
         } catch (error) {
             console.log(error)
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
+
+    login = async (req: Request, res: Response) => {
+        try {
+            const { usuario, contrasena } = req.body
+            if(!usuario || !contrasena) {
+                return res.status(400).json({ error: "Faltan datos requeridos" })
+            }
+            const usuarioEncontrado = await this.usuarioService.login(usuario, contrasena)
+            if (!usuarioEncontrado) {
+                return res.status(400).json({ error: "Usuario o contraseña incorrectos" })
+            }
+
+            const data = {
+                id: usuarioEncontrado._id,
+                usuario: usuarioEncontrado.usuario,
+                tipo: usuarioEncontrado.tipo,
+                nombre: usuarioEncontrado.nombre,
+                correo: usuarioEncontrado.correo
+            }
+
+            const token = jwt.sign(
+                data,
+                process.env.JWT_SECRET || 'secreto',
+                { expiresIn: '1h' }
+            )
+
+            res.json({ usuario: data, token })
+        } catch (error) {
             res.status(500).json({ error: "Error en servidor" })
         }
     }

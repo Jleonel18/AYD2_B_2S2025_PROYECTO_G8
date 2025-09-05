@@ -8,4 +8,5 @@ export interface IUserRepository {
     delete(id: string): Promise<void>;
     verifyAndSetPassword(userId: string, plainPassword: string): Promise<IUser | null>;
     findByToken(token: string): Promise<IUser | null>;
+    login(usuario: string, contrasena: string): Promise<IUser | null>;
 }
