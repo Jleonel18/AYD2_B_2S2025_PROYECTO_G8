@@ -35,4 +35,8 @@ export class UserService {
     async obtenerUsuarioPorToken(token: string): Promise<IUser | null> {
         return await this.userRepository.findByToken(token)
     }
+
+    async login(usuario: string, contrasena: string): Promise<IUser | null> {
+        return await this.userRepository.login(usuario, contrasena)
+    }
 }

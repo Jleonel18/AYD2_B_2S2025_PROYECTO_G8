@@ -1,6 +1,6 @@
 import { IUserRepository } from './IUserRepository';
 import { UserModel, IUser } from '../models/User';
-import { hashPassword } from '../../../utils/passwords';
+import { comparePassword, hashPassword } from '../../../utils/passwords';
 
 export class UserRepository implements IUserRepository {
     async create(user: Partial<IUser>): Promise<IUser> {
@@ -39,5 +39,14 @@ export class UserRepository implements IUserRepository {
     
     async findByToken(token: string): Promise<IUser | null> {
         return await UserModel.findOne({ 'token.token': token });
+    }
+
+    async login(usuario: string, contrasena: string): Promise<IUser | null> {
+        const user = await UserModel.findOne({ usuario: usuario });
+        if (!user) return null;
+
+        const isMatch = await comparePassword(contrasena, user.contrasena);
+        if (!isMatch) return null;
+        return user;
     }
 }
