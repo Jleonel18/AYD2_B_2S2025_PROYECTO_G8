@@ -8,6 +8,7 @@ export interface IAvion extends Document {
     numeroSerie: string;
     horas_Vuelo: number;
     limite_horas: number;
+    id_aeropuerto_actual?: string;
 }
 
 const avionSchema = new Schema<IAvion>({
@@ -16,7 +17,8 @@ const avionSchema = new Schema<IAvion>({
     horas_Vuelo: { type: Number, default: 0 },
     estado: { type: String, required: true },
     limite_horas: { type: Number, required: true },
-    numeroSerie: { type: String, required: true }
+    numeroSerie: { type: String, required: true },
+    id_aeropuerto_actual: { type: Schema.Types.ObjectId, ref: 'Aeropuerto', required: false }
 });
 
 export const AvionModel = model<IAvion>('Avion', avionSchema);
