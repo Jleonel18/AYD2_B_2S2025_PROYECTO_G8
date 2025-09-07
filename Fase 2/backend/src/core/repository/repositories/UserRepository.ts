@@ -1,6 +1,7 @@
 import { IUserRepository } from './IUserRepository';
 import { UserModel, IUser } from '../models/User';
 import { comparePassword, hashPassword } from '../../../utils/passwords';
+import { flattenObject } from '../../../utils/utils';
 
 export class UserRepository implements IUserRepository {
     async create(user: Partial<IUser>): Promise<IUser> {
@@ -48,5 +49,14 @@ export class UserRepository implements IUserRepository {
         const isMatch = await comparePassword(contrasena, user.contrasena);
         if (!isMatch) return null;
         return user;
+    }
+
+    async findByEmail(correo: string): Promise<IUser | null> {
+        return await UserModel.findOne({ correo: correo });
+    }
+
+    async editProfile(id: string, datos: Partial<IUser>): Promise<IUser | null> {
+        const datos_flattened = flattenObject(datos);
+        return await UserModel.findByIdAndUpdate(id, { $set: datos_flattened }, { new: true });
     }
 }

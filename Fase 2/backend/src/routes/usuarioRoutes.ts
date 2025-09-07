@@ -2,6 +2,7 @@ import { Router } from "express";
 import { UsuarioController } from "../modules/users/controllers/usuarioController";
 import { UserService } from "../core/repository/services/UserService";
 import { UserRepository } from "../core/repository/repositories/UserRepository";
+import { authorizeRoles, tokenAuth } from "../middleware/authMiddleware";
 
 // Aquí instanciamos dependencias
 const userRepository = new UserRepository();
@@ -21,5 +22,6 @@ export class UsuarioRoutes {
         this.router.get("/:id", usuarioController.obtenerUsuario);
         this.router.post("/verificar", usuarioController.verificarCorreoGuardarPass)
         this.router.post("/login", usuarioController.login)
+        this.router.put("/perfil", tokenAuth, authorizeRoles('pasajero'), usuarioController.editarPerfil)
     }
 }
