@@ -5,10 +5,13 @@ import { UsuarioRoutes } from "./routes/usuarioRoutes";
 import { AvionRoutes } from "./routes/avionRoutes";
 import { VueloRoutes } from "./routes/vueloRoutes";
 import { AeropuertoRoutes } from "./routes/aeropuertoRoutes";
+import cors from "cors";
 
 
 const app: Application = express();
 const PORT = process.env.PORT || 4000;
+
+app.use(cors());
 
 app.use(express.json());
 
