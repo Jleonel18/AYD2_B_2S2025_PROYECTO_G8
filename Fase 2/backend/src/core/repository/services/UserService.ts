@@ -7,6 +7,13 @@ export class UserService {
     constructor(private userRepository: IUserRepository) {}
 
     async crearUsuario(tipo: UsuarioType, datos: any): Promise<IUser> {
+
+        // Validar correo unico
+        const existingUser = await this.userRepository.findByEmail(datos.correo);
+        if (existingUser) {
+            throw new Error("El correo ya está en uso");
+        }
+
         // 1. Crear con factory (dominio)
         const usuario = UsuarioFactory.crearUsuario(tipo, datos)
 
@@ -38,5 +45,13 @@ export class UserService {
 
     async login(usuario: string, contrasena: string): Promise<IUser | null> {
         return await this.userRepository.login(usuario, contrasena)
+    }
+
+    async obtenerUsuarioPorCorreo(correo: string): Promise<IUser | null> {
+        return await this.userRepository.findByEmail(correo)
+    }
+
+    async editarPerfil(id: string, datos: Partial<IUser>): Promise<IUser | null> {
+        return await this.userRepository.editProfile(id, datos)
     }
 }

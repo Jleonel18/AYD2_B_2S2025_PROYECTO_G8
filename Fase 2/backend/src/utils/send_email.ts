@@ -64,7 +64,7 @@ export async function enviarCorreoVerificacion({ correoDestino, nombre, token, u
       <!-- Footer -->
       <tr>
         <td style="background-color:#f0f0f0; text-align:center; padding:15px; font-size:12px; color:#888;">
-          © ${new Date().getFullYear()} Tu Sistema - Todos los derechos reservados
+          © ${new Date().getFullYear()} AirFlow System - Todos los derechos reservados
         </td>
       </tr>
     </table>

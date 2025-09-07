@@ -17,4 +17,23 @@ function generarTokenVerificacion(): string {
     return crypto.randomBytes(32).toString('hex');
 }
 
-export { generarUsuario, generarTokenVerificacion };
+function flattenObject(obj: any, prefix = ''): any {
+    const flattened: any = {};
+
+    Object.keys(obj).forEach((key) => {
+        const value = obj[key];
+        const newKey = prefix ? `${prefix}.${key}` : key;
+
+        if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+            // Si es un objeto anidado, lo aplana recursivamente
+            Object.assign(flattened, flattenObject(value, newKey));
+        } else {
+            // Si no es un objeto, lo asigna directamente
+            flattened[newKey] = value;
+        }
+    });
+
+    return flattened;
+}
+
+export { generarUsuario, generarTokenVerificacion, flattenObject };

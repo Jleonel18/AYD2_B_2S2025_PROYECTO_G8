@@ -3,11 +3,13 @@ import {UserService} from "../../../core/repository/services/UserService"
 import { UsuarioType } from "../../../core/factory/usuario"
 import { generarTokenVerificacion, generarUsuario } from "../../../utils/utils"
 import { enviarCorreoVerificacion } from "../../../utils/send_email"
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { hashPassword } from "../../../utils/passwords"
+import { AuthRequest } from "../../../middleware/authMiddleware"
 
 export class UsuarioController {
     constructor(private readonly usuarioService: UserService) {}
+
 
     crearUsuario = async (req: Request, res: Response) => {
         try {
@@ -132,4 +134,58 @@ export class UsuarioController {
             res.status(500).json({ error: "Error en servidor" })
         }
     }
+
+    editarPerfil = async (req: AuthRequest, res: Response) => {
+        try {
+            const { id } = req.user
+            const datos = req.body
+            const usuarioActual = await this.usuarioService.obtenerUsuario(id)
+            if (!usuarioActual) {
+                return res.status(404).json({ error: "Usuario no encontrado" })
+            }
+
+            //Validar correo
+            if(datos.correo && datos.correo !== usuarioActual.correo) {
+                const correoExistente = await this.usuarioService.obtenerUsuarioPorCorreo(datos.correo)
+                if(correoExistente) {
+                    return res.status(400).json({ error: "El correo ya está en uso" })
+                }
+            }
+
+            // Validaciones
+            if(datos.edad && datos.edad < 18) {
+                return res.status(400).json({ error: "La edad debe ser menor o igual a 18 años" })
+            }
+
+            if(datos.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)) {
+                return res.status(400).json({ error: "Correo inválido" })
+            }
+
+            if(datos.telefono && datos.telefono.length < 8) {
+                return res.status(400).json({ error: "El teléfono debe tener al menos 8 caracteres" })
+            }
+
+            if(datos.fecha_nacimiento) {
+                const fechaNacimiento = new Date(datos.fecha_nacimiento);
+                if(fechaNacimiento >= new Date()) {
+                    return res.status(400).json({ error: "La fecha de nacimiento no puede ser en el futuro" })
+                }
+            }
+
+            if(datos.dpi && datos.dpi.length < 13) {
+                return res.status(400).json({ error: "El DPI debe tener al menos 13 caracteres" })
+            }
+
+            if(usuarioActual.tipo === "pasajero" && datos.pasaporte && new Date(datos.pasaporte.fecha_vencimiento) < new Date()) {
+                return res.status(400).json({ error: "El pasaporte no debe estar vencido" })
+            }
+
+            const usuarioEditado = await this.usuarioService.editarPerfil(id, datos)
+            res.json(usuarioEditado)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
+
 }
