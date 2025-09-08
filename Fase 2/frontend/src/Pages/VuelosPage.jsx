@@ -17,7 +17,7 @@ const VuelosPage = () => {
   useEffect(() => {
     const fetchFlights = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/`);
+        const response = await fetch('http://localhost:3000/api/vuelos/');
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         setFlights(data);
@@ -31,7 +31,7 @@ const VuelosPage = () => {
   const handleCreateFlight = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/vuelos/`, {
+      const response = await fetch('http://localhost:3000/api/vuelos/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newFlight),
@@ -47,7 +47,7 @@ const VuelosPage = () => {
 
   const handleUpdateStatus = async (id, status) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/${id}`, {
+      const response = await fetch(`http://localhost:3000/api/vuelos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -62,7 +62,7 @@ const VuelosPage = () => {
 
   const handleCancelFlight = async (id) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/${id}`, {
+      const response = await fetch(`http://localhost:3000/api/vuelos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Cancelado' }),
@@ -76,8 +76,9 @@ const VuelosPage = () => {
   };
 
   const handleEditFlight = (flight) => {
+    // Implement edit logic here, e.g., open a form to edit flight details
     console.log('Edit flight:', flight);
-    // Implement edit logic here, e.g., open a form to edit flight details and send a PUT request
+    // You can open a modal or form to edit flight details and send a PUT request to /:id
   };
 
   if (error) return <div className="ml-64 p-6 text-red-500">Error: {error}</div>;
