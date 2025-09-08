@@ -17,7 +17,7 @@ const VuelosPage = () => {
   useEffect(() => {
     const fetchFlights = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/`);
+        const response = await fetch('http://localhost:3000/api/vuelos/');
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         setFlights(data);
@@ -31,7 +31,7 @@ const VuelosPage = () => {
   const handleCreateFlight = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/vuelos/`, {
+      const response = await fetch('http://localhost:3000/api/vuelos/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newFlight),
@@ -47,7 +47,7 @@ const VuelosPage = () => {
 
   const handleUpdateStatus = async (id, status) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/${id}`, {
+      const response = await fetch(`http://localhost:3000/api/vuelos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
@@ -62,7 +62,7 @@ const VuelosPage = () => {
 
   const handleCancelFlight = async (id) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/${id}`, {
+      const response = await fetch(`http://localhost:3000/api/vuelos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'Cancelado' }),
@@ -76,8 +76,9 @@ const VuelosPage = () => {
   };
 
   const handleEditFlight = (flight) => {
+    // Implement edit logic here, e.g., open a form to edit flight details
     console.log('Edit flight:', flight);
-    // Implement edit logic here, e.g., open a form to edit flight details and send a PUT request
+    // You can open a modal or form to edit flight details and send a PUT request to /:id
   };
 
   if (error) return <div className="ml-64 p-6 text-red-500">Error: {error}</div>;
@@ -203,29 +204,6 @@ const VuelosPage = () => {
               Cerrar
             </button>
           </div>
-          <div className="mb-4">
-            <label className="block text-[#333446] text-sm mb-2" htmlFor="password">Contraseña</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-[#7F8CAA] rounded"
-              placeholder='********'
-            />
-          </div>
-          <button
-            className="w-full bg-[#333446] text-white p-2 rounded hover:bg-[#7F8CAA] transition"
-            onClick={handleLogin}
-          >
-            Iniciar sesión
-          </button>
-          <p className="text-[#7F8CAA] text-center mt-4 text-sm cursor-pointer hover:text-[#333446]" onClick={() => toast.info("Funcionalidad no implementada")}>
-            ¿Olvidaste tu contraseña?
-          </p>
-          <p className="text-[#7F8CAA] text-center mt-4 text-sm cursor-pointer hover:text-[#333446]" onClick={redirectToRegister}>
-            Regístrate
-          </p>
         </div>
       )}
     </div>
