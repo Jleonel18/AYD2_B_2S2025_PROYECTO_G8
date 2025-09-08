@@ -72,6 +72,7 @@ export class UsuarioController {
         try {
             const usuario = await this.usuarioService.obtenerUsuario(req.params.id)
             if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" })
+            //console.log(usuario)
             res.json(usuario)
         } catch (error) {
             res.status(500).json({ error: "Error en servidor" })
