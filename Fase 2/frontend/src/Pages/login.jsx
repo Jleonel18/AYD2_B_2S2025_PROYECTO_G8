@@ -74,6 +74,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full p-2 border border-[#7F8CAA] rounded"
+              placeholder='********'
             />
           </div>
           <button
@@ -82,10 +83,10 @@ const Login = () => {
           >
             Iniciar sesión
           </button>
-          <p className="text-[#7F8CAA] text-center mt-4 text-sm">
+          <p className="text-[#7F8CAA] text-center mt-4 text-sm cursor-pointer hover:text-[#333446]" onClick={() => toast.info("Funcionalidad no implementada")}>
             ¿Olvidaste tu contraseña?
           </p>
-          <p className="text-[#7F8CAA] text-center mt-4 text-sm" onClick={redirectToRegister}>
+          <p className="text-[#7F8CAA] text-center mt-4 text-sm cursor-pointer hover:text-[#333446]" onClick={redirectToRegister}>
             Regístrate
           </p>
         </div>
