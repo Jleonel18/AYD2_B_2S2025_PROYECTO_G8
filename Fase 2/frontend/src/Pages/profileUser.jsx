@@ -1,7 +1,10 @@
 import React from 'react';
+import NavbarComponent from '../components/navbarComponent';
 
 const ProfileUser = () => {
   return (
+    <div>
+      <NavbarComponent />
     <div className="flex flex-col items-center bg-[#EAEFEF] p-6">
       <div className="flex items-center justify-between w-full max-w-md mb-6">
         <img
@@ -43,6 +46,8 @@ const ProfileUser = () => {
         Cerrar Sesion
       </button>
     </div>
+        </div>
+
   );
 };
 

@@ -3,7 +3,7 @@ import NavbarComponent from '../components/navbarComponent';
 
 const MainPage = () => {
   return (<div>
-      <NavbarComponent />
+    <NavbarComponent />
       <div className="flex flex-col items-center bg-[#EAEFEF] p-6 min-h-screen">
         <div className="flex mb-4 w-full max-w-4xl">
           <button className="bg-[#7F8CAA] text-white px-4 py-2 rounded mr-2">Filtros</button>
