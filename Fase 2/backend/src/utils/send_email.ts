@@ -18,7 +18,7 @@ export async function enviarCorreoVerificacion({ correoDestino, nombre, token, u
         });
 
         // Link de verificación (frontend donde el usuario pondrá su contraseña)
-        const linkVerificacion = `${process.env.FRONTEND_URL}/verificar?token=${token}`;
+        const linkVerificacion = `${process.env.FRONTEND_URL}/verify-account?token=${token}`;
 
         // HTML del correo
         const htmlMensaje = `
