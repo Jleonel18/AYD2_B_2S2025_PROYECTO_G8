@@ -4,6 +4,7 @@ import Register from './Pages/register'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ProfileUser from './Pages/profileUser'
 import MainPage from './Pages/mainPage'
+import VerifyAccount from './Pages/verifyAccount'
 import { ToastContainer } from 'react-toastify'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path="/profile" element={<ProfileUser />} />
           <Route path="/mainpage" element={<MainPage />} />
           <Route path="/" element={<MainPage />} />
+          <Route path="/verify-account" element={<VerifyAccount />} />
         </Routes>
       </BrowserRouter>
     </>
