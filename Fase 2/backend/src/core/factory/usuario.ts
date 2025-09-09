@@ -1,0 +1,27 @@
+export enum UsuarioType {
+    PILOTO = "piloto",
+    COPILOTO = "copiloto",
+    SOBRECARGO = "sobrecargo",
+    PASAJERO = "pasajero",
+    OPERACIONES = "operaciones",
+}
+
+abstract class Usuario {
+    constructor(
+        public readonly nombre: string,
+        public readonly edad: number,
+        public readonly correo: string,
+        public readonly telefono: string,
+        public readonly direccion: string,
+        public readonly genero: string,
+        public readonly fecha_nacimiento: Date,
+        public readonly dpi: string,
+        public readonly usuario: string,
+        public readonly tipo: UsuarioType,
+        public readonly vuelos: string[] = [],
+        public readonly contrasena?: string,
+    ) {}
+    abstract toJSON(): Record<string, unknown>
+}
+
+export default Usuario;
