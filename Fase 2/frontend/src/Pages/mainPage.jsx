@@ -36,6 +36,7 @@ const MainPage = () => {
       setIsModalOpen(true);
     } else {
       // Handle reservation logic for logged-in passengers
+      
       console.log('Proceeding with reservation');
     }
   };
