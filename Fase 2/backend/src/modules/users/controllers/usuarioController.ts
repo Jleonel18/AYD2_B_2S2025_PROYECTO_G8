@@ -265,4 +265,19 @@ export class UsuarioController {
         }
     }
 
+    eliminarTrabajador = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+            const usuarioActual = await this.usuarioService.obtenerUsuario(id)
+            if (!usuarioActual) {
+                return res.status(404).json({ error: "Usuario no encontrado" })
+            }
+
+            await this.usuarioService.eliminarTrabajador(id)
+            res.json({ message: "Usuario eliminado" })
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
+
 }

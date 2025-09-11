@@ -23,6 +23,7 @@ export class UsuarioRoutes {
         this.router.get("/trabajadores", tokenAuth, authorizeRoles('operaciones'), usuarioController.obtenerTrabajadores);
         this.router.get("/trabajadores/:id", tokenAuth, authorizeRoles('operaciones'), usuarioController.obtenerTrabajadorPorId);
         this.router.put("/trabajadores/:id", tokenAuth, authorizeRoles('operaciones'), usuarioController.actualizarTrabajador);
+        this.router.delete("/trabajadores/:id", tokenAuth, authorizeRoles('operaciones'), usuarioController.eliminarTrabajador);
         this.router.post("/verificar", usuarioController.verificarCorreoGuardarPass)
         this.router.post("/login", usuarioController.login)
         this.router.put("/perfil", tokenAuth, authorizeRoles('pasajero'), usuarioController.editarPerfil)

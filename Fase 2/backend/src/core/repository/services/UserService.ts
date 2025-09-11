@@ -62,4 +62,8 @@ export class UserService {
     async actualizarTrabajador(id: string, datos: Partial<IUser>): Promise<IUser | null> {
         return await this.userRepository.updateWorker(id, datos)
     }
+
+    async eliminarTrabajador(id: string): Promise<void> {
+        return await this.userRepository.deleteWorker(id)
+    }
 }

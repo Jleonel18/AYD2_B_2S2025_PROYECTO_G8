@@ -13,4 +13,5 @@ export interface IUserRepository {
     login(usuario: string, contrasena: string): Promise<IUser | null>;
     editProfile(id: string, datos: Partial<IUser>): Promise<IUser | null>;
     updateWorker(id: string, datos: Partial<IUser>): Promise<IUser | null>;
+    deleteWorker(id: string): Promise<void>;
 }
