@@ -8,6 +8,7 @@ const Tripulacion = () => {
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedUsuario, setSelectedUsuario] = useState(null);
     const [formData, setFormData] = useState({
         tipo: 'piloto',
@@ -22,6 +23,7 @@ const Tripulacion = () => {
         contrasena: '',
         numero_licencia: '',
     });
+    const [editFormData, setEditFormData] = useState(null);
 
     useEffect(() => {
         fetch(`${apiUrl}/users/trabajadores`, {
@@ -79,10 +81,26 @@ const Tripulacion = () => {
         }
     };
 
+    const formatFechaInput = (fecha) => {
+        if (!fecha) return '';
+        try {
+            const date = new Date(fecha);
+            if (isNaN(date.getTime())) return '';
+            return date.toISOString().split('T')[0]; // Ejemplo: 2002-09-08
+        } catch {
+            return '';
+        }
+    };
+
     // Manejar cambios en el formulario
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+    };
+
+    const handleEditInputChange = (e) => {
+        const { name, value } = e.target;
+        setEditFormData({ ...editFormData, [name]: value });
     };
 
     // Cambiarlo a async/await
@@ -177,8 +195,96 @@ const Tripulacion = () => {
         }
     };
 
-    const handleEditar = (id) => {
-        alert(`Editar usuario con ID: ${id}`);
+    const handleEditar = async (id) => {
+        try {
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                throw new Error('No se encontró el token de autenticación');
+            }
+
+            const response = await fetch(`${apiUrl}/users/trabajadores/${id}`, {
+                headers: {
+                Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const data = await response.json();
+
+            if (response.status !== 200) {
+                throw new Error(data.error || 'Error al obtener datos del tripulante');
+            }
+            console.log("Este es el id del tripulante a editar:", id, data._id);
+            // Preparar datos para el formulario de edición
+            setEditFormData({
+                id: data._id || id,
+                tipo: data.tipo || 'piloto',
+                nombre: data.datos?.nombre || data.nombre || '',
+                correo: data.datos?.correo || data.correo || '',
+                telefono: data.datos?.telefono || data.telefono || '',
+                direccion: data.datos?.direccion || data.direccion || '',
+                genero: data.datos?.genero || data.genero || 'Masculino',
+                fecha_nacimiento: formatFechaInput(data.datos?.fecha_nacimiento || data.fecha_nacimiento),
+                dpi: data.datos?.dpi || data.dpi || '',
+                contrasena: '', // No pre-cargamos la contraseña por seguridad
+                numero_licencia: data.datos?.numero_licencia || data.numero_licencia || '',
+            });
+
+            setIsEditModalOpen(true);
+        } catch (error) {
+            console.error('Error al preparar edición:', error);
+            toast.error(`Error al preparar edición: ${error.message}`);
+        }
+    };
+
+    const handleEditSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const payload = {
+                nombre: editFormData.nombre,
+                correo: editFormData.correo,
+                edad: calcularEdad(editFormData.fecha_nacimiento),
+                telefono: editFormData.telefono,
+                direccion: editFormData.direccion,
+                genero: editFormData.genero,
+                fecha_nacimiento: editFormData.fecha_nacimiento,
+                dpi: editFormData.dpi,
+                ...(editFormData.contrasena && { contrasena: editFormData.contrasena }),
+                ...(editFormData.tipo === 'piloto' && { numero_licencia: editFormData.numero_licencia }),
+            };
+
+            console.log('Payload enviado (editar):', payload, editFormData);
+
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                throw new Error('No se encontró el token de autenticación');
+            }
+
+            const response = await fetch(`${apiUrl}/users/trabajadores/${editFormData.id}`, {
+                method: 'PUT',
+                headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json();
+
+            if (response.status !== 200) {
+                throw new Error(data.error || 'Error al actualizar tripulante');
+            }
+
+            // Actualizar la lista de tripulantes
+            setTripulacion(tripulacion.map((usuario) =>
+                usuario._id === editFormData.id ? data : usuario
+            ));
+            setIsEditModalOpen(false);
+            setEditFormData(null);
+            toast.success('Tripulante actualizado exitosamente');
+        } catch (error) {
+            console.error('Error al actualizar tripulante:', error);
+            toast.error(`Error al actualizar tripulante: ${error.message}`);
+        }
     };
 
     const handleEliminar = (id) => {
@@ -248,6 +354,9 @@ const Tripulacion = () => {
                         Tipo
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Usuario
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Correo
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -276,6 +385,9 @@ const Tripulacion = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {usuario.tipo ? usuario.tipo.charAt(0).toUpperCase() + usuario.tipo.slice(1) : 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {usuario.usuario || 'N/A'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {usuario.correo || 'N/A'}
@@ -464,7 +576,7 @@ const Tripulacion = () => {
         {isDetailsModalOpen && selectedUsuario && (
             <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg w-full max-w-3xl">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Detalles del Tripulante</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">Detalles del Tripulante ({selectedUsuario.usuario})</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700">Tipo</label>
@@ -538,6 +650,151 @@ const Tripulacion = () => {
                     Cerrar
                 </button>
                 </div>
+            </div>
+            </div>
+        )}
+        {/* Modal para editar tripulante */}
+        {isEditModalOpen && editFormData && (
+            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg w-full max-w-3xl">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">Editar Tripulante</h2>
+                <form onSubmit={handleEditSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Tipo</label>
+                    <select
+                        name="tipo"
+                        value={editFormData.tipo}
+                        onChange={handleEditInputChange}
+                        className="mt-1 w-full border border-gray-300 p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="piloto">Piloto</option>
+                        <option value="sobrecargo">Sobrecargo</option>
+                    </select>
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                    <input
+                        type="text"
+                        name="nombre"
+                        value={editFormData.nombre}
+                        onChange={handleEditInputChange}
+                        className="mt-1 w-full border border-gray-300 p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    />
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Correo</label>
+                    <input
+                        type="email"
+                        name="correo"
+                        value={editFormData.correo}
+                        onChange={handleEditInputChange}
+                        className="mt-1 w-full border border-gray-300 p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    />
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Teléfono</label>
+                    <input
+                        type="text"
+                        name="telefono"
+                        value={editFormData.telefono}
+                        onChange={handleEditInputChange}
+                        className="mt-1 w-full border border-gray-300 p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    />
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Dirección</label>
+                    <input
+                        type="text"
+                        name="direccion"
+                        value={editFormData.direccion}
+                        onChange={handleEditInputChange}
+                        className="mt-1 w-full border border-gray-300 p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    />
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Género</label>
+                    <select
+                        name="genero"
+                        value={editFormData.genero}
+                        onChange={handleEditInputChange}
+                        className="mt-1 w-full border border-gray-300 p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+                    <input
+                        type="date"
+                        name="fecha_nacimiento"
+                        value={editFormData.fecha_nacimiento}
+                        onChange={handleEditInputChange}
+                        className="mt-1 w-full border border-gray-300 p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    />
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">DPI</label>
+                    <input
+                        type="text"
+                        name="dpi"
+                        value={editFormData.dpi}
+                        onChange={handleEditInputChange}
+                        className="mt-1 w-full border border-gray-300 p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        required
+                    />
+                    </div>
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Contraseña (dejar en blanco para no cambiar)</label>
+                    <input
+                        type="password"
+                        name="contrasena"
+                        value={editFormData.contrasena}
+                        onChange={handleEditInputChange}
+                        className="mt-1 w-full border border-gray-300 p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Nueva contraseña (opcional)"
+                    />
+                    </div>
+                    {editFormData.tipo === 'piloto' && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Número de Licencia</label>
+                        <input
+                        type="text"
+                        name="numero_licencia"
+                        value={editFormData.numero_licencia}
+                        onChange={handleEditInputChange}
+                        className="mt-1 w-full border border-gray-300 p-2 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        required
+                        />
+                    </div>
+                    )}
+                </div>
+                <div className="mt-6 flex justify-end space-x-2">
+                    <button
+                    type="button"
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200"
+                    onClick={() => {
+                        setIsEditModalOpen(false);
+                        setEditFormData(null);
+                    }}
+                    >
+                    Cancelar
+                    </button>
+                    <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+                    >
+                    Guardar
+                    </button>
+                </div>
+                </form>
             </div>
             </div>
         )}
