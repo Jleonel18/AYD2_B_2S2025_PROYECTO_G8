@@ -198,4 +198,15 @@ export class UsuarioController {
         }
     }
 
+    obtenerTrabajadorPorId = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+            const usuario = await this.usuarioService.obtenerUsuario(id)
+            if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" })
+            res.json(usuario)
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
+
 }
