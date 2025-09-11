@@ -63,4 +63,9 @@ export class UserRepository implements IUserRepository {
         const datos_flattened = flattenObject(datos);
         return await UserModel.findByIdAndUpdate(id, { $set: datos_flattened }, { new: true });
     }
+
+    async updateWorker(id: string, datos: Partial<IUser>): Promise<IUser | null> {
+        const datos_flattened = flattenObject(datos);
+        return await UserModel.findByIdAndUpdate(id, { $set: datos_flattened }, { new: true });
+    }
 }

@@ -58,4 +58,8 @@ export class UserService {
     async editarPerfil(id: string, datos: Partial<IUser>): Promise<IUser | null> {
         return await this.userRepository.editProfile(id, datos)
     }
+
+    async actualizarTrabajador(id: string, datos: Partial<IUser>): Promise<IUser | null> {
+        return await this.userRepository.updateWorker(id, datos)
+    }
 }

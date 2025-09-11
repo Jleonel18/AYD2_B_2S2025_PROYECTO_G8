@@ -12,4 +12,5 @@ export interface IUserRepository {
     findByToken(token: string): Promise<IUser | null>;
     login(usuario: string, contrasena: string): Promise<IUser | null>;
     editProfile(id: string, datos: Partial<IUser>): Promise<IUser | null>;
+    updateWorker(id: string, datos: Partial<IUser>): Promise<IUser | null>;
 }
