@@ -43,8 +43,8 @@ export class UserService {
         return await this.userRepository.verifyAndSetPassword(id, datos.contrasena)
     }
 
-    async obtenerUsuarioPorToken(token: string): Promise<IUser | null> {
-        return await this.userRepository.findByToken(token)
+    async obtenerUsuarioPorToken(token: string, tipo: string): Promise<IUser | null> {
+        return await this.userRepository.findByToken(token, tipo)
     }
 
     async login(usuario: string, contrasena: string): Promise<IUser | null> {
@@ -65,5 +65,13 @@ export class UserService {
 
     async eliminarTrabajador(id: string): Promise<void> {
         return await this.userRepository.deleteWorker(id)
+    }
+
+    async guardarTokenRecuperacion(userId: string, token: string, expiration: Date): Promise<IUser | null> {
+        return await this.userRepository.saveTokenForgotPassword(userId, token, expiration)
+    }
+
+    async verificarYRestablecerContraseña(userId: string, plainPassword: string): Promise<IUser | null> {
+        return await this.userRepository.verifyAndResetPassword(userId, plainPassword)
     }
 }

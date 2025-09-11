@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 import {UserService} from "../../../core/repository/services/UserService"
 import { UsuarioType } from "../../../core/factory/usuario"
 import { generarTokenVerificacion, generarUsuario } from "../../../utils/utils"
-import { enviarCorreoVerificacion } from "../../../utils/send_email"
+import { enviarCorreoRecuperacion, enviarCorreoVerificacion } from "../../../utils/send_email"
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { hashPassword } from "../../../utils/passwords"
 import { AuthRequest } from "../../../middleware/authMiddleware"
@@ -59,7 +59,7 @@ export class UsuarioController {
             const nuevoUsuario = await this.usuarioService.crearUsuario(tipo as UsuarioType, datos)
 
             if(tipo === "pasajero") {
-                enviarCorreoVerificacion({correoDestino: nuevoUsuario.correo, nombre: nuevoUsuario.nombre, token: datos.token.token, usuario: usuario_unico})
+                await enviarCorreoVerificacion({correoDestino: nuevoUsuario.correo, nombre: nuevoUsuario.nombre, token: datos.token.token, usuario: usuario_unico})
             }
 
             res.status(201).json(nuevoUsuario)
@@ -100,7 +100,7 @@ export class UsuarioController {
                 return res.status(400).json({ error: "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número" })
             }
 
-            const usuario = await this.usuarioService.obtenerUsuarioPorToken(token)
+            const usuario = await this.usuarioService.obtenerUsuarioPorToken(token, "verificacion")
             if (!usuario) {
                 return res.status(400).json({ error: "Token inválido o expirado" })
             }
@@ -280,4 +280,61 @@ export class UsuarioController {
         }
     }
 
+    solicitarTokenRecuperacion = async (req: Request, res: Response) => {
+        try {
+            
+            const { correo } = req.body
+
+            if(!correo) {
+                return res.status(400).json({ error: "Faltan datos requeridos" })
+            }
+
+            const usuario = await this.usuarioService.obtenerUsuarioPorCorreo(correo)
+            if (!usuario) {
+                return res.status(400).json({ error: "Correo no registrado" })
+            }
+
+            if(usuario.tipo !== "pasajero") {
+                return res.status(400).json({ error: "No tienes permisos para reestablecer tu contraseña. Habla con el administrador" })
+            }
+
+            const token = generarTokenVerificacion()
+            const expiration = new Date(Date.now() + 1 * 60 * 60 * 1000) // 1 hora
+            const userUpdated = await this.usuarioService.guardarTokenRecuperacion(usuario._id, token, expiration)
+            if(!userUpdated) {
+                return res.status(500).json({ error: "Error al guardar token" })
+            }
+
+            await enviarCorreoRecuperacion({correoDestino: usuario.correo, nombre: usuario.nombre, token})
+
+            res.json({ message: "Se ha enviado un correo con las instrucciones para recuperar la contraseña", userUpdated })
+
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
+
+    verificarYRestablecerContrasena = async (req: Request, res: Response) => {
+        try {
+            const { token, nueva_contrasena } = req.body
+            if(!token || !nueva_contrasena) {
+                return res.status(400).json({ error: "Faltan datos requeridos" })
+            }
+
+            //validar contrasena
+            if(nueva_contrasena.length < 8 || !/[A-Z]/.test(nueva_contrasena) || !/[a-z]/.test(nueva_contrasena) || !/[0-9]/.test(nueva_contrasena)) {
+                return res.status(400).json({ error: "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número" })
+            }
+
+            const usuario = await this.usuarioService.obtenerUsuarioPorToken(token, "reset")
+            if (!usuario) {
+                return res.status(400).json({ error: "Token inválido o expirado" })
+            }
+            const userUpdated = await this.usuarioService.verificarYRestablecerContraseña(usuario._id, nueva_contrasena)
+            res.json({ message: "Contraseña actualizada", usuario: userUpdated })
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
 }

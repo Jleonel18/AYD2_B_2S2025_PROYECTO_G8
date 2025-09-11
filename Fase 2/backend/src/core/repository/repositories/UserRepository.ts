@@ -42,7 +42,10 @@ export class UserRepository implements IUserRepository {
         );
     }
     
-    async findByToken(token: string): Promise<IUser | null> {
+    async findByToken(token: string, tipo:string): Promise<IUser | null> {
+        if(tipo === "reset"){
+            return await UserModel.findOne({ 'token_reset.token': token });
+        }
         return await UserModel.findOne({ 'token.token': token });
     }
 
@@ -71,5 +74,33 @@ export class UserRepository implements IUserRepository {
 
     async deleteWorker(id: string): Promise<void> {
         await UserModel.findByIdAndDelete(id);
+    }
+
+    async saveTokenForgotPassword(userId: string, token: string, expiration: Date): Promise<IUser | null> {
+        
+        return await UserModel.findByIdAndUpdate(
+            userId,
+            {
+                $set: {
+                    token_reset: {
+                        token: token,
+                        expiration: expiration
+                    }
+                }
+            },
+            { new: true }
+        );
+    }
+
+    async verifyAndResetPassword(userId: string, plainPassword: string): Promise<IUser | null> {
+        const hashed = await hashPassword(plainPassword);
+        return await UserModel.findByIdAndUpdate(
+            userId,
+            {
+                contrasena: hashed,
+                $unset: { token_reset: "" }
+            },
+            { new: true }
+        );
     }
 }

@@ -27,5 +27,7 @@ export class UsuarioRoutes {
         this.router.post("/verificar", usuarioController.verificarCorreoGuardarPass)
         this.router.post("/login", usuarioController.login)
         this.router.put("/perfil", tokenAuth, authorizeRoles('pasajero'), usuarioController.editarPerfil)
+        this.router.post("/recuperar-password", usuarioController.solicitarTokenRecuperacion)
+        this.router.post("/verificar-password", usuarioController.verificarYRestablecerContrasena)
     }
 }

@@ -31,6 +31,7 @@ export interface IUser extends Document {
     verificacion_email?: boolean; // Pasajero
     puntos?: number; // Pasajero
     token?: IToken; // Token de verificación de email
+    token_reset?: IToken; // Token para recuperación de contraseña
 }
 
 const userSchema = new Schema<IUser>({
@@ -58,6 +59,10 @@ const userSchema = new Schema<IUser>({
     token: {
         token: { type: String, required: false },
         expiracion: { type: Date, required: false }
+    },
+    token_reset: {
+        token: { type: String, required: false },
+        expiration: { type: Date, required: false }
     }
 });
 
