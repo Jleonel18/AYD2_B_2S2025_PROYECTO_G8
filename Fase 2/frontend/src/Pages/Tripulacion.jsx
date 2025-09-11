@@ -7,6 +7,8 @@ const Tripulacion = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+    const [selectedUsuario, setSelectedUsuario] = useState(null);
     const [formData, setFormData] = useState({
         tipo: 'piloto',
         nombre: '',
@@ -60,6 +62,21 @@ const Tripulacion = () => {
         edad--;
         }
         return edad;
+    };
+
+    const formatFecha = (fecha) => {
+        if (!fecha) return 'N/A';
+        try {
+            const date = new Date(fecha);
+            if (isNaN(date.getTime())) return 'N/A';
+            return date.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            });
+        } catch {
+            return 'N/A';
+        }
     };
 
     // Manejar cambios en el formulario
@@ -132,41 +149,32 @@ const Tripulacion = () => {
             console.error('Error al agregar tripulante:', error);
             toast.error("Error al agregar tripulante");
         }
-        
-        // fetch(`${apiUrl}/users`, {
-        // method: 'POST',
-        // headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-        // },
-        // body: JSON.stringify(formData),
-        // })
-        // .then((response) => response.json())
-        // .then((nuevoUsuario) => {
-        //     setTripulacion([...tripulacion, nuevoUsuario]);
-        //     setIsModalOpen(false);
-        //     setFormData({
-        //     tipo: 'piloto',
-        //     nombre: '',
-        //     correo: '',
-        //     telefono: '',
-        //     direccion: '',
-        //     genero: 'Masculino',
-        //     fecha_nacimiento: '',
-        //     dpi: '',
-        //     contrasena: '',
-        //     numero_licencia: '',
-        //     });
-        // })
-        // .catch((error) => {
-        //     console.error('Error al agregar tripulante:', error);
-        //     alert('Error al agregar tripulante');
-        // });
     };
 
     // Funciones para acciones
-    const handleVerDetalles = (id) => {
-        alert(`Mostrar detalles del usuario con ID: ${id}`);
+    const handleVerDetalles = async (id) => {
+        try {
+
+            const response = await fetch(`${apiUrl}/users/trabajadores/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                },
+            });
+
+            const data = await response.json();
+
+            if(response.status !== 200) {
+                toast.error(data.error || "Error al obtener detalles del tripulante");
+                return;
+            }
+
+            setSelectedUsuario(data);
+            setIsDetailsModalOpen(true);
+
+        }catch (error) {
+            console.error('Error al obtener detalles del tripulante:', error);
+            toast.error("Error al obtener detalles del tripulante");
+        }
     };
 
     const handleEditar = (id) => {
@@ -276,7 +284,7 @@ const Tripulacion = () => {
                             {usuario.telefono || 'N/A'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {calcularEdad(usuario.fecha_nacimiento)}
+                            {usuario.edad}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                             <button
@@ -312,7 +320,7 @@ const Tripulacion = () => {
 
         {/* Modal para agregar tripulante */}
         {isModalOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="fixed inset-0 bg-black/30 bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg w-full max-w-3xl">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">Agregar Tripulante</h2>
                 <form onSubmit={handleSubmit}>
@@ -449,6 +457,87 @@ const Tripulacion = () => {
                     </button>
                 </div>
                 </form>
+            </div>
+            </div>
+        )}
+        {/* Modal para ver detalles */}
+        {isDetailsModalOpen && selectedUsuario && (
+            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg w-full max-w-3xl">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">Detalles del Tripulante</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Tipo</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                    {selectedUsuario.tipo ? selectedUsuario.tipo.charAt(0).toUpperCase() + selectedUsuario.tipo.slice(1) : 'N/A'}
+                    </p>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                    { selectedUsuario.nombre || 'N/A'}
+                    </p>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Correo</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                    { selectedUsuario.correo || 'N/A'}
+                    </p>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Teléfono</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                    { selectedUsuario.telefono || 'N/A'}
+                    </p>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Dirección</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                    { selectedUsuario.direccion || 'N/A'}
+                    </p>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Género</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                    {selectedUsuario.genero || 'N/A'}
+                    </p>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                    { formatFecha(selectedUsuario.fecha_nacimiento) || 'N/A'}
+                    </p>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Edad</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                    {selectedUsuario.edad}
+                    </p>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">DPI</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                    {selectedUsuario.dpi || 'N/A'}
+                    </p>
+                </div>
+                {selectedUsuario.tipo === 'piloto' && (
+                    <div>
+                    <label className="block text-sm font-medium text-gray-700">Número de Licencia</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                        {selectedUsuario.numero_licencia || 'N/A'}
+                    </p>
+                    </div>
+                )}
+                </div>
+                <div className="mt-6 flex justify-end">
+                <button
+                    type="button"
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200"
+                    onClick={() => setIsDetailsModalOpen(false)}
+                >
+                    Cerrar
+                </button>
+                </div>
             </div>
             </div>
         )}
