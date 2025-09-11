@@ -11,6 +11,8 @@ import React, { useState } from 'react';
 import VuelosPage from './Pages/VuelosPage';
 import AvionesPage from './Pages/AvionesPage';
 import UsuariosPage from './Pages/UsuariosPage';
+import DashboardAdmin from './Pages/DashboardAdmin'
+import Tripulacion from './Pages/Tripulacion'
 
 // Componente de layout para rutas autenticadas
 const AuthenticatedLayout = ({ children }) => {
@@ -42,6 +44,11 @@ function App() {
           <Route path="/mainpage" element={<MainPage />} />
           <Route path="/" element={<MainPage />} />
           <Route path="/verify-account" element={<VerifyAccount />} />
+          <Route path="/dashboard-admin" element={
+            <AuthenticatedLayout>
+              <DashboardAdmin />
+            </AuthenticatedLayout>
+          } />
           <Route
             path="/vuelos"
             element={
@@ -66,6 +73,11 @@ function App() {
               </AuthenticatedLayout>
             }
           />
+          <Route path="/tripulacion" element={
+            <AuthenticatedLayout>
+              <Tripulacion />
+            </AuthenticatedLayout>
+          } />
         </Routes>
       </BrowserRouter>
     </>

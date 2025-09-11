@@ -35,7 +35,7 @@ const AvionesPage = () => {
   const fetchAviones = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token'); // Asumiendo que usas JWT
+      const token = sessionStorage.getItem('token'); // Asumiendo que usas JWT
       const response = await fetch('http://localhost:3000/api/aviones/', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -57,7 +57,7 @@ const AvionesPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await fetch('http://localhost:3000/api/aviones/', {
         method: 'POST',
         headers: {
@@ -96,7 +96,7 @@ const AvionesPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await fetch(`http://localhost:3000/api/aviones/${editingAvion._id}`, {
         method: 'PUT',
         headers: {
@@ -128,7 +128,7 @@ const AvionesPage = () => {
     
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await fetch(`http://localhost:3000/api/aviones/${id}`, {
         method: 'DELETE',
         headers: {

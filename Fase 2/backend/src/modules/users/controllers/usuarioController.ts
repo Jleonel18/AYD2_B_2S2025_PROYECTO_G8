@@ -68,12 +68,21 @@ export class UsuarioController {
         }
     }
 
-    obtenerUsuario = async (req: Request, res: Response) => {
+    obtenerUsuario = async (req: AuthRequest, res: Response) => {
         try {
-            const usuario = await this.usuarioService.obtenerUsuario(req.params.id)
+            const usuario = await this.usuarioService.obtenerUsuario(req.user.id)
             if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" })
             //console.log(usuario)
             res.json(usuario)
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
+
+    obtenerTrabajadores = async (req: Request, res: Response) => {
+        try {
+            const usuarios = await this.usuarioService.listarTrabajadores()
+            res.json({ trabajadores: usuarios })
         } catch (error) {
             res.status(500).json({ error: "Error en servidor" })
         }
@@ -109,11 +118,11 @@ export class UsuarioController {
         try {
             const { usuario, contrasena } = req.body
             if(!usuario || !contrasena) {
-                return res.status(400).json({ error: "Faltan datos requeridos" })
+                return res.status(400).json({ message: "Faltan datos requeridos" })
             }
             const usuarioEncontrado = await this.usuarioService.login(usuario, contrasena)
             if (!usuarioEncontrado) {
-                return res.status(400).json({ error: "Usuario o contraseña incorrectos" })
+                return res.status(400).json({ message: "Usuario o contraseña incorrectos" })
             }
 
             const data = {
@@ -185,6 +194,88 @@ export class UsuarioController {
             res.json(usuarioEditado)
         } catch (error) {
             console.log(error)
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
+
+    obtenerTrabajadorPorId = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+            const usuario = await this.usuarioService.obtenerUsuario(id)
+            if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" })
+            res.json(usuario)
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
+
+    actualizarTrabajador = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+            const datos = req.body
+            const usuarioActual = await this.usuarioService.obtenerUsuario(id)
+            if (!usuarioActual) {
+                return res.status(404).json({ error: "Usuario no encontrado" })
+            }
+
+            //Validar correo
+            if(datos.correo && datos.correo !== usuarioActual.correo) {
+                const correoExistente = await this.usuarioService.obtenerUsuarioPorCorreo(datos.correo)
+                if(correoExistente) {
+                    return res.status(400).json({ error: "El correo ya está en uso" })
+                }
+
+            }
+
+            // Validaciones
+            if(datos.edad && datos.edad < 18) {
+                return res.status(400).json({ error: "La edad debe ser menor o igual a 18 años" })
+            }
+
+            if(datos.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo)) {
+                return res.status(400).json({ error: "Correo inválido" })
+            }
+
+            if(datos.telefono && datos.telefono.length < 8) {
+                return res.status(400).json({ error: "El teléfono debe tener al menos 8 caracteres" })
+            }
+
+            if(datos.fecha_nacimiento) {
+                const fechaNacimiento = new Date(datos.fecha_nacimiento);
+                if(fechaNacimiento >= new Date()) {
+                    return res.status(400).json({ error: "La fecha de nacimiento no puede ser en el futuro" })
+                }
+            }
+            if(datos.dpi && datos.dpi.length < 13) {
+                return res.status(400).json({ error: "El DPI debe tener al menos 13 caracteres" })
+            }
+
+            if(datos.contrasena) {
+                if(datos.contrasena.length < 8 || !/[A-Z]/.test(datos.contrasena) || !/[a-z]/.test(datos.contrasena) || !/[0-9]/.test(datos.contrasena)) {
+                    return res.status(400).json({ error: "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número" })
+                }
+                datos.contrasena = await hashPassword(datos.contrasena)
+            }
+
+            const usuarioEditado = await this.usuarioService.actualizarTrabajador(id, datos)
+            res.json(usuarioEditado)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
+
+    eliminarTrabajador = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params
+            const usuarioActual = await this.usuarioService.obtenerUsuario(id)
+            if (!usuarioActual) {
+                return res.status(404).json({ error: "Usuario no encontrado" })
+            }
+
+            await this.usuarioService.eliminarTrabajador(id)
+            res.json({ message: "Usuario eliminado" })
+        } catch (error) {
             res.status(500).json({ error: "Error en servidor" })
         }
     }

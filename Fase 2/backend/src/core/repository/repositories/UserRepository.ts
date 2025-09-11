@@ -17,6 +17,10 @@ export class UserRepository implements IUserRepository {
         return await UserModel.find();
     }
 
+    async findWorkers(): Promise<IUser[]> {
+        return await UserModel.find({ tipo: { $in: ['piloto', 'sobrecargo'] } });
+    }
+
     async update(id: string, user: Partial<IUser>): Promise<IUser | null> {
         return await UserModel.findByIdAndUpdate(id, user, { new: true });
     }
@@ -58,5 +62,14 @@ export class UserRepository implements IUserRepository {
     async editProfile(id: string, datos: Partial<IUser>): Promise<IUser | null> {
         const datos_flattened = flattenObject(datos);
         return await UserModel.findByIdAndUpdate(id, { $set: datos_flattened }, { new: true });
+    }
+
+    async updateWorker(id: string, datos: Partial<IUser>): Promise<IUser | null> {
+        const datos_flattened = flattenObject(datos);
+        return await UserModel.findByIdAndUpdate(id, { $set: datos_flattened }, { new: true });
+    }
+
+    async deleteWorker(id: string): Promise<void> {
+        await UserModel.findByIdAndDelete(id);
     }
 }
