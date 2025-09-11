@@ -19,8 +19,12 @@ const ProfileUser = () => {
 
   useEffect(() => {
     if (hasToken) {
-      const storedUser = JSON.parse(sessionStorage.getItem("user") || "{}");
-      fetch(`${apiUrl}/users/${storedUser.id}`)
+      // const storedUser = JSON.parse(sessionStorage.getItem("user") || "{}");
+      fetch(`${apiUrl}/users`, {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           setUser(data);
