@@ -19,7 +19,8 @@ export class UsuarioRoutes {
 
     private initializeRoutes() {
         this.router.post("/", usuarioController.crearUsuario);
-        this.router.get("/:id", usuarioController.obtenerUsuario);
+        this.router.get("/", tokenAuth, usuarioController.obtenerUsuario);
+        this.router.get("/trabajadores", tokenAuth, authorizeRoles('operaciones'), usuarioController.obtenerTrabajadores);
         this.router.post("/verificar", usuarioController.verificarCorreoGuardarPass)
         this.router.post("/login", usuarioController.login)
         this.router.put("/perfil", tokenAuth, authorizeRoles('pasajero'), usuarioController.editarPerfil)

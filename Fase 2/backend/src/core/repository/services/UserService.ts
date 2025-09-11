@@ -32,6 +32,10 @@ export class UserService {
         return await this.userRepository.findAll()
     }
 
+    async listarTrabajadores(): Promise<IUser[]> {
+        return await this.userRepository.findWorkers()
+    }
+
     async agregarPass(id: string, datos: Partial<IUser>): Promise<IUser | null> {
         if (!datos.contrasena) {
             throw new Error("La contraseña es requerida para actualizar");

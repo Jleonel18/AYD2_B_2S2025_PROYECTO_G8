@@ -68,12 +68,21 @@ export class UsuarioController {
         }
     }
 
-    obtenerUsuario = async (req: Request, res: Response) => {
+    obtenerUsuario = async (req: AuthRequest, res: Response) => {
         try {
-            const usuario = await this.usuarioService.obtenerUsuario(req.params.id)
+            const usuario = await this.usuarioService.obtenerUsuario(req.user.id)
             if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" })
             //console.log(usuario)
             res.json(usuario)
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" })
+        }
+    }
+
+    obtenerTrabajadores = async (req: Request, res: Response) => {
+        try {
+            const usuarios = await this.usuarioService.listarTrabajadores()
+            res.json({ trabajadores: usuarios })
         } catch (error) {
             res.status(500).json({ error: "Error en servidor" })
         }
@@ -109,11 +118,11 @@ export class UsuarioController {
         try {
             const { usuario, contrasena } = req.body
             if(!usuario || !contrasena) {
-                return res.status(400).json({ error: "Faltan datos requeridos" })
+                return res.status(400).json({ message: "Faltan datos requeridos" })
             }
             const usuarioEncontrado = await this.usuarioService.login(usuario, contrasena)
             if (!usuarioEncontrado) {
-                return res.status(400).json({ error: "Usuario o contraseña incorrectos" })
+                return res.status(400).json({ message: "Usuario o contraseña incorrectos" })
             }
 
             const data = {
