@@ -9,6 +9,8 @@ const Login = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [email, setEmail] = useState('');
 
   const handleLogin = async () => {
 
@@ -46,6 +48,44 @@ const Login = () => {
       toast.error("Error al iniciar sesión, por favor intente de nuevo.");
     }
   }
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEmail('');
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast.error("Por favor, ingrese su correo electrónico.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}/users/recuperar-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ correo: email }),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 200) {
+        toast.success(data.message || "Se ha enviado un enlace de restablecimiento a su correo.");
+        closeModal();
+      } else {
+        toast.error(data.error || "Error al enviar la solicitud de restablecimiento.");
+      }
+    } catch (error) {
+      console.error("Error al enviar la solicitud de restablecimiento:", error);
+      toast.error("Error al enviar la solicitud, por favor intente de nuevo.");
+    }
+  };
 
   const redirectToRegister = () => {
     navigate('/register');
@@ -87,7 +127,7 @@ const Login = () => {
           >
             Iniciar sesión
           </button>
-          <p className="text-[#7F8CAA] text-center mt-4 text-sm cursor-pointer hover:text-[#333446]" onClick={() => toast.info("Funcionalidad no implementada")}>
+          <p className="text-[#7F8CAA] text-center mt-4 text-sm cursor-pointer hover:text-[#333446]" onClick={openModal}>
             ¿Olvidaste tu contraseña?
           </p>
           <p className="text-[#7F8CAA] text-center mt-4 text-sm cursor-pointer hover:text-[#333446]" onClick={redirectToRegister}>
@@ -95,6 +135,38 @@ const Login = () => {
           </p>
         </div>
       </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-2xl font-bold text-[#333446] text-center mb-6">Restablecer Contraseña</h2>
+            <div className="mb-4">
+              <label className="block text-[#333446] text-sm mb-2" htmlFor="email">Correo Electrónico</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full p-2 border border-[#7F8CAA] rounded"
+                placeholder="correo@ejemplo.com"
+              />
+            </div>
+            <div className="flex justify-between">
+              <button
+                className="bg-[#7F8CAA] text-white p-2 rounded hover:bg-[#333446] transition"
+                onClick={handleForgotPassword}
+              >
+                Enviar
+              </button>
+              <button
+                className="bg-gray-300 text-[#333446] p-2 rounded hover:bg-gray-400 transition"
+                onClick={closeModal}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ProfileUser from './Pages/profileUser'
 import MainPage from './Pages/mainPage'
 import VerifyAccount from './Pages/verifyAccount'
+import ResetPassword from './Pages/ResetPassword'
 import { ToastContainer } from 'react-toastify'
 import Sidebar from './components/Sidebar';
 import React, { useState } from 'react';
@@ -44,6 +45,7 @@ function App() {
           <Route path="/mainpage" element={<MainPage />} />
           <Route path="/" element={<MainPage />} />
           <Route path="/verify-account" element={<VerifyAccount />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/dashboard-admin" element={
             <AuthenticatedLayout>
               <DashboardAdmin />

@@ -32,7 +32,8 @@ class UsuarioFactory {
                     { numero: datos.pasaporte.numero, fecha_vencimiento: datos.pasaporte.fecha_vencimiento, pais_emision: datos.pasaporte.pais_emision },
                     false,
                     0,
-                    { token: datos.token.token, expiracion: datos.token.expiracion }
+                    { token: datos.token.token, expiracion: datos.token.expiracion },
+                    { token: "", expiration: new Date() } // token_reset inicialmente vacío
                 )
             case UsuarioType.OPERACIONES:
                 return new Operaciones(datos.nombre, datos.edad, datos.correo, datos.telefono, datos.direccion,
