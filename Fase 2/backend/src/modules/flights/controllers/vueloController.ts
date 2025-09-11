@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { VueloService } from "../../../core/repository/services/VueloService";
 import { IVuelo } from "../../../core/repository/models/Vuelo";
 import { Types } from "mongoose";
+import { EstadoVuelo } from "../../../core/observer/observador";
 
 // Tipo para los datos de entrada desde req.body (sin propiedades de Document)
 interface VueloInput {
@@ -37,7 +38,7 @@ export class VueloController {
         fecha_salida: new Date(fecha_salida),
         fecha_llegada: new Date(fecha_llegada),
         aeronave: new Types.ObjectId(aeronave),
-        estado: estado ? new Types.ObjectId(estado) : new Types.ObjectId(), // Estado inicial
+        estado: EstadoVuelo.PLANIFICADO,
         tripulacion: {
           piloto_id: new Types.ObjectId(tripulacion.piloto_id),
           copiloto_id: new Types.ObjectId(tripulacion.copiloto_id),
@@ -80,9 +81,7 @@ export class VueloController {
       if (!vuelo) {
         return res.status(404).json({ error: "Vuelo no encontrado" });
       }
-      // Actualizar estado a "Cancelado" (necesitarías un ID de estado "Cancelado")
-      const estadoCancelado = new Types.ObjectId(); // Reemplaza con el ID real de "Cancelado"
-      const vueloCancelado = await this.vueloService.crearVuelo({ ...vuelo, estado: estadoCancelado });
+      const vueloCancelado = await this.vueloService.crearVuelo({ ...vuelo, estado: EstadoVuelo.CANCELADO });
       res.json(vueloCancelado);
     } catch (error) {
       res.status(500).json({ error: "Error al cancelar el vuelo" });
@@ -95,6 +94,11 @@ actualizarEstadoVuelo = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     const { estado } = req.body as { estado: string };
+
+    if(estado !== EstadoVuelo.INICIADO && estado !== EstadoVuelo.CANCELADO) {
+      return res.status(400).json({ error: "Estado inválido. Solo se permite 'Iniciado' o 'Cancelado'" });
+    }
+
     if (!estado) {
       return res.status(400).json({ error: "Estado requerido" });
     }

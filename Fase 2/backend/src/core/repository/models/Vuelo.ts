@@ -7,7 +7,7 @@ export interface IVuelo extends Document {
   fecha_salida: Date;
   fecha_llegada: Date;
   aeronave: Types.ObjectId; // Cambia a Types.ObjectId
-  estado: Types.ObjectId; // Cambia a Types.ObjectId
+  estado: string; // Cambia a Types.ObjectId
   tripulacion: {
     piloto_id: Types.ObjectId; // Cambia a Types.ObjectId
     copiloto_id: Types.ObjectId; // Cambia a Types.ObjectId
@@ -21,7 +21,7 @@ const VueloSchema = new Schema<IVuelo>({
   fecha_salida: { type: Date, required: true },
   fecha_llegada: { type: Date, required: true },
   aeronave: { type: Schema.Types.ObjectId, ref: 'Avion', required: true },
-  estado: { type: Schema.Types.ObjectId, required: true },
+  estado: { type: String, required: true },
   tripulacion: {
     piloto_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     copiloto_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
