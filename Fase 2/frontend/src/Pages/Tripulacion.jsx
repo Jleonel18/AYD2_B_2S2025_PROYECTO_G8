@@ -10,6 +10,8 @@ const Tripulacion = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedUsuario, setSelectedUsuario] = useState(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deleteCandidateId, setDeleteCandidateId] = useState(null);
     const [formData, setFormData] = useState({
         tipo: 'piloto',
         nombre: '',
@@ -288,19 +290,48 @@ const Tripulacion = () => {
     };
 
     const handleEliminar = (id) => {
-        fetch(`${apiUrl}/users/trabajadores/${id}`, {
-        method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${sessionStorage.getItem('token')}`,
-        },
-        })
-        .then(() => {
-            setTripulacion(tripulacion.filter((usuario) => usuario.id !== id));
-        })
-        .catch((error) => {
+        if (!id) {
+            toast.error('ID de tripulante no válido');
+            return;
+        }
+        setDeleteCandidateId(id);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmEliminar = async () => {
+        if (!deleteCandidateId) {
+            toast.error('ID de tripulante no válido');
+            setIsDeleteModalOpen(false);
+            return;
+        }
+        try {
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                throw new Error('No se encontró el token de autenticación');
+            }
+
+            const response = await fetch(`${apiUrl}/users/trabajadores/${deleteCandidateId}`, {
+                method: 'DELETE',
+                headers: {
+                Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || `Error HTTP: ${response.status} ${response.statusText}`);
+            }
+
+            setTripulacion(tripulacion.filter((usuario) => usuario._id !== deleteCandidateId));
+            setIsDeleteModalOpen(false);
+            setDeleteCandidateId(null);
+            toast.success('Tripulante eliminado exitosamente');
+        } catch (error) {
             console.error('Error al eliminar tripulante:', error);
-            alert('Error al eliminar tripulante');
-        });
+            toast.error(`Error al eliminar tripulante: ${error.message}`);
+            setIsDeleteModalOpen(false);
+            setDeleteCandidateId(null);
+        }
     };
 
     return (
@@ -315,7 +346,6 @@ const Tripulacion = () => {
             + Nuevo Tripulante
             </button>
         </div>
-
         {/* Estadísticas rápidas */}
         {isLoading ? (
             <p className="text-gray-600">Cargando tripulación...</p>
@@ -795,6 +825,36 @@ const Tripulacion = () => {
                     </button>
                 </div>
                 </form>
+            </div>
+            </div>
+        )}
+        {/* Modal de confirmación para eliminar */}
+        {isDeleteModalOpen && (
+            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg w-full max-w-md">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Confirmar Eliminación</h2>
+                <p className="text-sm text-gray-600 mb-6">
+                ¿Estás seguro de que deseas eliminar a este tripulante? Esta acción no se puede deshacer.
+                </p>
+                <div className="flex justify-end space-x-2">
+                <button
+                    type="button"
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200"
+                    onClick={() => {
+                    setIsDeleteModalOpen(false);
+                    setDeleteCandidateId(null);
+                    }}
+                >
+                    Cancelar
+                </button>
+                <button
+                    type="button"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+                    onClick={confirmEliminar}
+                >
+                    Confirmar
+                </button>
+                </div>
             </div>
             </div>
         )}
