@@ -32,7 +32,11 @@ const Login = () => {
         sessionStorage.setItem('token', data.token);
         sessionStorage.setItem('user', JSON.stringify(data.usuario));
         toast.success("Inicio de sesión exitoso");
-        navigate('/mainpage');
+        if(data.usuario.tipo === 'pasajero') {
+          navigate('/mainpage');
+        }else if(data.usuario.tipo === 'operaciones'){
+          navigate('/dashboard-admin');
+        }
       }else {
         toast.error(data.message || "Error al iniciar sesión");
       }
