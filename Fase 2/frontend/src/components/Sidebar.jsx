@@ -53,6 +53,16 @@ const Sidebar = () => {
             Flota Aérea
           </li>
         </NavLink>
+        <NavLink
+          to="/aeropuertos"
+          className={({ isActive }) =>
+            `text-white block ${isActive ? 'bg-[#7F8CAA]' : ''}`
+          }
+        >
+          <li className="px-4 py-2 hover:bg-[#7F8CAA]">
+            Aeropuertos
+          </li>
+        </NavLink>
       </ul>
       <button
         className="mt-auto w-full text-center py-2 bg-blue-500 hover:bg-blue-600 text-white"
