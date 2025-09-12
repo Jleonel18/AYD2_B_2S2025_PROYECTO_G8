@@ -1,6 +1,7 @@
 import { IVueloRepository } from '../repositories/IVueloRepository';
 import { VueloModel, IVuelo } from '../models/Vuelo';
 import { Observador, EstadoVuelo } from '../../observer/observador'; // Ajusta la ruta según tu estructura
+import { Types } from 'mongoose';
 
 export class VueloService {
     private vueloRepository: IVueloRepository;
@@ -67,6 +68,27 @@ export class VueloService {
             this.notificarObservadores(datos.estado as EstadoVuelo, id);
         }
         return vuelo;
+    }
+
+    async verificarDisponibilidadTrabajador(trabajadorId: string, fecha_salida: Date, fecha_llegada: Date): Promise<boolean> {
+        // Validar que fecha_salida sea anterior a fecha_llegada
+        if (fecha_salida >= fecha_llegada) {
+            console.log(`Error: La fecha de salida (${fecha_salida}) debe ser anterior a la fecha de llegada (${fecha_llegada})`);
+            return false;
+        }
+
+        const vuelosAsignados = await this.vueloRepository.findVuelosByTrabajador(trabajadorId);
+        
+        for (const vuelo of vuelosAsignados) {
+            // Verificar superposición de fechas
+            if (fecha_salida <= vuelo.fecha_llegada && fecha_llegada >= vuelo.fecha_salida) {
+                console.log(`El trabajador ${trabajadorId} está ocupado entre ${vuelo.fecha_salida} y ${vuelo.fecha_llegada}`);
+                return false; // El trabajador está ocupado
+            }
+        }
+
+        console.log(`El trabajador ${trabajadorId} está disponible`);
+        return true; // El trabajador está disponible
     }
 
 }

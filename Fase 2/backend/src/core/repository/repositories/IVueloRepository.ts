@@ -8,4 +8,5 @@ export interface IVueloRepository {
   delete(id: string): Promise<void>;
   updateEstado(id: string, nuevoEstado: string): Promise<IVuelo | null>;
   cancel(id: string): Promise<IVuelo | null>;
+  findVuelosByTrabajador(trabajadorId: string): Promise<IVuelo[]>;
 }
