@@ -23,4 +23,11 @@ export class AvionService {
     async deleteAvion(id: string): Promise<boolean> {
         return await this.avionRepository.delete(id);
     }
+
+    async avionEstaEnAeropuerto(idAvion: string, idAeropuerto: string): Promise<boolean> {
+        const avion = await this.avionRepository.findById(idAvion);
+        return avion?.id_aeropuerto_actual?.toString() == idAeropuerto;
+        
+    }
+
 }
