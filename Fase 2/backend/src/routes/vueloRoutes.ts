@@ -2,11 +2,15 @@ import { Router } from 'express';
 import { VueloController } from '../modules/flights/controllers/vueloController';
 import { VueloService } from '../core/repository/services/VueloService';
 import { VueloRepository } from '../core/repository/repositories/VueloRepository';
+import { AvionService } from '../core/repository/services/AvionService';
+import { AvionRepository } from '../core/repository/repositories/AvionRepository';
 
 
 const vueloRepository = new VueloRepository();
 const vueloService = new VueloService(vueloRepository);
-const vueloController = new VueloController(vueloService);
+const avionRepository = new AvionRepository();
+const avionService = new AvionService(avionRepository);
+const vueloController = new VueloController(vueloService, avionService);
 
 export class VueloRoutes {
     public router: Router;  
