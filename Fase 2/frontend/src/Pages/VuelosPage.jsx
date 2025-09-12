@@ -81,10 +81,10 @@ const VuelosPage = () => {
     // You can open a modal or form to edit flight details and send a PUT request to /:id
   };
 
-  if (error) return <div className="ml-64 p-6 text-red-500">Error: {error}</div>;
+  if (error) return <div className="p-6 text-red-500">Error: {error}</div>;
 
   return (
-    <div className="ml-64 p-6">
+    <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Vuelos</h1>
       <form onSubmit={handleCreateFlight} className="mb-4">
         <input

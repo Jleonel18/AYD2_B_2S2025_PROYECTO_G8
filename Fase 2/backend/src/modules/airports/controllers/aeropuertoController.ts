@@ -55,7 +55,7 @@ export class AeropuertoController {
             if (!eliminado) {
                 return res.status(404).json({ error: "Aeropuerto no encontrado" });
             }
-            res.status(204).send();
+            res.status(200).json({message: "Aeropuerto eliminado exitosamente" });
         } catch (error) {
             res.status(500).json({ error: "Error al eliminar aeropuerto" });
         }

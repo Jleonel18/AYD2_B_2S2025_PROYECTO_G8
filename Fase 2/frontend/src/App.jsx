@@ -14,6 +14,7 @@ import AvionesPage from './Pages/AvionesPage';
 import UsuariosPage from './Pages/UsuariosPage';
 import DashboardAdmin from './Pages/DashboardAdmin'
 import Tripulacion from './Pages/Tripulacion'
+import AeropuertosPage from './Pages/AeropuertosPage'
 
 // Componente de layout para rutas autenticadas
 const AuthenticatedLayout = ({ children }) => {
@@ -78,6 +79,11 @@ function App() {
           <Route path="/tripulacion" element={
             <AuthenticatedLayout>
               <Tripulacion />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/aeropuertos" element={
+            <AuthenticatedLayout>
+              <AeropuertosPage />
             </AuthenticatedLayout>
           } />
         </Routes>
