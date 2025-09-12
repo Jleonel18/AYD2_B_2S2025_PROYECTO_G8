@@ -3,11 +3,12 @@ import { VueloService } from "../../../core/repository/services/VueloService";
 import { IVuelo } from "../../../core/repository/models/Vuelo";
 import { Types } from "mongoose";
 import { EstadoVuelo } from "../../../core/observer/observador";
+import { AvionService } from "../../../core/repository/services/AvionService";
 
 
 
 export class VueloController {
-  constructor(private readonly vueloService: VueloService) {}
+  constructor(private readonly vueloService: VueloService, private readonly avionService: AvionService) {}
 
   crearVuelo = async (req: Request, res: Response) => {
   try {
@@ -83,6 +84,16 @@ export class VueloController {
         return res.status(400).json({ error: `El sobrecargo ${sobrecargoNoDisponible} ya tiene un vuelo asignado en la misma fecha` });
       }
     }
+
+    if(!(await this.vueloService.verificarDisponibilidadAvion(aeronave, fechaSalida, fechaLlegada))) {
+      return res.status(400).json({ error: 'El avión ya tiene un vuelo asignado en la misma fecha' });
+    }
+
+    if(!(await this.avionService.avionEstaEnAeropuerto(aeronave, origen))) {
+      return res.status(400).json({ error: 'El avión no está en un aeropuerto para iniciar el vuelo' });
+    }
+
+    // Crear el vuelo
 
     const nuevoVuelo = await this.vueloService.crearVuelo(vueloData);
     return res.status(201).json(nuevoVuelo);

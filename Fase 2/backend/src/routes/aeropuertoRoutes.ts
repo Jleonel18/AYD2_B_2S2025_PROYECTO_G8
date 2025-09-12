@@ -21,7 +21,7 @@ export class AeropuertoRoutes {
 
         this.router.get("/", tokenAuth, aeropuertoController.obtenerTodosLosAeropuertos);
 
-        this.router.get("/:id", tokenAuth, aeropuertoController.obtenerAeropuertoPorId);
+        this.router.get("/:id", aeropuertoController.obtenerAeropuertoPorId);
 
         this.router.put("/:id", tokenAuth, authorizeRoles("operaciones"), aeropuertoController.actualizarAeropuerto);
 

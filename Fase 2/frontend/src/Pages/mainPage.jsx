@@ -5,18 +5,61 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 const MainPage = () => {
   const [flights, setFlights] = useState([]);
+  const [airports, setAirports] = useState({});
+  const [aircrafts, setAircrafts] = useState({});
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const hasToken = !!sessionStorage.getItem('token');
   const user = JSON.parse(sessionStorage.getItem('user') || '{}');
   const isPasajero = hasToken && user.tipo === 'pasajero';
 
   useEffect(() => {
+    setLoading(true); // Inicia carga
     fetch(`${apiUrl}/vuelos`, {
       headers: hasToken ? { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` } : {},
     })
       .then((response) => response.json())
-      .then((data) => setFlights(data))
-      .catch((error) => console.error('Error fetching flights:', error));
+      .then((data) => {
+        setFlights(data);
+        const airportIds = [...new Set(data.flatMap(flight => [flight.origen, flight.destino]))];
+        const aircraftIds = [...new Set(data.map(flight => flight.aeronave))];
+        return Promise.all([
+          ...airportIds.map(id =>
+            fetch(`${apiUrl}/aeropuertos/${id}`, {
+              headers: hasToken ? { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` } : {},
+            })
+              .then(res => res.json())
+              .then(airport => ({ id, nombre: airport.nombre || airport.name || id }))
+              .catch(error => {
+                console.error(`Error fetching airport ${id}:`, error);
+                return { id, nombre: id };
+              })
+          ),
+          ...aircraftIds.map(id =>
+            fetch(`${apiUrl}/aviones/${id}`, {
+              headers: hasToken ? { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` } : {},
+            })
+              .then(res => res.json())
+              .then(aircraft => ({ id, modelo: aircraft.modelo || aircraft.model || id })) // Fallback a ID si no hay modelo
+              .catch(error => {
+                console.error(`Error fetching aircraft ${id}:`, error);
+                return { id, modelo: id };
+              })
+          )
+        ]);
+      })
+      .then(results => {
+        const newAirports = results
+          .filter(r => 'nombre' in r)
+          .reduce((acc, { id, nombre }) => ({ ...acc, [id]: nombre }), {});
+        const newAircrafts = results
+          .filter(r => 'modelo' in r)
+          .reduce((acc, { id, modelo }) => ({ ...acc, [id]: modelo }), {});
+        setAirports(newAirports);
+        setAircrafts(newAircrafts);
+      })
+      .catch((error) => console.error('Error fetching flights or airports/aircrafts:', error))
+      .finally(() => setLoading(false)); // Finaliza carga
   }, []);
 
   const formatDateTime = (dateString) => {
@@ -35,8 +78,6 @@ const MainPage = () => {
     if (!hasToken) {
       setIsModalOpen(true);
     } else {
-      // Handle reservation logic for logged-in passengers
-      
       console.log('Proceeding with reservation');
     }
   };
@@ -44,6 +85,10 @@ const MainPage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen bg-[#EAEFEF]">Cargando...</div>;
+  }
 
   return (
     <div>
@@ -58,8 +103,8 @@ const MainPage = () => {
           {flights.map((flight) => (
             <div key={flight._id} className="bg-[#333446] text-white p-4 rounded-lg flex items-center">
               <div className="w-2/3">
-                <p>Vuelo: {flight.origen} - {flight.destino}</p>
-                <p>Aeronave: Desconocida</p>
+                <p>Vuelo: {airports[flight.origen] || 'Cargando...'} - {airports[flight.destino] || 'Cargando...'}</p>
+                <p>Aeronave: {aircrafts[flight.aeronave] || 'Cargando...'}</p>
                 <p>Horario: {formatDateTime(flight.fecha_salida)}</p>
                 <p>Precio: No disponible</p>
                 <div className="mt-2">
