@@ -20,6 +20,6 @@ export class VueloRoutes {
         this.router.get("/", vueloController.listarVuelos);
         this.router.get("/:id", vueloController.obtenerVuelo);
         this.router.put("/:id", vueloController.actualizarEstadoVuelo);
-        this.router.put("/:id", vueloController.cancelarVuelo);
+        this.router.patch("/:id", vueloController.cancelarVuelo);
     }
 }
