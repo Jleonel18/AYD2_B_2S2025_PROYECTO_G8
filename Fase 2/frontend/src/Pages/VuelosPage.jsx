@@ -18,6 +18,8 @@ const VuelosPage = () => {
     sobrecargos: [''],
   });
   const [errorMessage, setErrorMessage] = useState('');
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedFlight, setSelectedFlight] = useState(null);
 
   // Mapping of display text to estado IDs (replace with actual IDs from your database)
   const estadoOptions = {
@@ -124,6 +126,12 @@ const VuelosPage = () => {
     return aircraft ? aircraft.modelo : aircraftId;
   };
 
+  // Helper function to get worker name by ID
+  const getWorkerName = (workerId) => {
+    const worker = [...workers.pilots, ...workers.cabinCrew].find(w => w._id === workerId);
+    return worker ? worker.nombre : workerId;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -205,6 +213,11 @@ const VuelosPage = () => {
     }
   };
 
+  const handleViewDetails = (flight) => {
+    setSelectedFlight(flight);
+    setShowDetails(true);
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
@@ -240,7 +253,7 @@ const VuelosPage = () => {
                   <span className={getStatusColor(flight.estado)}>{flight.estado}</span>
                 </td>
                 <td className="p-4 border-b border-gray-200 text-center">
-                  <button className="text-blue-500 mr-3 hover:text-blue-700"><span role="img" aria-label="view">👁️</span></button>
+                  <button onClick={() => handleViewDetails(flight)} className="text-blue-500 mr-3 hover:text-blue-700"><span role="img" aria-label="view">👁️</span></button>
                   <button className="text-blue-500 mr-3 hover:text-blue-700"><span role="img" aria-label="edit">✏️</span></button>
                   <button className="text-red-500 hover:text-red-700"><span role="img" aria-label="delete">❌</span></button>
                 </td>
@@ -263,8 +276,14 @@ const VuelosPage = () => {
           <div className="bg-white p-6 rounded-lg w-3/4 max-h-[85vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Nuevo Vuelo</h2>
             {errorMessage && (
-              <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-400 rounded">
-                {errorMessage}
+              <div className="mb-4 p-4 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-lg flex justify-between items-center">
+                <span>{errorMessage}</span>
+                <button
+                  onClick={() => setErrorMessage('')}
+                  className="ml-4 text-yellow-700 hover:text-yellow-900"
+                >
+                  <span role="img" aria-label="close">✖️</span>
+                </button>
               </div>
             )}
             <form onSubmit={handleSubmit}>
@@ -424,6 +443,41 @@ const VuelosPage = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showDetails && selectedFlight && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
+          <div className="bg-white p-6 rounded-lg w-3/4 max-h-[85vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Detalles del Vuelo</h2>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <p className="text-gray-700"><strong>ID:</strong> {selectedFlight._id}</p>
+                <p className="text-gray-700"><strong>Origen:</strong> {getAirportName(selectedFlight.origen)}</p>
+                <p className="text-gray-700"><strong>Destino:</strong> {getAirportName(selectedFlight.destino)}</p>
+                <p className="text-gray-700"><strong>Salida:</strong> {new Date(selectedFlight.fecha_salida).toLocaleString()}</p>
+                <p className="text-gray-700"><strong>Llegada:</strong> {new Date(selectedFlight.fecha_llegada).toLocaleString()}</p>
+                <p className="text-gray-700"><strong>Aeronave:</strong> {getAircraftModel(selectedFlight.aeronave)}</p>
+                <p className="text-gray-700"><strong>Estado:</strong> <span className={getStatusColor(selectedFlight.estado)}>{selectedFlight.estado}</span></p>
+                <p className="text-gray-700"><strong>Creado:</strong> {new Date(selectedFlight.createdAt).toLocaleString()}</p>
+                <p className="text-gray-700"><strong>Actualizado:</strong> {new Date(selectedFlight.updatedAt).toLocaleString()}</p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-800">Tripulación</h3>
+                <p className="text-gray-700"><strong>Piloto:</strong> {getWorkerName(selectedFlight.tripulacion.piloto_id)}</p>
+                <p className="text-gray-700"><strong>Copiloto:</strong> {getWorkerName(selectedFlight.tripulacion.copiloto_id)}</p>
+                <p className="text-gray-700"><strong>Sobrecargos:</strong> {selectedFlight.tripulacion.sobrecargos.map(id => getWorkerName(id)).join(', ')}</p>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowDetails(false)}
+                className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-200"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}
