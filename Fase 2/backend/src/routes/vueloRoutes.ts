@@ -4,6 +4,7 @@ import { VueloService } from '../core/repository/services/VueloService';
 import { VueloRepository } from '../core/repository/repositories/VueloRepository';
 import { AvionService } from '../core/repository/services/AvionService';
 import { AvionRepository } from '../core/repository/repositories/AvionRepository';
+import { authorizeRoles, tokenAuth } from '../middleware/authMiddleware';
 
 
 const vueloRepository = new VueloRepository();
@@ -20,7 +21,7 @@ export class VueloRoutes {
         this.initializeRoutes();
     }
     private initializeRoutes() {
-        this.router.post("/", vueloController.crearVuelo);
+        this.router.post("/", tokenAuth, authorizeRoles("operaciones"), vueloController.crearVuelo);
         this.router.get("/", vueloController.listarVuelos);
         this.router.get("/:id", vueloController.obtenerVuelo);
         this.router.put("/:id", vueloController.actualizarEstadoVuelo);

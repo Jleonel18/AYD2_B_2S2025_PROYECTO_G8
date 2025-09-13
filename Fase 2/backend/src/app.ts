@@ -6,6 +6,7 @@ import { AvionRoutes } from "./routes/avionRoutes";
 import { VueloRoutes } from "./routes/vueloRoutes";
 import { AeropuertoRoutes } from "./routes/aeropuertoRoutes";
 import cors from "cors";
+import { ReservaRoutes } from "./routes/reservaRoutes";
 
 
 const app: Application = express();
@@ -35,6 +36,10 @@ app.use("/api/vuelos", vueloRoutes.router);
 //Rutas de aeropuertos
 const aeropuertoRoutes = new AeropuertoRoutes();
 app.use("/api/aeropuertos", aeropuertoRoutes.router);
+
+// Rutas de reservas
+const reservaRoutes = new ReservaRoutes();
+app.use("/api/reservas", reservaRoutes.router);
 
 const startServer = async () => {
     try {
