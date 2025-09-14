@@ -7,6 +7,7 @@ const Sidebar = () => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/login');
   };
 
