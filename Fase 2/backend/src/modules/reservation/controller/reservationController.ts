@@ -5,11 +5,12 @@ import { ReservaFacade } from "../../../core/facade/ReservaFacade";
 import { generarCodigoQR } from "../../../utils/qr";
 import { enviarCorreoActualizacionReserva, enviarQRReserva } from "../../../utils/send_email";
 import { UserService } from "../../../core/repository/services/UserService";
+import { VueloService } from "../../../core/repository/services/VueloService";
 
 
 export class ReservaController {
 
-    constructor(private readonly reservaFacade: ReservaFacade, private readonly userService: UserService) {
+    constructor(private readonly reservaFacade: ReservaFacade, private readonly userService: UserService, private readonly vueloService: VueloService) {
     }
 
     crearReserva = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -46,8 +47,18 @@ export class ReservaController {
         try {
             const idReserva = req.params.id;
             const reserva = await this.reservaFacade.obtenerReserva(idReserva);
+
+            if(!reserva) {
+                throw new Error("Reserva no encontrada");
+            }
+
+            const vuelo = await this.vueloService.obtenerVuelo(reserva.id_vuelo.toString());
+            if (!vuelo) {
+                throw new Error("El vuelo asociado a la reserva no existe");
+            }
+
             if (reserva) {
-                res.status(200).json(reserva);
+                res.status(200).json({ reserva, vuelo });
             } else {
                 res.status(404).json({ error: "Reserva no encontrada" });
             }
@@ -64,7 +75,7 @@ export class ReservaController {
                 return;
             }
 
-            const reservas = await this.reservaFacade.listarReservasPorUsuario(req.user._id);
+            const reservas = await this.reservaFacade.listarReservasPorUsuario(req.user.id);
             res.status(200).json(reservas);
         } catch (error) {
             console.error("Error al listar reservas por usuario:", error);
@@ -136,6 +147,17 @@ export class ReservaController {
         } catch (error: any) {
             console.error("Error al cambiar estado de reserva:", error);
             res.status(500).json({ error: error.message || "Error al cambiar estado de reserva" });
+        }
+    }
+
+    obtenerAsientosReservados = async (req: AuthRequest, res: Response): Promise<void> => {
+        try {
+            const idVuelo = req.params.id_vuelo;
+            const asientos = await this.reservaFacade.obtenerAsientosReservados(idVuelo);
+            res.status(200).json(asientos);
+        } catch (error) {
+            console.error("Error al obtener asientos reservados:", error);
+            res.status(500).json({ error: "Error al obtener asientos reservados" });
         }
     }
 }

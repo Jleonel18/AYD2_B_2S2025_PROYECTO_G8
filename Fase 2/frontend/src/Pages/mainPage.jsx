@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import NavbarComponent from '../components/navbarComponent';
+import { useNavigate } from 'react-router-dom';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -12,6 +13,7 @@ const MainPage = () => {
   const hasToken = !!sessionStorage.getItem('token');
   const user = JSON.parse(sessionStorage.getItem('user') || '{}');
   const isPasajero = hasToken && user.tipo === 'pasajero';
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true); // Inicia carga
@@ -74,13 +76,17 @@ const MainPage = () => {
     }).replace(/ de /g, ' ');
   };
 
-  const handleReserveClick = () => {
-    if (!hasToken) {
-      setIsModalOpen(true);
-    } else {
-      console.log('Proceeding with reservation');
-    }
-  };
+  const navigateToReservar = (id) => {
+    navigate('/reservar?id_vuelo=' + id);
+  }
+
+  // const handleReserveClick = () => {
+  //   if (!hasToken) {
+  //     setIsModalOpen(true);
+  //   } else {
+  //     console.log('Proceeding with reservation');
+  //   }
+  // };
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -110,7 +116,7 @@ const MainPage = () => {
                 <div className="mt-2">
                   {isPasajero && (
                     <button
-                      onClick={handleReserveClick}
+                      onClick={() => navigateToReservar(flight._id)}
                       className="bg-[#7F8CAA] hover:bg-[#6c7a8a] text-white px-4 py-2 rounded mr-2"
                     >
                       Reservar

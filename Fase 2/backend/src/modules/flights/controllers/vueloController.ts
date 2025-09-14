@@ -111,10 +111,14 @@ export class VueloController {
   obtenerVuelo = async (req: Request, res: Response) => {
     try {
       const vuelo = await this.vueloService.obtenerVuelo(req.params.id);
+
       if (!vuelo) {
         return res.status(404).json({ error: "Vuelo no encontrado" });
       }
-      res.json(vuelo);
+
+      const avion = await this.avionService.getAvionById(vuelo.aeronave.toString());
+
+      res.json({ vuelo, avion });
     } catch (error) {
       res.status(500).json({ error: "Error en el servidor" });
     }
