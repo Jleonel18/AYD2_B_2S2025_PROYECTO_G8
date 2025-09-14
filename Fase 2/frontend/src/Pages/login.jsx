@@ -34,6 +34,7 @@ const Login = () => {
         sessionStorage.setItem('token', data.token);
         localStorage.setItem('token', data.token);
         sessionStorage.setItem('user', JSON.stringify(data.usuario));
+        localStorage.setItem('user', JSON.stringify(data.usuario));
         toast.success("Inicio de sesión exitoso");
         if(data.usuario.tipo === 'operaciones'){
           navigate('/dashboard-admin');

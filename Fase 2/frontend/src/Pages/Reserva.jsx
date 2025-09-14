@@ -15,12 +15,21 @@ const Reserva = () => {
     const [error, setError] = useState(null);
     const [isCheckinModalOpen, setIsCheckinModalOpen] = useState(false);
     const [maletas, setMaletas] = useState([{ tipo: 'Mano', peso: '' }]);
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({
+        id: '',
+        usuario: '',
+        tipo: '',
+        nombre: '',
+        correo: ''
+    });
 
     // Fetch reservation and airports
     useEffect(() => {
         const userInfo = getUserInfo();
         setUserInfo(userInfo);
+
+        sessionStorage.setItem('token', sessionStorage.getItem('token') || localStorage.getItem('token'));
+        sessionStorage.setItem('user', sessionStorage.getItem('user') || localStorage.getItem('user'));
 
         const fetchData = async () => {
         try {
@@ -241,9 +250,10 @@ const Reserva = () => {
 
     return (
         <div className="flex flex-col min-h-screen">
-        <NavbarComponent />
-        <div className="p-6 w-full">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">Detalles de la Reserva</h1>
+            {/* Si es tipo operaciones no muestra navbar */}
+            {userInfo.tipo !== 'operaciones' && <NavbarComponent />}
+            <div className="p-6 w-full">
+                <h1 className="text-3xl font-bold text-gray-800 mb-6">Detalles de la Reserva</h1>
 
             {isLoading ? (
             <p className="text-gray-600">Cargando datos de la reserva...</p>
