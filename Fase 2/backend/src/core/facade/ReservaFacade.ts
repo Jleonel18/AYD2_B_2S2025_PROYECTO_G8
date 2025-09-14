@@ -57,7 +57,14 @@ export class ReservaFacade {
     }
 
     async obtenerReserva(id: string): Promise<IReserva | null> {
-        return await this.reservaService.obtenerReserva(id);
+        
+        const reserva = await this.reservaService.obtenerReserva(id);
+
+        if (!reserva) {
+            throw new Error("Reserva no encontrada");
+        }
+
+        return reserva;
     }
 
     async listarReservasPorUsuario(id_usuario: string): Promise<IReserva[]> {
@@ -126,7 +133,7 @@ export class ReservaFacade {
 
         let estado: EstadoReserva;
         if (reserva.estado === EstadoReserva.pendiente_checkin) {
-            estado = EstadoReserva.pendiente_abordaje;
+            throw new Error("La reserva debe pasar por check-in antes de cambiar de estado");
         }
         else if (reserva.estado === EstadoReserva.pendiente_abordaje) {
             estado = EstadoReserva.abordado;
@@ -136,5 +143,13 @@ export class ReservaFacade {
         }
 
         return await this.reservaService.cambiarEstadoReserva(id, estado);
+    }
+
+    async obtenerAsientosReservados(id_vuelo: string): Promise<number[]> {
+        const reservas = await this.reservaService.listarReservasPorVuelo(id_vuelo);
+        // Filtrar reservas que no estén canceladas
+        const reservasActivas = reservas.filter(r => r.estado !== EstadoReserva.cancelada);
+        const asientos = reservasActivas.flatMap(r => r.asientos);
+        return asientos;
     }
 }

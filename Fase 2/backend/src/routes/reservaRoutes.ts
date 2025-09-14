@@ -20,7 +20,7 @@ const reservaService = new ReservaService(reservaRepository, userService);
 const avionRepository = new AvionRepository();
 const avionService = new AvionService(avionRepository);
 const reservaFacade = new ReservaFacade(vueloService, avionService, reservaService);
-const reservaController = new ReservaController(reservaFacade, userService);
+const reservaController = new ReservaController(reservaFacade, userService, vueloService);
 
 
 export class ReservaRoutes {
@@ -39,5 +39,6 @@ export class ReservaRoutes {
         this.router.get("/vuelo/:id_vuelo", tokenAuth, reservaController.listarReservasPorVuelo);
         this.router.post("/checkin/:id", tokenAuth, authorizeRoles('pasajero'), reservaController.hacerCheckIn);
         this.router.post("/actualizar-estado/:id", tokenAuth, authorizeRoles('operaciones'), reservaController.cambiarEstadoReserva);
+        this.router.get("/asientos-reservados/:id_vuelo", tokenAuth, reservaController.obtenerAsientosReservados);
     }
 }
