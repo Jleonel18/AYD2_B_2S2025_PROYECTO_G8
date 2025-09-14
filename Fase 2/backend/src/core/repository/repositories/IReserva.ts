@@ -1,3 +1,4 @@
+import { EstadoReserva } from "../../../types/reservas";
 import { IReserva } from "../models/Reserva";
 
 export interface IReservaRepository {
@@ -8,4 +9,6 @@ export interface IReservaRepository {
     eliminarReserva(id: string): Promise<boolean>;
     obtenerReservasPorVuelo(id_vuelo: string): Promise<IReserva[]>;
     cancelarReservasPorVuelo(id_vuelo: string): Promise<number>;
+    hacerCheckIn(id: string, maletas: { tipo: string; peso: number }[]): Promise<IReserva | null>;
+    cambiarEstadoReserva(id: string, estado: EstadoReserva): Promise<IReserva | null>;
 }

@@ -2,11 +2,14 @@ import { Request, Response } from "express"
 import { AuthRequest } from "../../../middleware/authMiddleware"
 import { ReservaService } from "../../../core/repository/services/ReservaService";
 import { ReservaFacade } from "../../../core/facade/ReservaFacade";
+import { generarCodigoQR } from "../../../utils/qr";
+import { enviarCorreoActualizacionReserva, enviarQRReserva } from "../../../utils/send_email";
+import { UserService } from "../../../core/repository/services/UserService";
 
 
 export class ReservaController {
 
-    constructor(private readonly reservaFacade: ReservaFacade) {
+    constructor(private readonly reservaFacade: ReservaFacade, private readonly userService: UserService) {
     }
 
     crearReserva = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -20,6 +23,17 @@ export class ReservaController {
             }
 
             const reservaCreada = await this.reservaFacade.crearReserva(datosReserva);
+
+            const qrCode = await generarCodigoQR(reservaCreada._id.toString())
+
+            const usuario = await this.userService.obtenerUsuario(reservaCreada.id_usuario.toString());
+
+            if(!usuario) {
+                throw new Error("El usuario asociado a la reserva no existe");
+            }
+
+            await enviarQRReserva({ correoDestino: usuario.correo, nombre: usuario.nombre, codigo_reserva: reservaCreada.codigo_reserva, qrCode, estado: reservaCreada.estado });
+
             res.status(201).json({message: "Reserva creada exitosamente", reserva: reservaCreada});
         } catch (error: any) {
             console.error("Error al crear reserva:", error);
@@ -61,15 +75,15 @@ export class ReservaController {
     eliminarReserva = async (req: AuthRequest, res: Response): Promise<void> => {
         try {
             const idReserva = req.params.id;
-            const reservaEliminada = await this.reservaFacade.eliminarReserva(idReserva);
+            const reservaEliminada = await this.reservaFacade.eliminarReserva(idReserva, req.user.id);
             if (reservaEliminada) {
                 res.status(200).json({ message: "Reserva cancelada exitosamente" });
             } else {
                 res.status(404).json({ error: "Reserva no encontrada" });
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error al eliminar reserva:", error);
-            res.status(500).json({ error: "Error al eliminar reserva" });
+            res.status(500).json({ error: error.message || "Error al eliminar reserva" });
         }
     }
 
@@ -81,6 +95,47 @@ export class ReservaController {
         } catch (error) {
             console.error("Error al listar reservas por vuelo:", error);
             res.status(500).json({ error: "Error al listar reservas por vuelo" });
+        }
+    }
+
+    hacerCheckIn = async (req: AuthRequest, res: Response): Promise<void> => {
+        try {
+            const idReserva = req.params.id;
+            const maletas = req.body.maletas; // Espera un array de maletas en el cuerpo de la solicitud
+
+            const reservaActualizada = await this.reservaFacade.hacerCheckIn(idReserva, req.user.id, maletas);
+            if (reservaActualizada) {
+
+                const qrCode = await generarCodigoQR(reservaActualizada._id.toString())
+
+                await enviarCorreoActualizacionReserva({ correoDestino: req.user.correo, nombre: req.user.nombre, codigo_reserva: reservaActualizada.codigo_reserva, qrCode: qrCode, estado: reservaActualizada.estado });
+
+                res.status(200).json({ message: "Check-in realizado exitosamente", reserva: reservaActualizada });
+            } else {
+                res.status(404).json({ error: "Reserva no encontrada" });
+            }
+        } catch (error) {
+            console.error("Error al hacer check-in:", error);
+            res.status(500).json({ error: "Error al hacer check-in" });
+        }
+    }
+
+    cambiarEstadoReserva = async (req: AuthRequest, res: Response): Promise<void> => {
+        try {
+            const idReserva = req.params.id;
+
+            const reservaActualizada = await this.reservaFacade.cambiarEstadoReserva(idReserva);
+            if (reservaActualizada) {
+                const qrCode = await generarCodigoQR(reservaActualizada._id.toString())
+
+                await enviarCorreoActualizacionReserva({ correoDestino: req.user.correo, nombre: req.user.nombre, codigo_reserva: reservaActualizada.codigo_reserva, qrCode: qrCode, estado: reservaActualizada.estado });
+                res.status(200).json({ message: "Estado de reserva actualizado exitosamente", reserva: reservaActualizada });
+            } else {
+                res.status(404).json({ error: "Reserva no encontrada" });
+            }
+        } catch (error: any) {
+            console.error("Error al cambiar estado de reserva:", error);
+            res.status(500).json({ error: error.message || "Error al cambiar estado de reserva" });
         }
     }
 }

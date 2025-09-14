@@ -86,4 +86,15 @@ export class ReservaService {
         return resultado;
     }
 
+    async hacerCheckIn(id: string, maletas: { tipo: string; peso: number }[]): Promise<IReserva | null> {
+        return await this.reservaRepository.hacerCheckIn(id, maletas);
+    }
+
+    async cambiarEstadoReserva(id: string, estado: EstadoReserva): Promise<IReserva | null> {
+
+        const reserva = await this.reservaRepository.cambiarEstadoReserva(id, estado);
+        
+        return reserva;
+    }
+
 }
