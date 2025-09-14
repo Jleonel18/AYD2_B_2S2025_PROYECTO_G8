@@ -15,6 +15,11 @@ import UsuariosPage from './Pages/UsuariosPage';
 import DashboardAdmin from './Pages/DashboardAdmin'
 import Tripulacion from './Pages/Tripulacion'
 import AeropuertosPage from './Pages/AeropuertosPage'
+import Reservas from './Pages/Reservas'
+import Historial from './Pages/Historial'
+import Puntos from './Pages/Puntos'
+import Reservar from './Pages/Reservar'
+import Reserva from './Pages/Reserva'
 
 // Componente de layout para rutas autenticadas
 const AuthenticatedLayout = ({ children }) => {
@@ -47,6 +52,11 @@ function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/verify-account" element={<VerifyAccount />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reserva/:id_reserva" element={<Reserva />} />
+          <Route path="/reservar" element={<Reservar />} />
+          <Route path="/reservas" element={<Reservas />} />
+          <Route path="/historial" element={<Historial />} />
+          <Route path="/puntos" element={<Puntos />} />
           <Route path="/dashboard-admin" element={
             <AuthenticatedLayout>
               <DashboardAdmin />
