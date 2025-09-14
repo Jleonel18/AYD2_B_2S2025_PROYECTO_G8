@@ -12,21 +12,14 @@ const VuelosPage = () => {
     fecha_salida: '',
     fecha_llegada: '',
     aeronave: '',
-    estado: '',
     piloto_id: '',
     copiloto_id: '',
-    sobrecargos: [''],
+    sobrecargos: [],
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [showDetails, setShowDetails] = useState(false);
   const [selectedFlight, setSelectedFlight] = useState(null);
-
-  // Mapping of display text to estado IDs (replace with actual IDs from your database)
-  const estadoOptions = {
-    'Planificado': '68b921fcdf84a51ec21ae484', // Example ID, replace with correct ID
-    'Iniciado': '68b921fcdf84a51ec21ae485',   // Example ID, replace with correct ID
-    'Cancelado': '68b92229df84a51ec21ae487', // Example ID, replace with correct ID
-  };
+  const [maxSobrecargos, setMaxSobrecargos] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -134,7 +127,19 @@ const VuelosPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let newFormData = { ...formData, [name]: value };
+    if (name === 'aeronave') {
+      const selectedAircraft = aircrafts.find(a => a._id === value);
+      if (selectedAircraft) {
+        const req = Math.ceil(selectedAircraft.capacidadMaxima / 50);
+        setMaxSobrecargos(req);
+        newFormData.sobrecargos = Array(req).fill('');
+      } else {
+        setMaxSobrecargos(0);
+        newFormData.sobrecargos = [];
+      }
+    }
+    setFormData(newFormData);
   };
 
   const handleSobrecargoChange = (index, value) => {
@@ -143,29 +148,30 @@ const VuelosPage = () => {
     setFormData((prev) => ({ ...prev, sobrecargos: newSobrecargos }));
   };
 
-  const addSobrecargoField = () => {
-    setFormData((prev) => ({ ...prev, sobrecargos: [...prev.sobrecargos, ''] }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = sessionStorage.getItem('token');
+    if (formData.piloto_id && formData.piloto_id === formData.copiloto_id) {
+      setErrorMessage('El piloto y el copiloto deben ser diferentes.');
+      return;
+    }
+    if (formData.aeronave) {
+      const assignedSobrecargos = formData.sobrecargos.filter(id => id);
+      if (assignedSobrecargos.length !== maxSobrecargos) {
+        setErrorMessage(`Debes asignar exactamente ${maxSobrecargos} sobrecargos.`);
+        return;
+      }
+      const uniqueSobrecargos = new Set(assignedSobrecargos);
+      if (uniqueSobrecargos.size !== maxSobrecargos) {
+        setErrorMessage('Los sobrecargos deben ser únicos, sin duplicados.');
+        return;
+      }
+    }
     const tripulacion = {
       piloto_id: formData.piloto_id,
       copiloto_id: formData.copiloto_id,
       sobrecargos: formData.sobrecargos.filter(id => id),
     };
-
-    const estadoId = estadoOptions[formData.estado] || '';
-    console.log('Payload enviado:', {
-      origen: formData.origen,
-      destino: formData.destino,
-      fecha_salida: formData.fecha_salida + 'Z',
-      fecha_llegada: formData.fecha_llegada + 'Z',
-      aeronave: formData.aeronave,
-      estado: estadoId,
-      tripulacion,
-    });
 
     const payload = {
       origen: formData.origen,
@@ -173,7 +179,7 @@ const VuelosPage = () => {
       fecha_salida: formData.fecha_salida + 'Z',
       fecha_llegada: formData.fecha_llegada + 'Z',
       aeronave: formData.aeronave,
-      estado: estadoId,
+      estado: 'Planificado',
       tripulacion,
     };
 
@@ -197,12 +203,12 @@ const VuelosPage = () => {
           fecha_salida: '',
           fecha_llegada: '',
           aeronave: '',
-          estado: '',
           piloto_id: '',
           copiloto_id: '',
-          sobrecargos: [''],
+          sobrecargos: [],
         });
         setErrorMessage('');
+        setMaxSobrecargos(0);
       } else {
         const errorText = await response.text();
         setErrorMessage(errorText || 'Error desconocido al crear el vuelo');
@@ -254,7 +260,6 @@ const VuelosPage = () => {
                 </td>
                 <td className="p-4 border-b border-gray-200 text-center">
                   <button onClick={() => handleViewDetails(flight)} className="text-blue-500 mr-3 hover:text-blue-700"><span role="img" aria-label="view">👁️</span></button>
-                  <button className="text-blue-500 mr-3 hover:text-blue-700"><span role="img" aria-label="edit">✏️</span></button>
                   <button className="text-red-500 hover:text-red-700"><span role="img" aria-label="delete">❌</span></button>
                 </td>
               </tr>
@@ -272,7 +277,7 @@ const VuelosPage = () => {
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 bg-opacity-50 flex items-center justify-center overflow-y-auto">
           <div className="bg-white p-6 rounded-lg w-3/4 max-h-[85vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Nuevo Vuelo</h2>
             {errorMessage && (
@@ -357,22 +362,6 @@ const VuelosPage = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block mb-2 text-gray-700">Estado</label>
-                  <select
-                    name="estado"
-                    value={formData.estado}
-                    onChange={handleInputChange}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Selecciona un estado</option>
-                    {Object.keys(estadoOptions).map((text) => (
-                      <option key={text} value={text}>
-                        {text}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
                   <label className="block mb-2 text-gray-700">Piloto</label>
                   <select
                     name="piloto_id"
@@ -406,29 +395,31 @@ const VuelosPage = () => {
                 </div>
               </div>
               <div className="mt-6">
-                <label className="block mb-2 text-gray-700">Sobrecargos</label>
-                {formData.sobrecargos.map((sobrecargo, index) => (
-                  <select
-                    key={index}
-                    value={sobrecargo}
-                    onChange={(e) => handleSobrecargoChange(index, e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Selecciona un sobrecargo</option>
-                    {workers.cabinCrew.map((crew) => (
-                      <option key={crew._id} value={crew._id}>
-                        {crew.nombre}
-                      </option>
-                    ))}
-                  </select>
-                ))}
-                <button
-                  type="button"
-                  onClick={addSobrecargoField}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-200"
-                >
-                  + Añadir Sobrecargo
-                </button>
+                {formData.sobrecargos.length > 0 && (
+                  <>
+                    <label className="block mb-2 text-gray-700">Sobrecargos (requeridos: {maxSobrecargos})</label>
+                    {formData.sobrecargos.map((sobrecargo, index) => {
+                      const availableCrew = workers.cabinCrew.filter((crew) =>
+                        !formData.sobrecargos.some((id, i) => i !== index && id === crew._id)
+                      );
+                      return (
+                        <select
+                          key={index}
+                          value={sobrecargo}
+                          onChange={(e) => handleSobrecargoChange(index, e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="">Selecciona un sobrecargo</option>
+                          {availableCrew.map((crew) => (
+                            <option key={crew._id} value={crew._id}>
+                              {crew.nombre}
+                            </option>
+                          ))}
+                        </select>
+                      );
+                    })}
+                  </>
+                )}
               </div>
               <div className="mt-6 flex justify-end sticky bottom-0 bg-white pt-4 border-t border-gray-200">
                 <button
@@ -448,7 +439,7 @@ const VuelosPage = () => {
       )}
 
       {showDetails && selectedFlight && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-y-auto">
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 bg-opacity-50 flex items-center justify-center overflow-y-auto">
           <div className="bg-white p-6 rounded-lg w-3/4 max-h-[85vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Detalles del Vuelo</h2>
             <div className="grid grid-cols-2 gap-6">
