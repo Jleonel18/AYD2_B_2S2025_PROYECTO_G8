@@ -37,10 +37,40 @@ export class ReservaRepository implements IReservaRepository {
     }
 
     async cancelarReservasPorVuelo(id_vuelo: string): Promise<number> {
-    const resultado = await ReservaModel.updateMany(
-        { id_vuelo, estado: { $ne: EstadoReserva.cancelada } },
-        { $set: { estado: EstadoReserva.cancelada } }
-    ).exec();
-    return resultado.modifiedCount;
+        const resultado = await ReservaModel.updateMany(
+            { id_vuelo, estado: { $ne: EstadoReserva.cancelada } },
+            { $set: { estado: EstadoReserva.cancelada } }
+        ).exec();
+        return resultado.modifiedCount;
+    }
+
+    async hacerCheckIn(id: string, maletas: { tipo: string; peso: number }[]): Promise<IReserva | null> {
+        const reserva = await ReservaModel.findById(id).exec();
+        if (!reserva) {
+            throw new Error("Reserva no encontrada");
+        }
+
+        // Validar que la reserva esté en estado pendiente_checkin
+        if (reserva.estado !== EstadoReserva.pendiente_checkin) {
+            throw new Error("La reserva no está en estado de check-in");
+        }
+
+        // Asignar maletas a la reserva
+        reserva.maletas = maletas;
+        reserva.estado = EstadoReserva.pendiente_abordaje;
+
+        await reserva.save();
+        return reserva;
+    }
+
+    async cambiarEstadoReserva(id: string, estado: EstadoReserva): Promise<IReserva | null> {
+        const reserva = await ReservaModel.findById(id).exec();
+        if (!reserva) {
+            throw new Error("Reserva no encontrada");
+        }
+
+        reserva.estado = estado;
+        await reserva.save();
+        return reserva;
     }
 }

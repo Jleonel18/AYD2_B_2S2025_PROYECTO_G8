@@ -42,6 +42,13 @@ export class ReservaFacade {
             throw new Error("No hay suficientes asientos disponibles en el avión para esta reserva");
         }
 
+        // // Validar que las maletas no excedan el limite (50 lbs/cada una)
+        // for (const maleta of reserva.maletas) {
+        //     if (maleta.peso > 50) {
+        //         throw new Error(`La maleta excede el límite de peso permitido (50 lbs)`);
+        //     }
+        // }
+
         reserva.codigo_reserva = "RSV-" + Math.random().toString(36).substring(2, 8).toUpperCase();
         reserva.fecha_reserva = new Date();
         reserva.estado = EstadoReserva.pendiente_checkin
@@ -61,11 +68,73 @@ export class ReservaFacade {
         return await this.reservaService.actualizarReserva(id, reserva);
     }
 
-    async eliminarReserva(id: string): Promise<boolean> {
+    async eliminarReserva(id: string, id_usuario: string): Promise<boolean> {
+
+        const reserva = await this.reservaService.obtenerReserva(id);
+        if (!reserva) {
+            throw new Error("Reserva no encontrada");
+        }
+
+        if (reserva.estado === EstadoReserva.cancelada) {
+            throw new Error("La reserva ya está cancelada");
+        }
+
+        // Validar que la reserva sea del usuario
+        if (reserva.id_usuario.toString() !== id_usuario) {
+            throw new Error("No tienes permiso para cancelar esta reserva");
+        }
+
         return await this.reservaService.eliminarReserva(id);
     }
 
     async listarReservasPorVuelo(id_vuelo: string): Promise<IReserva[]> {
         return await this.reservaService.listarReservasPorVuelo(id_vuelo);
+    }
+
+    async hacerCheckIn(id: string, id_usuario: string, maletas: { tipo: string; peso: number }[]): Promise<IReserva | null> {
+
+        const reserva = await this.reservaService.obtenerReserva(id);
+        if (!reserva) {
+            throw new Error("Reserva no encontrada");
+        }
+
+        // Validar que la reserva esté en estado pendiente_checkin
+        if (reserva.estado !== EstadoReserva.pendiente_checkin) {
+            throw new Error("La reserva no está en estado de check-in");
+        }
+
+        // Validar que la reserva sea del usuario
+        if (reserva.id_usuario.toString() !== id_usuario) {
+            throw new Error("No tienes permiso para hacer check-in en esta reserva");
+        }
+
+        for (const maleta of maletas) {
+            if (maleta.peso > 50) {
+                throw new Error(`La maleta excede el límite de peso permitido (50 lbs)`);
+            }
+        }
+
+        return await this.reservaService.hacerCheckIn(id, maletas);
+    }
+
+    async cambiarEstadoReserva(id: string): Promise<IReserva | null> {
+        
+        const reserva = await this.reservaService.obtenerReserva(id);
+        if (!reserva) {
+            throw new Error("Reserva no encontrada");
+        }
+
+        let estado: EstadoReserva;
+        if (reserva.estado === EstadoReserva.pendiente_checkin) {
+            estado = EstadoReserva.pendiente_abordaje;
+        }
+        else if (reserva.estado === EstadoReserva.pendiente_abordaje) {
+            estado = EstadoReserva.abordado;
+        }
+        else {
+            throw new Error("La reserva no está en un estado válido para cambiar");
+        }
+
+        return await this.reservaService.cambiarEstadoReserva(id, estado);
     }
 }

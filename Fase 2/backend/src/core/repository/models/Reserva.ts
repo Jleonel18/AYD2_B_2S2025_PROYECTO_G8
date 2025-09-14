@@ -20,7 +20,7 @@ const ReservaSchema = new Schema<IReserva>({
     fecha_reserva: { type: Date, required: true },
     estado: { type: String, required: true },
     codigo_reserva: { type: String, required: true },
-    maletas: { type: [{ tipo: String, peso: Number }], required: true },
+    maletas: { type: [{ tipo: String, peso: Number }], required: false },
 }, {
     timestamps: true,
 });

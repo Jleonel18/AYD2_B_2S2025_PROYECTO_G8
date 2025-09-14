@@ -48,7 +48,7 @@ export class UsuarioController {
             if(tipo === "pasajero") {
                 datos.token = {}
                 datos.token.token = generarTokenVerificacion()
-                datos.token.expiracion = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 horas
+                datos.token.expiracion = new Date(Date.now() + 120 * 60 * 60 * 1000) // 120 horas
             }else {
                 if(datos.contrasena.length < 8 || !/[A-Z]/.test(datos.contrasena) || !/[a-z]/.test(datos.contrasena) || !/[0-9]/.test(datos.contrasena)) {
                     return res.status(400).json({ error: "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número" })
