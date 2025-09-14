@@ -7,6 +7,71 @@ interface EnviarCorreoParams {
     usuario: string
 }
 
+interface EnviarCorreoCancelacionParams {
+    correoDestino: string;
+    nombre: string;
+    reservaId: string;
+    codigo_reserva: string;
+}
+
+export async function enviarCorreoCancelacion({ correoDestino, nombre, reservaId, codigo_reserva }: EnviarCorreoCancelacionParams) {
+    try {
+        const transport = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+        // HTML del correo
+        const htmlMensaje = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8" />
+            <title>Cancelación de Reserva</title>
+        </head>
+        <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f6f8; color:#333;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:auto; background-color:#fff; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                <tr>
+                    <td style="background-color:#0e1d30; padding:20px; text-align:center; color:#ffffff;">
+                        <img src="https://i.imgur.com/9Tp4bis.jpeg" alt="AirFlow Logo" width="240" style="display:block; margin:auto;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:30px;">
+                        <p style="font-size:16px;">Hola <strong>${nombre}</strong>,</p>
+                        <p style="font-size:16px;">Lamentamos informarte que tu reserva con código <strong>${codigo_reserva}</strong> ha sido cancelada.</p>
+                        <p style="font-size:16px; line-height:1.5;">Esto puede deberse a la cancelación del vuelo asociado.</p>
+                        <p style="font-size:14px; color:#777;">Para más información, contáctanos en soporte@airflowsystem.com.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color:#f0f0f0; text-align:center; padding:15px; font-size:12px; color:#888;">
+                        © ${new Date().getFullYear()} AirFlow System - Todos los derechos reservados
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        `;
+
+        const info = await transport.sendMail({
+            from: `"AirFlow System" <${process.env.EMAIL_USER}>`,
+            to: correoDestino,
+            subject: "Cancelación de tu Reserva",
+            html: htmlMensaje
+        });
+
+        console.log("Correo de cancelación enviado:", info.messageId);
+        return true;
+
+    } catch (error) {
+        console.error("Error al enviar correo de cancelación:", error);
+        return false;
+    }
+}
+
 export async function enviarCorreoVerificacion({ correoDestino, nombre, token, usuario }: EnviarCorreoParams) {
     try {
         const transport = nodemailer.createTransport({

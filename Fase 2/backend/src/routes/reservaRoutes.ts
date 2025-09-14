@@ -8,11 +8,15 @@ import { VueloRepository } from '../core/repository/repositories/VueloRepository
 import { AvionRepository } from '../core/repository/repositories/AvionRepository';
 import { VueloService } from '../core/repository/services/VueloService';
 import { AvionService } from '../core/repository/services/AvionService';
+import { UserService } from '../core/repository/services/UserService';
+import { UserRepository } from '../core/repository/repositories/UserRepository';
 
 const reservaRepository = new ReservaRepository();
 const vueloRepository = new VueloRepository();
 const vueloService = new VueloService(vueloRepository);
-const reservaService = new ReservaService(reservaRepository);
+const userRepository = new UserRepository();
+const userService = new UserService(userRepository);
+const reservaService = new ReservaService(reservaRepository, userService);
 const avionRepository = new AvionRepository();
 const avionService = new AvionService(avionRepository);
 const reservaFacade = new ReservaFacade(vueloService, avionService, reservaService);

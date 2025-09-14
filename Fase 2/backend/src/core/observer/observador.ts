@@ -1,3 +1,4 @@
+import { EstadoReserva } from "../../types/reservas";
 export enum EstadoVuelo {
     PLANIFICADO = "Planificado",
     INICIADO = "Iniciado",
@@ -5,5 +6,5 @@ export enum EstadoVuelo {
 }
 
 export interface Observador {
-    actualizar(estado: EstadoVuelo, vueloId: string): void;
+    actualizar(estado: EstadoReserva, reservaId: string): void;
 }
