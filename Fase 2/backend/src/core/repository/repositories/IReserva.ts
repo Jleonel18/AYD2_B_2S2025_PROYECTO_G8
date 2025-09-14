@@ -7,4 +7,5 @@ export interface IReservaRepository {
     actualizarReserva(id: string, reserva: Partial<IReserva>): Promise<IReserva | null>;
     eliminarReserva(id: string): Promise<boolean>;
     obtenerReservasPorVuelo(id_vuelo: string): Promise<IReserva[]>;
+    cancelarReservasPorVuelo(id_vuelo: string): Promise<number>;
 }

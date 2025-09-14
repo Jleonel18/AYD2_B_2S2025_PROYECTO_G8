@@ -4,11 +4,12 @@ import { IVuelo } from "../../../core/repository/models/Vuelo";
 import { Types } from "mongoose";
 import { EstadoVuelo } from "../../../core/observer/observador";
 import { AvionService } from "../../../core/repository/services/AvionService";
+import { ReservaService } from "../../../core/repository/services/ReservaService";
 
 
 
 export class VueloController {
-  constructor(private readonly vueloService: VueloService, private readonly avionService: AvionService) {}
+  constructor(private readonly vueloService: VueloService, private readonly avionService: AvionService, private readonly reservaService: ReservaService) {}
 
   crearVuelo = async (req: Request, res: Response) => {
   try {
@@ -135,7 +136,8 @@ export class VueloController {
       if (!vuelo) {
         return res.status(404).json({ error: "Vuelo no encontrado" });
       }
-      const vueloCancelado = await this.vueloService.crearVuelo({ ...vuelo, estado: EstadoVuelo.CANCELADO });
+      await this.reservaService.cancelarReservasPorVuelo(id);
+      const vueloCancelado = await this.vueloService.cancelarVuelo(id);
       res.json(vueloCancelado);
     } catch (error) {
       res.status(500).json({ error: "Error al cancelar el vuelo" });

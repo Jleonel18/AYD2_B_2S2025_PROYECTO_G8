@@ -5,13 +5,21 @@ import { VueloRepository } from '../core/repository/repositories/VueloRepository
 import { AvionService } from '../core/repository/services/AvionService';
 import { AvionRepository } from '../core/repository/repositories/AvionRepository';
 import { authorizeRoles, tokenAuth } from '../middleware/authMiddleware';
+import { ReservaService } from '../core/repository/services/ReservaService';
+import { ReservaRepository } from '../core/repository/repositories/ReservaRepository';
+import { UserRepository } from '../core/repository/repositories/UserRepository';
+import { UserService } from '../core/repository/services/UserService';
 
 
 const vueloRepository = new VueloRepository();
 const vueloService = new VueloService(vueloRepository);
 const avionRepository = new AvionRepository();
 const avionService = new AvionService(avionRepository);
-const vueloController = new VueloController(vueloService, avionService);
+const reservaRepository = new ReservaRepository();
+const userRepository = new UserRepository();
+const userService = new UserService(userRepository);
+const reservaService = new ReservaService(reservaRepository, userService);
+const vueloController = new VueloController(vueloService, avionService, reservaService);
 
 export class VueloRoutes {
     public router: Router;  

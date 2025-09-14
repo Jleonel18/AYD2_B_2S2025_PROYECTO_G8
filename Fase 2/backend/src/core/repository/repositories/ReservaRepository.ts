@@ -35,4 +35,12 @@ export class ReservaRepository implements IReservaRepository {
     async obtenerReservasPorVuelo(id_vuelo: string): Promise<IReserva[]> {
         return await ReservaModel.find({ id_vuelo }).exec();
     }
+
+    async cancelarReservasPorVuelo(id_vuelo: string): Promise<number> {
+    const resultado = await ReservaModel.updateMany(
+        { id_vuelo, estado: { $ne: EstadoReserva.cancelada } },
+        { $set: { estado: EstadoReserva.cancelada } }
+    ).exec();
+    return resultado.modifiedCount;
+    }
 }
