@@ -60,4 +60,30 @@ export class AvionController {
             res.status(500).json({ error: "Error al eliminar avión" });
         }
     }
+
+    sumarHorasVuelo = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const { horas } = req.body;
+            
+            if (!horas || typeof horas !== 'number') {
+                return res.status(400).json({ 
+                    error: "Debe proporcionar un número válido de horas" 
+                });
+            }
+            
+            const avionActualizado = await this.avionService.addFlightHoursToAvion(id, horas);
+            
+            if (!avionActualizado) {
+                return res.status(404).json({ error: "Avión no encontrado" });
+            }
+            
+            res.json({
+                message: `Se agregaron ${horas} horas de vuelo al avión`,
+                avion: avionActualizado
+            });
+        } catch (error) {
+            res.status(400).json({ error: (error as Error).message });
+        }
+    }
 }

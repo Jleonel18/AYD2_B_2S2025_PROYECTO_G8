@@ -155,8 +155,9 @@ actualizarEstadoVuelo = async (req: Request, res: Response) => {
     const id = req.params.id;
     const { estado } = req.body as { estado: string };
 
-    if(estado !== EstadoVuelo.INICIADO && estado !== EstadoVuelo.CANCELADO) {
-      return res.status(400).json({ error: "Estado inválido. Solo se permite 'Iniciado' o 'Cancelado'" });
+    // Agregar el estado retrasado
+    if(estado !== EstadoVuelo.INICIADO && estado !== EstadoVuelo.CANCELADO && estado !== EstadoVuelo.RETRASADO) {
+      return res.status(400).json({ error: "Estado inválido. Solo se permite 'Iniciado', 'Cancelado' o 'Retrasado'" });
     }
 
     if (!estado) {

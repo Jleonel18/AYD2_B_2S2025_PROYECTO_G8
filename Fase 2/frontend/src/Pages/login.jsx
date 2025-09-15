@@ -38,6 +38,8 @@ const Login = () => {
         toast.success("Inicio de sesión exitoso");
         if(data.usuario.tipo === 'operaciones'){
           navigate('/dashboard-admin');
+        }else if(data.usuario.tipo === 'piloto'){
+          navigate('/Piloto');
         }else {
           navigate('/mainpage');
         }

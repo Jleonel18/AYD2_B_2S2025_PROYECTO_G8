@@ -337,4 +337,36 @@ export class UsuarioController {
             res.status(500).json({ error: "Error en servidor" })
         }
     }
+
+    sumarHorasVueloPiloto = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const { horas } = req.body;
+            
+            if (!horas || typeof horas !== 'number') {
+                return res.status(400).json({ 
+                    error: "Debe proporcionar un número válido de horas" 
+                });
+            }
+            
+            const pilotoActualizado = await this.usuarioService.sumarHorasVueloPiloto(id, horas);
+            
+            if (!pilotoActualizado) {
+                return res.status(404).json({ error: "Piloto no encontrado" });
+            }
+            
+            res.json({
+                message: `Se agregaron ${horas} horas de vuelo al piloto ${pilotoActualizado.nombre}`,
+                piloto: {
+                    id: pilotoActualizado._id,
+                    nombre: pilotoActualizado.nombre,
+                    usuario: pilotoActualizado.usuario,
+                    horasVuelo: pilotoActualizado.horasVuelo,
+                    tipo: pilotoActualizado.tipo
+                }
+            });
+        } catch (error) {
+            res.status(400).json({ error: (error as Error).message });
+        }
+    }
 }

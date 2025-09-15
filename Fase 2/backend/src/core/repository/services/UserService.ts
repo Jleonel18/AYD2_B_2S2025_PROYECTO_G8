@@ -74,4 +74,12 @@ export class UserService {
     async verificarYRestablecerContraseña(userId: string, plainPassword: string): Promise<IUser | null> {
         return await this.userRepository.verifyAndResetPassword(userId, plainPassword)
     }
+
+    async sumarHorasVueloPiloto(pilotId: string, hours: number): Promise<IUser | null> {
+        if (hours <= 0) {
+            throw new Error("Las horas de vuelo deben ser un número positivo");
+        }
+        
+        return await this.userRepository.addFlightHoursToPilot(pilotId, hours);
+    }
 }
