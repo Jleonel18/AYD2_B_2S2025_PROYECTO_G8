@@ -82,4 +82,12 @@ export class UserService {
         
         return await this.userRepository.addFlightHoursToPilot(pilotId, hours);
     }
+
+    async puntosPorHorasDeVuelo(pasajero: string, puntos: number): Promise<IUser | null> {
+        if (puntos === undefined) {
+            throw new Error("Debe proporcionar puntos para actualizar");
+        }
+        return await this.userRepository.updatePoints(pasajero, puntos);
+    }
+
 }

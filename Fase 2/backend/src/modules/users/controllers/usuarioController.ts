@@ -369,4 +369,55 @@ export class UsuarioController {
             res.status(400).json({ error: (error as Error).message });
         }
     }
+
+    sumarPuntosPorHorasVuelo = async (req: Request, res: Response) => {
+    try {
+        const { ids, horas } = req.body; // Esperamos una lista de IDs y las horas en el body
+        const horasTruncadas = Math.floor(horas); // Truncar las horas a la parte entera
+        const puntos = horasTruncadas * 100; // Ejemplo: 100 puntos por hora de vuelo
+
+        // Validar que horas sea un número válido
+        if (!horas || typeof horas !== 'number' || horasTruncadas <= 0) {
+            return res.status(400).json({
+                error: "Debe proporcionar un número válido de horas mayor que 0"
+            });
+        }
+
+        // Validar que ids sea un arreglo y no esté vacío
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({
+                error: "Debe proporcionar una lista válida de IDs"
+            });
+        }
+
+        // Procesar cada ID en la lista
+        const resultados = [];
+        for (const id of ids) {
+            const tripulacionActualizada = await this.usuarioService.puntosPorHorasDeVuelo(id, puntos);
+            if (!tripulacionActualizada) {
+                resultados.push({ id, error: "Miembro de tripulación no encontrado" });
+            } else {
+                resultados.push({
+                    id: tripulacionActualizada._id,
+                    message: `Se agregaron ${horasTruncadas} horas de vuelo al miembro de tripulación ${tripulacionActualizada.nombre}`,
+                    tripulacion: {
+                        id: tripulacionActualizada._id,
+                        nombre: tripulacionActualizada.nombre,
+                        usuario: tripulacionActualizada.usuario,
+                        puntos: tripulacionActualizada.puntos,
+                        tipo: tripulacionActualizada.tipo
+                    }
+                });
+            }
+        }
+
+        // Responder con los resultados de todos los IDs procesados
+        res.json({
+            message: "Procesamiento de horas de vuelo completado",
+            resultados
+        });
+    } catch (error) {
+        res.status(400).json({ error: (error as Error).message + " - Asegúrese de enviar una lista de IDs y un número de horas válido" });
+    }
+};
 }
