@@ -94,3 +94,78 @@ https://drive.google.com/file/d/1YmEyXaWsYLadL6oT6nzm5b-01skORyEs/view?usp=drive
 ### Kanban al final del Daily:
 
 ![alt text](image-7.png)
+
+## Daily 3:
+
+### Kanban durante el daily:
+
+![alt text](image-8.png)
+
+### Kanban al final del Daily:
+![alt text](image-9.png)
+
+### Franklin Orlando Noj Perez
+
+- **¿Qué se hizo el día anterior?:** Realice la validacion de limites de sobrecargos en cada avion segun su capaciadad, tambien actualice el get de vuelos de la vista principal, y realice algunas pruebas generales de vuelos para asegurarme que todo funcione correctamente.
+- **¿Qué se hará el día actual?:** Realizare el sistema de fidelizacion en conjunto con el compañero Jose Manuel.
+- **Se tiene algún impedimento:** Por el momento no tengo ningun impedimento y puedo seguir avanzando libremente.
+
+### José Leonel López Ajvix:
+
+- **¿Qué se hizo el día anterior?:** Se realizó el estado de envío por el correo electrónico por el lado del backend.
+- **¿Qué se hará el día actual?:** El día de hoy empezaré a implementar las validaciones del patrón observer para que se envíen correctamente los correos, además de verificar las horas de vuelo si se finaliza un vuelo.
+- **Se tiene algún impedimento:** Por el momento no tengo ningun impedimento y puedo seguir avanzando.
+
+### José David Góngora Olmedo
+
+- **¿Qué se hizo el día anterior?:** Implemente del lado del backend todo el flujo de las reservaciones, asi como los correos que se deben de enviar al usuario.
+- **¿Qué se hará el día actual?:** Este dia empezare a implentar las reservas en el frontend.
+- **Se tiene algún impedimento:** No, todo bien por el momento.
+
+### José Manuel López Lemus
+
+- **¿Qué se hizo el día anterior?:** ayer realice el frontend para poder cambiar lo de la acumulación de horas de vuelos y las restricciones de los vuelos
+- **¿Qué se hará el día actual?:** Actualizare algunos endpoints que hicieron falta y lo unificare
+- **Se tiene algún impedimento:** No, todo bien por el momento.
+
+### Captura del meet:
+
+![alt text](image-10.png)
+
+## Sprint Retrospective:
+
+### Link de la Grabación:
+
+https://drive.google.com/file/d/1IbrEZRj-rOYvdu3bNUYB3U2vrtV8Vn9H/view?usp=drive_link
+
+### Captura del Meet:
+
+![alt text](image-11.png)
+
+### José Leonel López Ajvix:
+
+- **¿Qué se hizo bien durante el Sprint?** Se mejoró la planificación, y la división de tareas.
+- **¿Qué se hizo mal durante el Sprint?** Se mejoró bastante en todo, sin embargo tal vez fue algo difícil la planificación de tiempos.
+- **¿Qué mejoras se pueden implementar?** Por el momento creo que todo bien, solo organizarnos mejor para grabar los dailys.
+
+### José Manuel López Lemus
+
+- **¿Qué se hizo bien durante el Sprint?:** En este sprint aprendimos mucho del sprint pasado, supimos organizarnos mejor, repartimos las tareas de una manera más eficiente, y tuvimos una mejor comunicación
+- **¿Qué se hizo mal durante el Sprint?:** Aunque supimos encontrar días para las reuniones, la hora sigue siendo un problema, no logramos encontrar una hora donde todos podamos ser puntuales
+- **¿Qué mejoras se deben implementar en el próximo Sprint?:** Ser mas efectivos con el tiempo para no atrasarnos con entregas ni reuniones.
+
+### Franklin Orlando Noj Perez
+
+- **¿Qué se hizo bien durante el Sprint?:** Mantuvimos la buena comunicación efectiva, siempre nos brindamos apoyo si alguien lo necesitaba, cumplimos con lo que teníamos asignados cada uno sin problema.
+- **¿Qué se hizo mal durante el Sprint?:** Nos costaba poder cumplir con los horarios para las reuniones mayormente, debido a que todos tenemos diferentes cursos en diferentes horarios, por lo que eso hace que se dificulte el poder cumplir al 100% siempre.
+- **¿Qué mejoras se deben implementar en el próximo Sprint?.** Tratar de cumplir un poco mas con los establecido, mayormente en las reuniones que pleneamos, los daily, sprint, etc.
+
+### José David Góngora Olmedo:
+
+- **¿Qué se hizo bien durante el Sprint?** Creo que lo que hicimos bien fue la comunicación y el trabajo en equipo, porque nos apoyamos bastante para cumplir con las tareas. Si alguien tenia problemas pues nos apoyamos mutuamente.
+- **¿Qué se hizo mal durante el Sprint?** Lo que se hizo mal fue que algunas tareas no se estimaron bien y nos tomaron más tiempo del que pensábamos.
+- **¿Qué mejoras se pueden implementar?** Para el próximo Sprint deberíamos planificar mejor los tiempos y documentar más claramente lo que vamos avanzando.
+
+### Captura del Jira:
+
+![alt text](image-12.png)
