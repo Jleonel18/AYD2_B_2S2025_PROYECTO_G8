@@ -57,6 +57,7 @@ function App() {
           <Route path="/reservas" element={<Reservas />} />
           <Route path="/historial" element={<Historial />} />
           <Route path="/puntos" element={<Puntos />} />
+          
           <Route path="/dashboard-admin" element={
             <AuthenticatedLayout>
               <DashboardAdmin />

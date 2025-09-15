@@ -103,4 +103,19 @@ export class UserRepository implements IUserRepository {
             { new: true }
         );
     }
+
+    async addFlightHoursToPilot(pilotId: string, hours: number): Promise<IUser | null> {
+        // Primero verificamos que el usuario sea un piloto
+        const user = await UserModel.findById(pilotId);
+        if (!user || user.tipo !== 'piloto') {
+            throw new Error("El usuario no es un piloto o no existe");
+        }
+        
+        // Incrementamos las horas de vuelo del piloto
+        return await UserModel.findByIdAndUpdate(
+            pilotId,
+            { $inc: { horasVuelo: hours } },
+            { new: true }
+        );
+    }
 }

@@ -30,4 +30,17 @@ export class AvionService {
         
     }
 
+    async addFlightHoursToAvion(id: string, hours: number): Promise<IAvion | null> {
+    if (hours <= 0) {
+        throw new Error("Las horas de vuelo deben ser un número positivo");
+    }
+    
+    const avion = await this.avionRepository.findById(id);
+    if (!avion) {
+        throw new Error("Avión no encontrado");
+    }
+    
+    return await this.avionRepository.addFlightHours(id, hours);
+    }   
+
 }
