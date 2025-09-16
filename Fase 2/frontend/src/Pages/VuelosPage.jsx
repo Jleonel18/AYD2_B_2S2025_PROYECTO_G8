@@ -227,11 +227,21 @@ const VuelosPage = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Lista de Vuelos</h1>
-        <button onClick={() => setShowForm(true)} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
-          + Nuevo Vuelo
-        </button>
+      <div className="flex flex-col mb-6">
+        <div className='flex justify-between'>
+          <h1 className="text-3xl font-bold text-gray-800">Lista de Vuelos</h1>
+          <button onClick={() => setShowForm(true)} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+            + Nuevo Vuelo
+          </button>
+        </div>
+        <div className="mt-4 text-sm text-gray-600 flex space-x-4">
+        <span className="text-blue-500">Planificado</span>
+        <span className="text-green-500">Iniciado</span>
+        <span className="text-green-500">En tiempo</span>
+        <span className="text-orange-500">Retrasado</span>
+        <span className="text-red-500">Cancelado</span>
+        <span className="text-purple-500">Aterrizado</span>
+      </div>
       </div>
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full text-left">
@@ -267,14 +277,6 @@ const VuelosPage = () => {
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="mt-4 text-sm text-gray-600 flex space-x-4">
-        <span className="text-blue-500">Planificado</span>
-        <span className="text-green-500">Iniciado</span>
-        <span className="text-green-500">En tiempo</span>
-        <span className="text-orange-500">Retrasado</span>
-        <span className="text-red-500">Cancelado</span>
-        <span className="text-purple-500">Aterrizado</span>
       </div>
 
       {showForm && (
