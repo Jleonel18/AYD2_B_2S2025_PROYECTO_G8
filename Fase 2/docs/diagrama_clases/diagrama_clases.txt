@@ -1,0 +1,487 @@
+@startuml
+' Definición de enumeraciones
+
+' Definición de clases de modelo
+class Aeropuerto {
+  +_id: string
+  +nombre: string
+  +ciudad: string
+  +pais: string
+  +codigoIATA: string
+  +codigoICAO: string
+}
+
+class Avion {
+  +_id: string
+  +modelo: string
+  +capacidadMaxima: number
+  +estado: string
+  +numeroSerie: string
+  +horas_Vuelo: number
+  +limite_horas: number
+  +id_aeropuerto_actual: ObjectId
+}
+
+class Reserva {
+  +_id: ObjectId
+  +id_usuario: ObjectId
+  +id_vuelo: ObjectId
+  +asientos_reservados: number
+  +asientos: number[]
+  +fecha_reserva: Date
+  +estado: EstadoReserva
+  +codigo_reserva: string
+  +maletas: {tipo: string, peso: number}[]
+}
+
+class User {
+  +_id: string
+  +nombre: string
+  +correo: string
+  +edad: number
+  +telefono: string
+  +direccion: string
+  +genero: string
+  +fecha_nacimiento: Date
+  +dpi: string
+  +usuario: string
+  +contrasena: string
+  +tipo: string
+  +vuelos: ObjectId[]
+  +numero_licencia: string
+  +horasVuelo: number
+  +verificacion_email: boolean
+  +puntos: number
+}
+
+class Pasaporte {
+  +numero: string
+  +fecha_vencimiento: Date
+  +pais_emision: string
+}
+
+class Token {
+  +token: string
+  +expiracion: Date
+}
+
+class Vuelo {
+  +_id: ObjectId
+  +origen: ObjectId
+  +destino: ObjectId
+  +fecha_salida: Date
+  +fecha_llegada: Date
+  +aeronave: ObjectId
+  +estado: EstadoVuelo
+  +piloto_id: ObjectId
+  +copiloto_id: ObjectId
+  +sobrecargos: ObjectId[]
+}
+
+class DatabaseSingleton {
+  -instance: DatabaseSingleton
+  +getInstance(): DatabaseSingleton
+  +connect(uri: string): void
+}
+
+' Definición de clases de dominio
+abstract class Usuario {
+  +nombre: string
+  +edad: number
+  +correo: string
+  +telefono: string
+  +direccion: string
+  +genero: string
+  +fecha_nacimiento: Date
+  +dpi: string
+  +usuario: string
+  +tipo: UsuarioType
+  +vuelos: string[]
+  +contrasena: string
+  +toJSON(): Record<string, unknown>
+}
+
+class Piloto {
+  +numero_licencia: string
+  +horasVuelo: number
+  +toJSON(): Record<string, unknown>
+}
+
+class Pasajero {
+  +pasaporte: Pasaporte
+  +verificacion_email: boolean
+  +puntos: number
+  +token: Token
+  +token_reset: Token
+  +toJSON(): Record<string, unknown>
+}
+
+class Sobrecargo {
+  +toJSON(): Record<string, unknown>
+}
+
+class Operaciones {
+  +toJSON(): Record<string, unknown>
+}
+
+class UsuarioFactory {
+  +crearUsuario(tipo: UsuarioType, datos: any): Usuario
+}
+
+' Definición de interfaz Observador
+interface Observador {
+  +actualizar(estado: EstadoReserva, reservaId: string): void
+}
+
+' Definición de interfaces de repositorio
+interface IAeropuertoRepository {
+  +create(aeropuerto: IAeropuerto): Promise<IAeropuerto>
+  +findAll(): Promise<IAeropuerto[]>
+  +findById(id: string): Promise<IAeropuerto | null>
+  +update(id: string, aeropuerto: IAeropuerto): Promise<IAeropuerto | null>
+  +delete(id: string): Promise<boolean>
+}
+
+interface IAvionRepository {
+  +create(avion: IAvion): Promise<IAvion>
+  +findAll(): Promise<IAvion[]>
+  +findById(id: string): Promise<IAvion | null>
+  +update(id: string, avion: IAvion): Promise<IAvion | null>
+  +delete(id: string): Promise<boolean>
+  +addFlightHours(id: string, hours: number): Promise<IAvion | null>
+}
+
+interface IReservaRepository {
+  +crearReserva(reserva: IReserva): Promise<IReserva>
+  +obtenerReservaPorId(id: string): Promise<IReserva | null>
+  +obtenerReservasPorUsuario(id_usuario: string): Promise<IReserva[]>
+  +actualizarReserva(id: string, reserva: Partial<IReserva>): Promise<IReserva | null>
+  +eliminarReserva(id: string): Promise<boolean>
+  +obtenerReservasPorVuelo(id_vuelo: string): Promise<IReserva[]>
+  +cancelarReservasPorVuelo(id_vuelo: string): Promise<number>
+  +hacerCheckIn(id: string, maletas: {tipo: string, peso: number}[]): Promise<IReserva | null>
+  +cambiarEstadoReserva(id: string, estado: EstadoReserva): Promise<IReserva | null>
+}
+
+interface IUserRepository {
+  +create(user: Partial<IUser>): Promise<IUser>
+  +findById(id: string): Promise<IUser | null>
+  +findAll(): Promise<IUser[]>
+  +findWorkers(): Promise<IUser[]>
+  +update(id: string, user: Partial<IUser>): Promise<IUser | null>
+  +delete(id: string): Promise<void>
+  +verifyAndSetPassword(userId: string, plainPassword: string): Promise<IUser | null>
+  +findByEmail(email: string): Promise<IUser | null>
+  +findByToken(token: string, tipo: string): Promise<IUser | null>
+  +login(usuario: string, contrasena: string): Promise<IUser | null>
+  +editProfile(id: string, datos: Partial<IUser>): Promise<IUser | null>
+  +updateWorker(id: string, datos: Partial<IUser>): Promise<IUser | null>
+  +deleteWorker(id: string): Promise<void>
+  +saveTokenForgotPassword(userId: string, token: string, expiration: Date): Promise<IUser | null>
+  +verifyAndResetPassword(userId: string, plainPassword: string): Promise<IUser | null>
+  +addFlightHoursToPilot(pilotId: string, hours: number): Promise<IUser | null>
+  +updatePoints(pasajero: string, puntos: number): Promise<IUser | null>
+}
+
+interface IVueloRepository {
+  +create(vuelo: Partial<IVuelo): Promise<IVuelo>
+  +findById(id: string): Promise<IVuelo | null>
+  +findAll(): Promise<IVuelo[]>
+  +update(id: string, vuelo: Partial<IVuelo): Promise<IVuelo | null>
+  +delete(id: string): Promise<void>
+  +updateEstado(id: string, nuevoEstado: string): Promise<IVuelo | null>
+  +cancel(id: string): Promise<IVuelo | null>
+  +findVuelosByTrabajador(trabajadorId: string): Promise<IVuelo[]>
+}
+
+' Definición de clases de repositorio
+class AeropuertoRepository {
+  +create(aeropuerto: IAeropuerto): Promise<IAeropuerto>
+  +findAll(): Promise<IAeropuerto[]>
+  +findById(id: string): Promise<IAeropuerto | null>
+  +update(id: string, aeropuerto: IAeropuerto): Promise<IAeropuerto | null>
+  +delete(id: string): Promise<boolean>
+}
+
+class AvionRepository {
+  +create(avion: Partial<IAvion): Promise<IAvion>
+  +findAll(): Promise<IAvion[]>
+  +findById(id: string): Promise<IAvion | null>
+  +update(id: string, avion: Partial<IAvion): Promise<IAvion | null>
+  +delete(id: string): Promise<boolean>
+  +addFlightHours(id: string, hours: number): Promise<IAvion | null>
+}
+
+class ReservaRepository {
+  +crearReserva(reserva: IReserva): Promise<IReserva>
+  +obtenerReservaPorId(id: string): Promise<IReserva | null>
+  +obtenerReservasPorUsuario(id_usuario: string): Promise<IReserva[]>
+  +actualizarReserva(id: string, reserva: Partial<IReserva): Promise<IReserva | null>
+  +eliminarReserva(id: string): Promise<boolean>
+  +obtenerReservasPorVuelo(id_vuelo: string): Promise<IReserva[]>
+  +cancelarReservasPorVuelo(id_vuelo: string): Promise<number>
+  +hacerCheckIn(id: string, maletas: {tipo: string, peso: number}[]): Promise<IReserva | null>
+  +cambiarEstadoReserva(id: string, estado: EstadoReserva): Promise<IReserva | null>
+}
+
+class UserRepository {
+  +create(user: Partial<IUser): Promise<IUser>
+  +findById(id: string): Promise<IUser | null>
+  +findAll(): Promise<IUser[]>
+  +findWorkers(): Promise<IUser[]>
+  +update(id: string, user: Partial<IUser): Promise<IUser | null>
+  +delete(id: string): Promise<void>
+  +verifyAndSetPassword(userId: string, plainPassword: string): Promise<IUser | null>
+  +findByEmail(email: string): Promise<IUser | null>
+  +findByToken(token: string, tipo: string): Promise<IUser | null>
+  +login(usuario: string, contrasena: string): Promise<IUser | null>
+  +editProfile(id: string, datos: Partial<IUser): Promise<IUser | null>
+  +updateWorker(id: string, datos: Partial<IUser): Promise<IUser | null>
+  +deleteWorker(id: string): Promise<void>
+  +saveTokenForgotPassword(userId: string, token: string, expiration: Date): Promise<IUser | null>
+  +verifyAndResetPassword(userId: string, plainPassword: string): Promise<IUser | null>
+  +addFlightHoursToPilot(pilotId: string, hours: number): Promise<IUser | null>
+  +updatePoints(pasajero: string, puntos: number): Promise<IUser | null>
+}
+
+class VueloRepository {
+  +create(vuelo: Partial<IVuelo): Promise<IVuelo>
+  +findById(id: string): Promise<IVuelo | null>
+  +findAll(): Promise<IVuelo[]>
+  +update(id: string, vuelo: Partial<IVuelo): Promise<IVuelo | null>
+  +delete(id: string): Promise<void>
+  +updateEstado(id: string, nuevoEstado: string): Promise<IVuelo | null>
+  +cancel(id: string): Promise<IVuelo | null>
+  +findVuelosByTrabajador(trabajadorId: string): Promise<IVuelo[]>
+}
+
+' Definición de clases de servicio
+class AeropuertoService {
+  -aeropuertoRepository: IAeropuertoRepository
+  +createAeropuerto(aeropuerto: IAeropuerto): Promise<IAeropuerto>
+  +getAllAeropuertos(): Promise<IAeropuerto[]>
+  +getAeropuertoById(id: string): Promise<IAeropuerto | null>
+  +updateAeropuerto(id: string, aeropuerto: IAeropuerto): Promise<IAeropuerto | null>
+  +deleteAeropuerto(id: string): Promise<boolean>
+}
+
+class AvionService {
+  -avionRepository: IAvionRepository
+  +createAvion(avion: IAvion): Promise<IAvion>
+  +getAllAviones(): Promise<IAvion[]>
+  +getAvionById(id: string): Promise<IAvion | null>
+  +updateAvion(id: string, avion: IAvion): Promise<IAvion | null>
+  +deleteAvion(id: string): Promise<boolean>
+  +avionEstaEnAeropuerto(idAvion: string, idAeropuerto: string): Promise<boolean>
+  +addFlightHoursToAvion(id: string, hours: number): Promise<IAvion | null>
+}
+
+class ReservaService {
+  -reservaRepository: IReservaRepository
+  -userService: UserService
+  -observadores: Observador[]
+  +registrarObservador(observador: Observador): void
+  +eliminarObservador(observador: Observador): void
+  -notificarObservadores(estado: EstadoReserva, reserva: IReserva): Promise<void>
+  +crearReserva(datos: Partial<IReserva): Promise<IReserva>
+  +obtenerReserva(id: string): Promise<IReserva | null>
+  +listarReservasPorUsuario(id_usuario: string): Promise<IReserva[]>
+  +actualizarReserva(id: string, datos: Partial<IReserva): Promise<IReserva | null>
+  +eliminarReserva(id: string): Promise<boolean>
+  +listarReservasPorVuelo(id_vuelo: string): Promise<IReserva[]>
+  +cancelarReservasPorVuelo(id_vuelo: string): Promise<number>
+  +hacerCheckIn(id: string, maletas: {tipo: string, peso: number}[]): Promise<IReserva | null>
+  +cambiarEstadoReserva(id: string, estado: EstadoReserva): Promise<IReserva | null>
+}
+
+class UserService {
+  -userRepository: IUserRepository
+  +crearUsuario(tipo: UsuarioType, datos: any): Promise<IUser>
+  +obtenerUsuario(id: string): Promise<IUser | null>
+  +listarUsuarios(): Promise<IUser[]>
+  +listarTrabajadores(): Promise<IUser[]>
+  +agregarPass(id: string, datos: Partial<IUser): Promise<IUser | null>
+  +obtenerUsuarioPorToken(token: string, tipo: string): Promise<IUser | null>
+  +login(usuario: string, contrasena: string): Promise<IUser | null>
+  +obtenerUsuarioPorCorreo(correo: string): Promise<IUser | null>
+  +editarPerfil(id: string, datos: Partial<IUser): Promise<IUser | null>
+  +actualizarTrabajador(id: string, datos: Partial<IUser): Promise<IUser | null>
+  +eliminarTrabajador(id: string): Promise<void>
+  +guardarTokenRecuperacion(userId: string, token: string, expiration: Date): Promise<IUser | null>
+  +verificarYRestablecerContraseña(userId: string, plainPassword: string): Promise<IUser | null>
+  +sumarHorasVueloPiloto(pilotId: string, hours: number): Promise<IUser | null>
+  +puntosPorHorasDeVuelo(pasajero: string, puntos: number): Promise<IUser | null>
+}
+
+class VueloService {
+  -vueloRepository: IVueloRepository
+  +crearVuelo(datos: Partial<IVuelo): Promise<IVuelo>
+  +obtenerVuelo(id: string): Promise<IVuelo | null>
+  +listarVuelos(): Promise<IVuelo[]>
+  +actualizarEstadoVuelo(id: string, nuevoEstado: string): Promise<IVuelo | null>
+  +cancelarVuelo(id: string): Promise<IVuelo | null>
+  +actualizarVuelo(id: string, datos: Partial<IVuelo): Promise<IVuelo | null>
+  +verificarDisponibilidadTrabajador(trabajadorId: string, fecha_salida: Date, fecha_llegada: Date): Promise<boolean>
+  +verificarDisponibilidadAvion(aeronave: string, fecha_salida: Date, fecha_llegada: Date): Promise<boolean>
+}
+
+class ReservaFacade {
+  -vueloService: VueloService
+  -avionService: AvionService
+  -reservaService: ReservaService
+  +crearReserva(reserva: IReserva): Promise<IReserva>
+  +obtenerReserva(id: string): Promise<IReserva | null>
+  +listarReservasPorUsuario(id_usuario: string): Promise<IReserva[]>
+  +actualizarReserva(id: string, reserva: IReserva): Promise<IReserva | null>
+  +eliminarReserva(id: string, id_usuario: string): Promise<boolean>
+  +listarReservasPorVuelo(id_vuelo: string): Promise<IReserva[]>
+  +hacerCheckIn(id: string, id_usuario: string, maletas: {tipo: string, peso: number}[]): Promise<IReserva | null>
+  +cambiarEstadoReserva(id: string): Promise<IReserva | null>
+  +obtenerAsientosReservados(id_vuelo: string): Promise<number[]>
+}
+
+' Definición de clases de controlador
+class AeropuertoController {
+  -aeropuertoService: AeropuertoService
+  +crearAeropuerto(req: Request, res: Response): Promise<void>
+  +obtenerTodosLosAeropuertos(req: Request, res: Response): Promise<void>
+  +obtenerAeropuertoPorId(req: Request, res: Response): Promise<void>
+  +actualizarAeropuerto(req: Request, res: Response): Promise<void>
+  +eliminarAeropuerto(req: Request, res: Response): Promise<void>
+}
+
+class AvionController {
+  -avionService: AvionService
+  +crearAvion(req: Request, res: Response): Promise<void>
+  +obtenerTodosLosAviones(req: Request, res: Response): Promise<void>
+  +obtenerAvionPorId(req: Request, res: Response): Promise<void>
+  +actualizarAvion(req: Request, res: Response): Promise<void>
+  +eliminarAvion(req: Request, res: Response): Promise<void>
+  +sumarHorasVuelo(req: Request, res: Response): Promise<void>
+  +verificarHorasVuelo(req: Request, res: Response): Promise<void>
+}
+
+class VueloController {
+  -vueloService: VueloService
+  -avionService: AvionService
+  -reservaService: ReservaService
+  +crearVuelo(req: Request, res: Response): Promise<void>
+  +obtenerVuelo(req: Request, res: Response): Promise<void>
+  +listarVuelos(req: Request, res: Response): Promise<void>
+  +cancelarVuelo(req: Request, res: Response): Promise<void>
+  +actualizarEstadoVuelo(req: Request, res: Response): Promise<void>
+}
+
+class ReservaController {
+  -reservaFacade: ReservaFacade
+  -userService: UserService
+  -vueloService: VueloService
+  +crearReserva(req: AuthRequest, res: Response): Promise<void>
+  +obtenerReserva(req: AuthRequest, res: Response): Promise<void>
+  +listarReservasPorUsuario(req: AuthRequest, res: Response): Promise<void>
+  +eliminarReserva(req: AuthRequest, res: Response): Promise<void>
+  +listarReservasPorVuelo(req: AuthRequest, res: Response): Promise<void>
+  +hacerCheckIn(req: AuthRequest, res: Response): Promise<void>
+  +cambiarEstadoReserva(req: AuthRequest, res: Response): Promise<void>
+  +obtenerAsientosReservados(req: AuthRequest, res: Response): Promise<void>
+}
+
+class UsuarioController {
+  -usuarioService: UserService
+  +crearUsuario(req: Request, res: Response): Promise<void>
+  +obtenerUsuario(req: AuthRequest, res: Response): Promise<void>
+  +obtenerTrabajadores(req: Request, res: Response): Promise<void>
+  +verificarCorreoGuardarPass(req: Request, res: Response): Promise<void>
+  +login(req: Request, res: Response): Promise<void>
+  +editarPerfil(req: AuthRequest, res: Response): Promise<void>
+  +obtenerTrabajadorPorId(req: Request, res: Response): Promise<void>
+  +actualizarTrabajador(req: Request, res: Response): Promise<void>
+  +eliminarTrabajador(req: Request, res: Response): Promise<void>
+  +solicitarTokenRecuperacion(req: Request, res: Response): Promise<void>
+  +verificarYRestablecerContrasena(req: Request, res: Response): Promise<void>
+  +sumarHorasVueloPiloto(req: Request, res: Response): Promise<void>
+  +sumarPuntosPorHorasVuelo(req: Request, res: Response): Promise<void>
+}
+
+' Relaciones estructurales
+Avion --> "0..1" Aeropuerto
+Reserva --> "1" User
+Reserva --> "1" Vuelo
+User --> "0..*" Vuelo
+User "1" *-- "0..1" Pasaporte
+User "1" *-- "0..1" Token
+User "1" *-- "0..1" Token
+Vuelo --> "1" Aeropuerto
+Vuelo --> "1" Aeropuerto
+Vuelo --> "1" Avion
+Vuelo --> "1" User
+Vuelo --> "1" User
+Vuelo --> "0..*" User
+
+' Relaciones de herencia
+Piloto --|> Usuario
+Pasajero --|> Usuario
+Sobrecargo --|> Usuario
+Operaciones --|> Usuario
+
+' Relaciones de composición para Pasajero
+Pasajero "1" *-- "1" Pasaporte
+Pasajero "1" *-- "0..1" Token
+Pasajero "1" *-- "0..1" Token
+
+' Relaciones de fábrica
+UsuarioFactory --> Piloto
+UsuarioFactory --> Pasajero
+UsuarioFactory --> Sobrecargo
+UsuarioFactory --> Operaciones
+
+' Relaciones de implementación
+AeropuertoRepository ..|> IAeropuertoRepository
+AvionRepository ..|> IAvionRepository
+ReservaRepository ..|> IReservaRepository
+UserRepository ..|> IUserRepository
+VueloRepository ..|> IVueloRepository
+
+' Relaciones de servicio
+AeropuertoService --> IAeropuertoRepository
+AvionService --> IAvionRepository
+ReservaService --> IReservaRepository
+ReservaService --> UserService
+ReservaService --> "0..*" Observador
+UserService --> IUserRepository
+UserService --> UsuarioFactory
+VueloService --> IVueloRepository
+ReservaFacade --> VueloService
+ReservaFacade --> AvionService
+ReservaFacade --> ReservaService
+
+' Relaciones de controlador
+AeropuertoController --> AeropuertoService
+AvionController --> AvionService
+VueloController --> VueloService
+VueloController --> AvionService
+VueloController --> ReservaService
+ReservaController --> ReservaFacade
+ReservaController --> UserService
+ReservaController --> VueloService
+UsuarioController --> UserService
+
+' Dependencias con modelos y DatabaseSingleton
+Aeropuerto --> DatabaseSingleton
+Avion --> DatabaseSingleton
+Reserva --> DatabaseSingleton
+User --> DatabaseSingleton
+Vuelo --> DatabaseSingleton
+AeropuertoRepository --> Aeropuerto
+AvionRepository --> Avion
+ReservaRepository --> Reserva
+UserRepository --> User
+VueloRepository --> Vuelo
+AeropuertoRepository --> DatabaseSingleton
+AvionRepository --> DatabaseSingleton
+ReservaRepository --> DatabaseSingleton
+UserRepository --> DatabaseSingleton
+VueloRepository --> DatabaseSingleton
+Usuario --> "0..*" Vuelo
+
+@enduml
