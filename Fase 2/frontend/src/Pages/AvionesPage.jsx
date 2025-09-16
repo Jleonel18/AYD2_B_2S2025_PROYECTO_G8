@@ -28,6 +28,13 @@ const AvionesPage = () => {
 
   const estadoOptions = ['Disponible', 'En vuelo', 'Mantenimiento', 'Fuera de servicio', 'Reservado'];
 
+  // Function to determine progress bar color based on percentage
+  const getProgressBarColor = (percentage) => {
+    if (percentage <= 50) return 'bg-green-500'; // Green for low usage
+    if (percentage <= 75) return 'bg-yellow-500'; // Yellow for medium usage
+    return 'bg-red-500'; // Red for high usage
+  };
+
   useEffect(() => {
     fetchAviones();
   }, []);
@@ -35,7 +42,7 @@ const AvionesPage = () => {
   const fetchAviones = async () => {
     setLoading(true);
     try {
-      const token = sessionStorage.getItem('token'); // Asumiendo que usas JWT
+      const token = sessionStorage.getItem('token');
       const response = await fetch('http://localhost:3000/api/aviones/', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -235,6 +242,7 @@ const AvionesPage = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {aviones.map((avion) => {
               const mantenimientoStatus = getMantenimientoStatus(avion.horas_Vuelo, avion.limite_horas);
+              const percentage = (avion.horas_Vuelo / avion.limite_horas) * 100;
               return (
                 <tr key={avion._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -255,8 +263,8 @@ const AvionesPage = () => {
                     {avion.horas_Vuelo} / {avion.limite_horas} hrs
                     <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                       <div
-                        className="bg-blue-600 h-2 rounded-full"
-                        style={{ width: `${(avion.horas_Vuelo / avion.limite_horas) * 100}%` }}
+                        className={`${getProgressBarColor(percentage)} h-2 rounded-full`}
+                        style={{ width: `${percentage}%` }}
                       ></div>
                     </div>
                   </td>
@@ -540,7 +548,7 @@ const AvionesPage = () => {
                 <strong className="text-gray-700">Progreso de Mantenimiento:</strong>
                 <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                   <div
-                    className="bg-blue-600 h-2 rounded-full"
+                    className={`${getProgressBarColor((selectedAvion.horas_Vuelo / selectedAvion.limite_horas) * 100)} h-2 rounded-full`}
                     style={{ width: `${(selectedAvion.horas_Vuelo / selectedAvion.limite_horas) * 100}%` }}
                   ></div>
                 </div>
