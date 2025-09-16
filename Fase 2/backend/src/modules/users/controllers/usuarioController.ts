@@ -6,9 +6,10 @@ import { enviarCorreoRecuperacion, enviarCorreoVerificacion } from "../../../uti
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { hashPassword } from "../../../utils/passwords"
 import { AuthRequest } from "../../../middleware/authMiddleware"
+import { VueloService } from "../../../core/repository/services/VueloService"
 
 export class UsuarioController {
-    constructor(private readonly usuarioService: UserService) {}
+    constructor(private readonly usuarioService: UserService, private readonly vueloService: VueloService) {}
 
 
     crearUsuario = async (req: Request, res: Response) => {
@@ -371,53 +372,75 @@ export class UsuarioController {
     }
 
     sumarPuntosPorHorasVuelo = async (req: Request, res: Response) => {
-    try {
-        const { ids, horas } = req.body; // Esperamos una lista de IDs y las horas en el body
-        const horasTruncadas = Math.floor(horas); // Truncar las horas a la parte entera
-        const puntos = horasTruncadas * 100; // Ejemplo: 100 puntos por hora de vuelo
+        try {
+            const { ids, horas } = req.body; // Esperamos una lista de IDs y las horas en el body
+            const horasTruncadas = Math.floor(horas); // Truncar las horas a la parte entera
+            const puntos = horasTruncadas * 100; // Ejemplo: 100 puntos por hora de vuelo
 
-        // Validar que horas sea un número válido
-        if (!horas || typeof horas !== 'number' || horasTruncadas <= 0) {
-            return res.status(400).json({
-                error: "Debe proporcionar un número válido de horas mayor que 0"
-            });
-        }
-
-        // Validar que ids sea un arreglo y no esté vacío
-        if (!Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({
-                error: "Debe proporcionar una lista válida de IDs"
-            });
-        }
-
-        // Procesar cada ID en la lista
-        const resultados = [];
-        for (const id of ids) {
-            const tripulacionActualizada = await this.usuarioService.puntosPorHorasDeVuelo(id, puntos);
-            if (!tripulacionActualizada) {
-                resultados.push({ id, error: "Miembro de tripulación no encontrado" });
-            } else {
-                resultados.push({
-                    id: tripulacionActualizada._id,
-                    message: `Se agregaron ${horasTruncadas} horas de vuelo al miembro de tripulación ${tripulacionActualizada.nombre}`,
-                    tripulacion: {
-                        id: tripulacionActualizada._id,
-                        nombre: tripulacionActualizada.nombre,
-                        usuario: tripulacionActualizada.usuario,
-                        puntos: tripulacionActualizada.puntos,
-                        tipo: tripulacionActualizada.tipo
-                    }
+            // Validar que horas sea un número válido
+            if (!horas || typeof horas !== 'number' || horasTruncadas <= 0) {
+                return res.status(400).json({
+                    error: "Debe proporcionar un número válido de horas mayor que 0"
                 });
             }
-        }
 
-        // Responder con los resultados de todos los IDs procesados
-        res.json({
-            message: "Procesamiento de horas de vuelo completado",
-            resultados
-        });
-    } catch (error) {
-        res.status(400).json({ error: (error as Error).message + " - Asegúrese de enviar una lista de IDs y un número de horas válido" });
+            // Validar que ids sea un arreglo y no esté vacío
+            if (!Array.isArray(ids) || ids.length === 0) {
+                return res.status(400).json({
+                    error: "Debe proporcionar una lista válida de IDs"
+                });
+            }
+
+            // Procesar cada ID en la lista
+            const resultados = [];
+            for (const id of ids) {
+                const tripulacionActualizada = await this.usuarioService.puntosPorHorasDeVuelo(id, puntos);
+                if (!tripulacionActualizada) {
+                    resultados.push({ id, error: "Miembro de tripulación no encontrado" });
+                } else {
+                    resultados.push({
+                        id: tripulacionActualizada._id,
+                        message: `Se agregaron ${horasTruncadas} horas de vuelo al miembro de tripulación ${tripulacionActualizada.nombre}`,
+                        tripulacion: {
+                            id: tripulacionActualizada._id,
+                            nombre: tripulacionActualizada.nombre,
+                            usuario: tripulacionActualizada.usuario,
+                            puntos: tripulacionActualizada.puntos,
+                            tipo: tripulacionActualizada.tipo
+                        }
+                    });
+                }
+            }
+
+            // Responder con los resultados de todos los IDs procesados
+            res.json({
+                message: "Procesamiento de horas de vuelo completado",
+                resultados
+            });
+        } catch (error) {
+            res.status(400).json({ error: (error as Error).message + " - Asegúrese de enviar una lista de IDs y un número de horas válido" });
+        }
+    };
+
+    obtenerHistorialVuelos = async (req: AuthRequest, res: Response) => {
+        try {
+            const { id } = req.user;
+            const usuario = await this.usuarioService.obtenerUsuario(id);
+            if (!usuario) {
+                return res.status(404).json({ error: "Usuario no encontrado" });
+            }
+
+            const historial = await this.usuarioService.obtenerHistorialDeVuelos(id);
+            if (!historial) {
+                return res.status(404).json({ error: "No se encontró historial de vuelos para este usuario" });
+            }
+
+            // Retornar toda la información de los vuelos en el historial
+            const vuelosInfo = await Promise.all(historial.map(vueloId => this.vueloService.obtenerVuelo(vueloId.toString())));
+
+            res.json({ vuelos: vuelosInfo });
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" });
+        }
     }
-};
 }
