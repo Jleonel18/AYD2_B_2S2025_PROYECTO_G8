@@ -1,43 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
 
-const PilotFlightsPage = () => {
+const PilotView = () => {
   const [flights, setFlights] = useState([]);
+  const [pilotInfo, setPilotInfo] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showStatusModal, setShowStatusModal] = useState(false);
-  const [selectedFlight, setSelectedFlight] = useState(null);
-  const [newStatus, setNewStatus] = useState('');
-  const [delayTime, setDelayTime] = useState('');
-  const [airports, setAirports] = useState([]);
-  const [aircrafts, setAircrafts] = useState([]);
-  const [workers, setWorkers] = useState([]);
+  const [updatingFlight, setUpdatingFlight] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const statusOptions = [
-    { value: 'Planificado', label: 'Planificado', color: 'text-blue-500' },
-    { value: 'Iniciado', label: 'Iniciado', color: 'text-green-500' },
-    { value: 'En tiempo', label: 'En tiempo', color: 'text-green-500' },
-    { value: 'Retrasado', label: 'Retrasado', color: 'text-orange-500' },
-    { value: 'Aterrizado', label: 'Aterrizado', color: 'text-purple-500' },
-    { value: 'Cancelado', label: 'Cancelado', color: 'text-red-500' }
+  // Estados disponibles para cambio
+  const availableStates = [
+    'Planificado',
+    'Iniciado', 
+    'En tiempo',
+    'Retrasado',
+    'Aterrizado', // Equivalente a "Completado"
+    'Cancelado'
   ];
 
   useEffect(() => {
     fetchPilotFlights();
-    fetchReferenceData();
+    fetchPilotInfo();
   }, []);
 
-  const fetchPilotFlights = async () => {
+  const fetchPilotInfo = async () => {
+    const token = sessionStorage.getItem('token');
     try {
-      const token = sessionStorage.getItem('token');
-      const user = JSON.parse(sessionStorage.getItem('user'));
+      const response = await fetch('http://localhost:3000/api/users/', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
       
-      if (!token || !user) {
-        toast.error('No se encontró información de sesión');
-        return;
+      if (response.ok) {
+        const data = await response.json();
+        setPilotInfo(data);
       }
+    } catch (error) {
+      console.error('Error fetching pilot info:', error);
+    }
+  };
 
-      const response = await fetch(`http://localhost:3000/api/vuelos/piloto/${user._id}`, {
-        method: 'GET',
+  const fetchPilotFlights = async () => {
+    const token = sessionStorage.getItem('token');
+    setLoading(true);
+    
+    try {
+      // Obtener todos los vuelos
+      const response = await fetch('http://localhost:3000/api/vuelos', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -45,145 +56,183 @@ const PilotFlightsPage = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setFlights(data);
+        const allFlights = await response.json();
+        
+        // Obtener info del piloto para filtrar sus vuelos
+        const userResponse = await fetch('http://localhost:3000/api/users/', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          const pilotId = userData._id;
+          
+          // Filtrar solo los vuelos donde este piloto participa
+          const pilotFlights = allFlights.filter(flight => 
+            flight.tripulacion?.piloto_id === pilotId || 
+            flight.tripulacion?.copiloto_id === pilotId
+          );
+          
+          setFlights(pilotFlights);
+        }
       } else {
-        toast.error('Error al obtener los vuelos');
+        setErrorMessage('Error al cargar los vuelos');
       }
     } catch (error) {
-      console.error('Error fetching pilot flights:', error);
-      toast.error('Error de conexión');
+      console.error('Error fetching flights:', error);
+      setErrorMessage('Error de conexión al cargar los vuelos');
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchReferenceData = async () => {
+  const calculateFlightHours = (fechaSalida, fechaLlegada) => {
+    const salida = new Date(fechaSalida);
+    const llegada = new Date(fechaLlegada);
+    const diffMs = llegada.getTime() - salida.getTime();
+    const diffHours = Math.round((diffMs / (1000 * 60 * 60)) * 100) / 100; // Redondear a 2 decimales
+    return diffHours;
+  };
+
+  const updateFlightStatus = async (flightId, newStatus) => {
     const token = sessionStorage.getItem('token');
+    setUpdatingFlight(flightId);
+    
     try {
-      // Fetch airports
-      const airportsResponse = await fetch('http://localhost:3000/api/aeropuertos/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (airportsResponse.ok) {
-        setAirports(await airportsResponse.json());
-      }
-
-      // Fetch aircrafts
-      const aircraftsResponse = await fetch('http://localhost:3000/api/aviones/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (aircraftsResponse.ok) {
-        setAircrafts(await aircraftsResponse.json());
-      }
-
-      // Fetch workers
-      const workersResponse = await fetch('http://localhost:3000/api/users/trabajadores', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (workersResponse.ok) {
-        const data = await workersResponse.json();
-        setWorkers(data.trabajadores);
-      }
-    } catch (error) {
-      console.error('Error fetching reference data:', error);
-    }
-  };
-
-  const getStatusColor = (estado) => {
-    const status = statusOptions.find(s => s.value === estado);
-    return status ? status.color : 'text-gray-500';
-  };
-
-  const getAirportName = (airportId) => {
-    const airport = airports.find(a => a._id === airportId);
-    return airport ? airport.nombre : airportId;
-  };
-
-  const getAircraftModel = (aircraftId) => {
-    const aircraft = aircrafts.find(a => a._id === aircraftId);
-    return aircraft ? aircraft.modelo : aircraftId;
-  };
-
-  const getWorkerName = (workerId) => {
-    const worker = workers.find(w => w._id === workerId);
-    return worker ? worker.nombre : workerId;
-  };
-
-  const calculateFlightDuration = (salida, llegada, delayMinutes = 0) => {
-    const start = new Date(salida);
-    const end = new Date(llegada);
-    const durationMs = end.getTime() - start.getTime() + (delayMinutes * 60 * 1000);
-    return Math.round(durationMs / (1000 * 60 * 60 * 100)) / 100; // Horas con 2 decimales
-  };
-
-  const handleStatusChange = (flight) => {
-    setSelectedFlight(flight);
-    setNewStatus('');
-    setDelayTime('');
-    setShowStatusModal(true);
-  };
-
-  const handleStatusUpdate = async () => {
-    if (!newStatus) {
-      toast.error('Selecciona un estado');
-      return;
-    }
-
-    if (newStatus === 'Retrasado' && (!delayTime || delayTime <= 0)) {
-      toast.error('Ingresa el tiempo de retraso en minutos');
-      return;
-    }
-
-    try {
-      const token = sessionStorage.getItem('token');
-      const user = JSON.parse(sessionStorage.getItem('user'));
-
-      const payload = {
-        nuevoEstado: newStatus,
-        ...(newStatus === 'Retrasado' && { tiempoRetraso: parseInt(delayTime) }),
-        ...(newStatus === 'Aterrizado' && {
-          tiempoVuelo: calculateFlightDuration(
-            selectedFlight.fecha_salida,
-            selectedFlight.fecha_llegada,
-            selectedFlight.tiempoRetraso || 0
-          ),
-          pilotoId: user._id,
-          aeronaveId: selectedFlight.aeronave
-        })
-      };
-
-      const response = await fetch(`http://localhost:3000/api/vuelos/${selectedFlight._id}/estado`, {
+      // Primero actualizamos el estado del vuelo
+      const response = await fetch(`http://localhost:3000/api/vuelos/${flightId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ estado: newStatus }),
       });
 
       if (response.ok) {
         const updatedFlight = await response.json();
-        setFlights(prev => prev.map(f => f._id === selectedFlight._id ? updatedFlight : f));
-        toast.success('Estado actualizado correctamente');
-        setShowStatusModal(false);
         
+        // Si el vuelo se marca como "Aterrizado" (Completado), calculamos y sumamos las horas
         if (newStatus === 'Aterrizado') {
-          toast.success(`Vuelo completado. Tiempo de vuelo: ${payload.tiempoVuelo} horas`);
+          const flightHours = calculateFlightHours(
+            updatedFlight.fecha_salida, 
+            updatedFlight.fecha_llegada
+          );
+          
+          // Sumar horas al piloto actual
+          if (pilotInfo && updatedFlight.tripulacion?.piloto_id === pilotInfo._id) {
+            await updatePilotFlightHours(pilotInfo._id, flightHours);
+          }
+          
+          // Si hay copiloto y es diferente, también sumarle las horas
+          if (updatedFlight.tripulacion?.copiloto_id && 
+              updatedFlight.tripulacion.copiloto_id !== pilotInfo._id) {
+            await updatePilotFlightHours(updatedFlight.tripulacion.copiloto_id, flightHours);
+          }
+          
+          // Sumar horas al avión
+          await updateAircraftFlightHours(updatedFlight.aeronave, flightHours);
+          
+          setSuccessMessage(`Vuelo completado. Se sumaron ${flightHours} horas de vuelo.`);
+        } else {
+          setSuccessMessage(`Estado del vuelo actualizado a: ${newStatus}`);
         }
+        
+        // Actualizar la lista de vuelos
+        setFlights(prevFlights => 
+          prevFlights.map(flight => 
+            flight._id === flightId 
+              ? { ...flight, estado: newStatus }
+              : flight
+          )
+        );
+        
       } else {
         const errorText = await response.text();
-        toast.error(errorText || 'Error al actualizar el estado');
+        setErrorMessage(`Error al actualizar el vuelo: ${errorText}`);
       }
     } catch (error) {
-      console.error('Error updating flight status:', error);
-      toast.error('Error de conexión');
+      console.error('Error updating flight:', error);
+      setErrorMessage('Error de conexión al actualizar el vuelo');
+    } finally {
+      setUpdatingFlight(null);
     }
+  };
+
+  const updatePilotFlightHours = async (pilotId, hours) => {
+    const token = sessionStorage.getItem('token');
+    
+    try {
+      const response = await fetch(`http://localhost:3000/api/users/pilotos/${pilotId}/horas-vuelo`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ horas: hours }),
+      });
+      
+      if (!response.ok) {
+        console.error('Error al actualizar horas del piloto');
+      }
+    } catch (error) {
+      console.error('Error updating pilot flight hours:', error);
+    }
+  };
+
+  const updateAircraftFlightHours = async (aircraftId, hours) => {
+    const token = sessionStorage.getItem('token');
+    
+    try {
+      const response = await fetch(`http://localhost:3000/api/aviones/${aircraftId}/horas-vuelo`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ horas: hours }),
+      });
+      
+      if (!response.ok) {
+        console.error('Error al actualizar horas del avión');
+      }
+    } catch (error) {
+      console.error('Error updating aircraft flight hours:', error);
+    }
+  };
+
+  const getStatusColor = (estado) => {
+    switch (estado) {
+      case 'Planificado': return 'text-blue-500 bg-blue-50';
+      case 'Iniciado': return 'text-green-500 bg-green-50';
+      case 'En tiempo': return 'text-green-600 bg-green-100';
+      case 'Retrasado': return 'text-orange-500 bg-orange-50';
+      case 'Cancelado': return 'text-red-500 bg-red-50';
+      case 'Aterrizado': return 'text-purple-500 bg-purple-50';
+      default: return 'text-gray-500 bg-gray-50';
+    }
+  };
+
+  const canChangeStatus = (currentStatus) => {
+    // Lógica de negocio: qué estados pueden cambiar a cuáles
+    const statusTransitions = {
+      'Planificado': ['Iniciado', 'Cancelado', 'Retrasado'],
+      'Iniciado': ['En tiempo', 'Retrasado', 'Aterrizado'],
+      'En tiempo': ['Aterrizado', 'Retrasado'],
+      'Retrasado': ['Aterrizado', 'En tiempo'],
+      'Aterrizado': [], // No se puede cambiar desde aterrizado
+      'Cancelado': [] // No se puede cambiar desde cancelado
+    };
+    
+    return statusTransitions[currentStatus] || [];
   };
 
   if (loading) {
     return (
-      <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="text-xl text-gray-600">Cargando vuelos...</div>
       </div>
     );
@@ -192,173 +241,178 @@ const PilotFlightsPage = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Mis Vuelos Asignados</h1>
-        <p className="text-gray-600">Gestiona el estado de tus vuelos asignados</p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Panel del Piloto</h1>
+        {pilotInfo && (
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-700">
+              Bienvenido, {pilotInfo.nombre}
+            </h2>
+            <p className="text-gray-600">
+              Horas de vuelo: {pilotInfo.horasVuelo || 0} hrs
+            </p>
+          </div>
+        )}
       </div>
 
+      {/* Mensajes de estado */}
+      {errorMessage && (
+        <div className="mb-4 p-4 bg-red-50 text-red-700 border border-red-200 rounded-lg flex justify-between items-center">
+          <span>{errorMessage}</span>
+          <button
+            onClick={() => setErrorMessage('')}
+            className="ml-4 text-red-700 hover:text-red-900"
+          >
+            ✖️
+          </button>
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="mb-4 p-4 bg-green-50 text-green-700 border border-green-200 rounded-lg flex justify-between items-center">
+          <span>{successMessage}</span>
+          <button
+            onClick={() => setSuccessMessage('')}
+            className="ml-4 text-green-700 hover:text-green-900"
+          >
+            ✖️
+          </button>
+        </div>
+      )}
+
+      {/* Lista de vuelos */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-200 text-gray-700">
-            <tr>
-              <th className="p-4 border-b-2 border-gray-300">ID Vuelo</th>
-              <th className="p-4 border-b-2 border-gray-300">Origen</th>
-              <th className="p-4 border-b-2 border-gray-300">Destino</th>
-              <th className="p-4 border-b-2 border-gray-300">Salida</th>
-              <th className="p-4 border-b-2 border-gray-300">Llegada</th>
-              <th className="p-4 border-b-2 border-gray-300">Aeronave</th>
-              <th className="p-4 border-b-2 border-gray-300">Estado</th>
-              <th className="p-4 border-b-2 border-gray-300">Retraso</th>
-              <th className="p-4 border-b-2 border-gray-300">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {flights.length === 0 ? (
-              <tr>
-                <td colSpan="9" className="p-8 text-center text-gray-500">
-                  No tienes vuelos asignados
-                </td>
-              </tr>
-            ) : (
-              flights.map((flight) => (
-                <tr key={flight._id} className="hover:bg-gray-100 transition duration-150">
-                  <td className="p-4 border-b border-gray-200 font-mono text-sm">
-                    {flight._id.slice(-8)}
-                  </td>
-                  <td className="p-4 border-b border-gray-200">
-                    {getAirportName(flight.origen)}
-                  </td>
-                  <td className="p-4 border-b border-gray-200">
-                    {getAirportName(flight.destino)}
-                  </td>
-                  <td className="p-4 border-b border-gray-200">
-                    {new Date(flight.fecha_salida).toLocaleString()}
-                  </td>
-                  <td className="p-4 border-b border-gray-200">
-                    {new Date(flight.fecha_llegada).toLocaleString()}
-                  </td>
-                  <td className="p-4 border-b border-gray-200">
-                    {getAircraftModel(flight.aeronave)}
-                  </td>
-                  <td className="p-4 border-b border-gray-200">
-                    <span className={getStatusColor(flight.estado)}>{flight.estado}</span>
-                  </td>
-                  <td className="p-4 border-b border-gray-200">
-                    {flight.tiempoRetraso ? `${flight.tiempoRetraso} min` : '-'}
-                  </td>
-                  <td className="p-4 border-b border-gray-200">
-                    {flight.estado !== 'Aterrizado' && flight.estado !== 'Cancelado' && (
-                      <button
-                        onClick={() => handleStatusChange(flight)}
-                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition duration-200"
-                      >
-                        Cambiar Estado
-                      </button>
-                    )}
-                  </td>
+        <div className="px-6 py-4 bg-gray-100 border-b">
+          <h2 className="text-xl font-semibold text-gray-800">Mis Vuelos Asignados</h2>
+        </div>
+        
+        {flights.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            No tienes vuelos asignados actualmente.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Vuelo
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Ruta
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Horarios
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Estado Actual
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Cambiar Estado
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Duración
+                  </th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {flights.map((flight) => {
+                  const availableTransitions = canChangeStatus(flight.estado);
+                  const flightDuration = calculateFlightHours(flight.fecha_salida, flight.fecha_llegada);
+                  
+                  return (
+                    <tr key={flight._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {flight._id.substring(0, 8)}...
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {pilotInfo && flight.tripulacion?.piloto_id === pilotInfo._id ? 'Piloto' : 'Copiloto'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {flight.origen} → {flight.destino}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          <div>Salida: {new Date(flight.fecha_salida).toLocaleString()}</div>
+                          <div>Llegada: {new Date(flight.fecha_llegada).toLocaleString()}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(flight.estado)}`}>
+                          {flight.estado}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {availableTransitions.length > 0 && updatingFlight !== flight._id ? (
+                          <select
+                            className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value=""
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                updateFlightStatus(flight._id, e.target.value);
+                              }
+                            }}
+                          >
+                            <option value="">Cambiar a...</option>
+                            {availableTransitions.map((status) => (
+                              <option key={status} value={status}>
+                                {status}
+                              </option>
+                            ))}
+                          </select>
+                        ) : updatingFlight === flight._id ? (
+                          <div className="text-sm text-gray-500">Actualizando...</div>
+                        ) : (
+                          <div className="text-sm text-gray-400">No modificable</div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {flightDuration} hrs
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Leyenda de estados */}
-      <div className="mt-4 flex flex-wrap gap-4 text-sm">
-        {statusOptions.map((status) => (
-          <span key={status.value} className={status.color}>
-            ● {status.label}
-          </span>
-        ))}
-      </div>
-
-      {/* Modal para cambio de estado */}
-      {showStatusModal && selectedFlight && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-96 max-w-sm">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">
-              Cambiar Estado del Vuelo
-            </h2>
-            
-            <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-2">
-                Vuelo: {getAirportName(selectedFlight.origen)} → {getAirportName(selectedFlight.destino)}
-              </p>
-              <p className="text-sm text-gray-600 mb-4">
-                Estado actual: <span className={getStatusColor(selectedFlight.estado)}>
-                  {selectedFlight.estado}
-                </span>
-              </p>
-            </div>
-
-            <div className="mb-4">
-              <label className="block mb-2 text-gray-700 font-semibold">
-                Nuevo Estado
-              </label>
-              <select
-                value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Selecciona un estado</option>
-                {statusOptions
-                  .filter(status => status.value !== selectedFlight.estado)
-                  .map((status) => (
-                    <option key={status.value} value={status.value}>
-                      {status.label}
-                    </option>
-                  ))}
-              </select>
-            </div>
-
-            {newStatus === 'Retrasado' && (
-              <div className="mb-4">
-                <label className="block mb-2 text-gray-700 font-semibold">
-                  Tiempo de Retraso (minutos)
-                </label>
-                <input
-                  type="number"
-                  value={delayTime}
-                  onChange={(e) => setDelayTime(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ej: 30"
-                  min="1"
-                />
-              </div>
-            )}
-
-            {newStatus === 'Aterrizado' && (
-              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-700">
-                  ℹ️ Al marcar como aterrizado, se calculará automáticamente el tiempo de vuelo 
-                  y se actualizarán los registros del piloto y la aeronave.
-                </p>
-                {selectedFlight.tiempoRetraso && (
-                  <p className="text-sm text-green-700 mt-1">
-                    Tiempo de retraso incluido: {selectedFlight.tiempoRetraso} minutos
-                  </p>
-                )}
-              </div>
-            )}
-
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => setShowStatusModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition duration-200"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleStatusUpdate}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
-              >
-                Actualizar
-              </button>
-            </div>
+      <div className="mt-6 bg-white p-4 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">Estados de Vuelo</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+          <div className="flex items-center">
+            <span className="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
+            <span>Planificado - Vuelo programado</span>
+          </div>
+          <div className="flex items-center">
+            <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></span>
+            <span>Iniciado - Vuelo en progreso</span>
+          </div>
+          <div className="flex items-center">
+            <span className="inline-block w-3 h-3 rounded-full bg-green-600 mr-2"></span>
+            <span>En tiempo - Sin retrasos</span>
+          </div>
+          <div className="flex items-center">
+            <span className="inline-block w-3 h-3 rounded-full bg-orange-500 mr-2"></span>
+            <span>Retrasado - Fuera de horario</span>
+          </div>
+          <div className="flex items-center">
+            <span className="inline-block w-3 h-3 rounded-full bg-purple-500 mr-2"></span>
+            <span>Aterrizado - Vuelo completado</span>
+          </div>
+          <div className="flex items-center">
+            <span className="inline-block w-3 h-3 rounded-full bg-red-500 mr-2"></span>
+            <span>Cancelado - Vuelo cancelado</span>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
 
-export default PilotFlightsPage;
+export default PilotView;

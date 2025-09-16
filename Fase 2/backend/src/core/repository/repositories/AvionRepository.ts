@@ -28,7 +28,7 @@ export class AvionRepository implements IAvionRepository {
     async addFlightHours(id: string, hours: number): Promise<IAvion | null> {
     return await AvionModel.findByIdAndUpdate(
         id, 
-        { $inc: { horasVuelo: hours } }, // Incrementa las horas de vuelo
+        { $inc: { horas_Vuelo: hours } }, // Incrementa las horas de vuelo
         { new: true }
     ).exec();
 }

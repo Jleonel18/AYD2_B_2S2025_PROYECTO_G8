@@ -20,6 +20,7 @@ import Historial from './Pages/Historial'
 import Puntos from './Pages/Puntos'
 import Reservar from './Pages/Reservar'
 import Reserva from './Pages/Reserva'
+import PilotView from './Pages/Piloto'
 
 // Componente de layout para rutas autenticadas
 const AuthenticatedLayout = ({ children }) => {
@@ -57,7 +58,8 @@ function App() {
           <Route path="/reservas" element={<Reservas />} />
           <Route path="/historial" element={<Historial />} />
           <Route path="/puntos" element={<Puntos />} />
-          
+          <Route path="/pilotos" element={<PilotView />} />
+
           <Route path="/dashboard-admin" element={
             <AuthenticatedLayout>
               <DashboardAdmin />
@@ -97,6 +99,13 @@ function App() {
               <AeropuertosPage />
             </AuthenticatedLayout>
           } />
+
+          <Route path="/pilotos" element={
+            <AuthenticatedLayout>
+              <PilotView />
+            </AuthenticatedLayout>
+          } />
+
         </Routes>
       </BrowserRouter>
     </>

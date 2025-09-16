@@ -27,6 +27,6 @@ export class AvionRoutes {
 
         this.router.delete("/:id", tokenAuth, authorizeRoles("operaciones"), avionController.eliminarAvion);
 
-        this.router.patch("/:id/horas-vuelo", tokenAuth, authorizeRoles("piloto"), avionController.sumarHorasVuelo);
+        this.router.patch("/:id/horas-vuelo", avionController.sumarHorasVuelo);
     }
 }
