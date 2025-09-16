@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import { VueloController } from '../modules/flights/controllers/vueloController';
-import { VueloService } from '../core/repository/services/VueloService';
-import { VueloRepository } from '../core/repository/repositories/VueloRepository';
-import { AvionService } from '../core/repository/services/AvionService';
-import { AvionRepository } from '../core/repository/repositories/AvionRepository';
-import { authorizeRoles, tokenAuth } from '../middleware/authMiddleware';
-import { ReservaService } from '../core/repository/services/ReservaService';
-import { ReservaRepository } from '../core/repository/repositories/ReservaRepository';
-import { UserRepository } from '../core/repository/repositories/UserRepository';
-import { UserService } from '../core/repository/services/UserService';
+import { VueloController } from '../modules/flights/controllers/vueloController.js';
+import { VueloService } from '../core/repository/services/VueloService.js';
+import { VueloRepository } from '../core/repository/repositories/VueloRepository.js';
+import { AvionService } from '../core/repository/services/AvionService.js';
+import { AvionRepository } from '../core/repository/repositories/AvionRepository.js';
+import { authorizeRoles, tokenAuth } from '../middleware/authMiddleware.js';
+import { ReservaService } from '../core/repository/services/ReservaService.js';
+import { ReservaRepository } from '../core/repository/repositories/ReservaRepository.js';
+import { UserRepository } from '../core/repository/repositories/UserRepository.js';
+import { UserService } from '../core/repository/services/UserService.js';
 
 
 const vueloRepository = new VueloRepository();

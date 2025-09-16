@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AeropuertoService } from "../../../core/repository/services/AeropuertoService";
-import { IAeropuerto } from "../../../core/repository/models/Aeropuerto";
+import { AeropuertoService } from "../../../core/repository/services/AeropuertoService.js";
+import { IAeropuerto } from "../../../core/repository/models/Aeropuerto.js";
 
 export class AeropuertoController {
     constructor(private readonly aeropuertoService: AeropuertoService) {}

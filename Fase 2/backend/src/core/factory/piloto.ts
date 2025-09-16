@@ -1,5 +1,5 @@
-import Usuario from "./usuario";
-import { UsuarioType } from "./usuario";
+import Usuario from "./usuario.js";
+import { UsuarioType } from "./usuario.js";
 
 class Piloto extends Usuario {
     public readonly numero_licencia: string;

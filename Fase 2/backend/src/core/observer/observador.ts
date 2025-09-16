@@ -1,4 +1,4 @@
-import { EstadoReserva } from "../../types/reservas";
+import { EstadoReserva } from "../../types/reservas.js";
 export enum EstadoVuelo {
     PLANIFICADO = "Planificado",
     INICIADO = "Iniciado",

@@ -1,4 +1,4 @@
-import { IAvion } from "../models/Avion";
+import { IAvion } from "../models/Avion.js";
 
 export interface IAvionRepository {
     create(avion: IAvion): Promise<IAvion>;

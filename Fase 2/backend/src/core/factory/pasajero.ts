@@ -1,4 +1,4 @@
-import Usuario, { UsuarioType } from "./usuario";
+import Usuario, { UsuarioType } from "./usuario.js";
 
 class Pasajero extends Usuario {
 

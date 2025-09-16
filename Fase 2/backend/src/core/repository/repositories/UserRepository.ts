@@ -1,7 +1,7 @@
-import { IUserRepository } from './IUserRepository';
-import { UserModel, IUser } from '../models/User';
-import { comparePassword, hashPassword } from '../../../utils/passwords';
-import { flattenObject } from '../../../utils/utils';
+import { IUserRepository } from './IUserRepository.js';
+import { UserModel, IUser } from '../models/User.js';
+import { comparePassword, hashPassword } from '../../../utils/passwords.js';
+import { flattenObject } from '../../../utils/utils.js';
 import { ObjectId } from 'mongodb';
 
 export class UserRepository implements IUserRepository {

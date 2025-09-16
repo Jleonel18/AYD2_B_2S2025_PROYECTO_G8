@@ -1,4 +1,4 @@
-import { IVuelo } from '../models/Vuelo';
+import { IVuelo } from '../models/Vuelo.js';
 
 export interface IVueloRepository {
   create(vuelo: Partial<IVuelo>): Promise<IVuelo>;

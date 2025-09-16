@@ -1,7 +1,7 @@
-import { IVueloRepository } from '../repositories/IVueloRepository';
-import { VueloModel, IVuelo } from '../models/Vuelo';
+import { IVueloRepository } from '../repositories/IVueloRepository.js';
+import { VueloModel, IVuelo } from '../models/Vuelo.js';
 import { Types } from 'mongoose';
-import { EstadoVuelo } from '../../observer/observador';
+import { EstadoVuelo } from '../../observer/observador.js';
 
 export class VueloService {
     private vueloRepository: IVueloRepository;
