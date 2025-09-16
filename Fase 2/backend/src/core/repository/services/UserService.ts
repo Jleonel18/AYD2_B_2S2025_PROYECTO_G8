@@ -2,6 +2,7 @@ import { IUserRepository } from '../repositories/IUserRepository';
 import { IUser } from '../models/User';
 import { UsuarioType } from '../../factory/usuario';
 import UsuarioFactory from '../../factory/usuarioFactory';
+import { ObjectId } from 'mongodb';
 
 export class UserService {
     constructor(private userRepository: IUserRepository) {}
@@ -99,5 +100,9 @@ export class UserService {
             throw new Error("Debe proporcionar puntos para actualizar");
         }
         return await this.userRepository.addPointsAndFlightToHistory(usuarioID, vueloId, puntos);
+    }
+
+    async obtenerHistorialDeVuelos(usuarioID: string): Promise<ObjectId[] | null> {
+        return await this.userRepository.getFlightHistory(usuarioID);
     }
 }

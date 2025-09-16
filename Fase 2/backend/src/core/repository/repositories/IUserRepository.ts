@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { IUser } from '../models/User';
 
 export interface IUserRepository {
@@ -20,4 +21,5 @@ export interface IUserRepository {
     updatePoints(pasajero: string, puntos: number): Promise<IUser | null>;
     addFlightToHistory(usuarioID: string, vueloId: string): Promise<IUser | null>;
     addPointsAndFlightToHistory(usuarioID: string, vueloId: string, puntos: number): Promise<IUser | null>;
+    getFlightHistory(usuarioID: string): Promise<ObjectId[] | null>;
 }

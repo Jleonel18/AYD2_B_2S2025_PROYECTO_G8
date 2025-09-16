@@ -2,6 +2,7 @@ import { IUserRepository } from './IUserRepository';
 import { UserModel, IUser } from '../models/User';
 import { comparePassword, hashPassword } from '../../../utils/passwords';
 import { flattenObject } from '../../../utils/utils';
+import { ObjectId } from 'mongodb';
 
 export class UserRepository implements IUserRepository {
     async create(user: Partial<IUser>): Promise<IUser> {
@@ -142,17 +143,15 @@ export class UserRepository implements IUserRepository {
     }
 
     async addPointsAndFlightToHistory(usuarioID: string, vueloId: string, puntos: number): Promise<IUser | null> {
-        // Hacerlo asi
-        /*
-        return await UserModel.findByIdAndUpdate(
-            usuarioID,
-            { $push: { vuelos: vueloId } },
-            { new: true }
-        );*/
         return await UserModel.findByIdAndUpdate(
             usuarioID,
             { $push: { vuelos: vueloId }, $inc: { puntos: puntos } },
             { new: true }
         );
+    }
+
+    async getFlightHistory(usuarioID: string): Promise<ObjectId[] | null> {
+        const user = await UserModel.findById(usuarioID).select('vuelos');
+        return user ? user.vuelos : null;
     }
 }
