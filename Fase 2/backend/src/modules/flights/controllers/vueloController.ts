@@ -92,8 +92,8 @@ export class VueloController {
     }
 
     const estadoAvion = await this.avionService.getEstadoAvion(aeronave);
-    if(estadoAvion === 'Fuera de servicio') {
-      return res.status(400).json({ error: 'El avión está fuera de servicio y no puede ser asignado a un vuelo' });
+    if(estadoAvion === 'Fuera de servicio' || estadoAvion === 'Mantenimiento') {
+      return res.status(400).json({ error: 'El avión está fuera de servicio o en mantenimiento y no puede ser asignado a un vuelo' });
     }
 
     if(!(await this.vueloService.verificarDisponibilidadAvion(aeronave, fechaSalida, fechaLlegada))) {
