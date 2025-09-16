@@ -3,5 +3,6 @@ export enum EstadoReserva {
     pendiente_abordaje = "Pendiente de Abordaje",
     abordado = "Abordado",
     cancelada = "Cancelada",
-    aterrizado = "Aterrizado"
+    aterrizado = "Aterrizado",
+    en_tiempo = "En tiempo"
 }
