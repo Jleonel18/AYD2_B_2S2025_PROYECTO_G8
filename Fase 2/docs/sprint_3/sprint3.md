@@ -6,6 +6,7 @@ https://drive.google.com/file/d/19iqsWOZ8GABfN_vPiUVUFC-S2GUtBDNp/view?usp=drive
 
 ## Daily 1:
 
+
 ### Link de la grabación:
 
 https://drive.google.com/file/d/1oEqA0SyvVl1bRpisEmMEVz6kAYOLAWda/view?usp=drive_link
