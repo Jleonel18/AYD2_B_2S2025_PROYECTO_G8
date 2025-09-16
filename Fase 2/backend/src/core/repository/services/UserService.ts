@@ -105,4 +105,8 @@ export class UserService {
     async obtenerHistorialDeVuelos(usuarioID: string): Promise<ObjectId[] | null> {
         return await this.userRepository.getFlightHistory(usuarioID);
     }
+
+    async getStatisticsUsers(): Promise<{ totalUsers: number; totalPilots: number; totalFlightAttendants: number; }> {
+        return await this.userRepository.getStatisticsUsers();
+    }
 }

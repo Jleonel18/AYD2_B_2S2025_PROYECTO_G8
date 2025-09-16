@@ -154,4 +154,11 @@ export class UserRepository implements IUserRepository {
         const user = await UserModel.findById(usuarioID).select('vuelos');
         return user ? user.vuelos : null;
     }
+
+    async getStatisticsUsers(): Promise<{ totalUsers: number; totalPilots: number; totalFlightAttendants: number; }> {
+        const totalUsers = await UserModel.countDocuments({tipo: 'pasajero' });
+        const totalPilots = await UserModel.countDocuments({ tipo: 'piloto' });
+        const totalFlightAttendants = await UserModel.countDocuments({ tipo: 'sobrecargo' });
+        return { totalUsers, totalPilots, totalFlightAttendants };
+    }
 }

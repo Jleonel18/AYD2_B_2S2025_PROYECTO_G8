@@ -48,4 +48,8 @@ export class AvionService {
         return avion ? avion.estado : null;
     }
 
+    async getStatisticsAviones(): Promise<{ totalAviones: number; averageFlightHours: number; totalAvionesCriticos: number; }> {
+        return await this.avionRepository.getStatisticsAviones();
+    }
+
 }

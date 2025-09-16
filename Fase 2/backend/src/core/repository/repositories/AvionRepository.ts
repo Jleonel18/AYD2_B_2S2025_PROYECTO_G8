@@ -26,11 +26,20 @@ export class AvionRepository implements IAvionRepository {
     }
 
     async addFlightHours(id: string, hours: number): Promise<IAvion | null> {
-    return await AvionModel.findByIdAndUpdate(
-        id, 
-        { $inc: { horas_Vuelo: hours } }, // Incrementa las horas de vuelo
-        { new: true }
-    ).exec();
-}
+        return await AvionModel.findByIdAndUpdate(
+            id, 
+            { $inc: { horas_Vuelo: hours } }, // Incrementa las horas de vuelo
+            { new: true }
+        ).exec();
+    }
 
+    async getStatisticsAviones(): Promise<{ totalAviones: number; averageFlightHours: number; totalAvionesCriticos: number; }> {
+        const totalAviones = await AvionModel.countDocuments();
+        const totalHoras = await AvionModel.aggregate([
+            { $group: { _id: null, total: { $sum: "$horas_Vuelo" } } }
+        ]);
+        const averageFlightHours = totalAviones > 0 ? (totalHoras[0]?.total || 0) / totalAviones : 0;
+        const totalAvionesCriticos = await AvionModel.countDocuments({ estado: 'critico' });
+        return { totalAviones, averageFlightHours, totalAvionesCriticos };
+    }
 }
