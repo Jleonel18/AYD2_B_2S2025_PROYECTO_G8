@@ -210,8 +210,9 @@ const VuelosPage = () => {
         setErrorMessage('');
         setMaxSobrecargos(0);
       } else {
-        const errorText = await response.text();
-        setErrorMessage(errorText || 'Error desconocido al crear el vuelo');
+        const errorText = await response.json();
+        console.log("El error es:", errorText.error);
+        setErrorMessage(errorText.error || 'Error desconocido al crear el vuelo');
       }
     } catch (error) {
       console.error('Error:', error);
