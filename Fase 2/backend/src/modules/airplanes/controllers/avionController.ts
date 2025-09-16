@@ -73,14 +73,19 @@ export class AvionController {
             }
             
             const avionActualizado = await this.avionService.addFlightHoursToAvion(id, horas);
+            let estadoNuevo: any;
             
             if (!avionActualizado) {
                 return res.status(404).json({ error: "Avión no encontrado" });
             }
+
+            if(avionActualizado.horas_Vuelo > avionActualizado.limite_horas) {
+                estadoNuevo = await this.avionService.updateAvion(id, { estado: 'Fuera de servicio' } as IAvion);
+            }
             
             res.json({
                 message: `Se agregaron ${horas} horas de vuelo al avión`,
-                avion: avionActualizado
+                avion: estadoNuevo || avionActualizado
             });
         } catch (error) {
             res.status(400).json({ error: (error as Error).message });

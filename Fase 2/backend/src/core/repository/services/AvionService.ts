@@ -41,6 +41,11 @@ export class AvionService {
     }
     
     return await this.avionRepository.addFlightHours(id, hours);
-    }   
+    } 
+    
+    async getEstadoAvion(id: string): Promise<string | null> {
+        const avion = await this.avionRepository.findById(id);
+        return avion ? avion.estado : null;
+    }
 
 }
