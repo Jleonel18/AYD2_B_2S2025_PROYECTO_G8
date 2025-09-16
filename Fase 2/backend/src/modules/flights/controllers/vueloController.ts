@@ -87,6 +87,15 @@ export class VueloController {
       }
     }
 
+    if(!(await this.avionService.getEstadoAvion(aeronave))) {
+      return res.status(400).json({ error: 'El avión no existe' });
+    }
+
+    const estadoAvion = await this.avionService.getEstadoAvion(aeronave);
+    if(estadoAvion === 'Fuera de servicio') {
+      return res.status(400).json({ error: 'El avión está fuera de servicio y no puede ser asignado a un vuelo' });
+    }
+
     if(!(await this.vueloService.verificarDisponibilidadAvion(aeronave, fechaSalida, fechaLlegada))) {
       return res.status(400).json({ error: 'El avión ya tiene un vuelo asignado en la misma fecha' });
     }
