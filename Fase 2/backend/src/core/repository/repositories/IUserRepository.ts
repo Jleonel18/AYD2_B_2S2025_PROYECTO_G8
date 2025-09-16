@@ -18,4 +18,6 @@ export interface IUserRepository {
     verifyAndResetPassword(userId: string, plainPassword: string): Promise<IUser | null>;
     addFlightHoursToPilot(pilotId: string, hours: number): Promise<IUser | null>;
     updatePoints(pasajero: string, puntos: number): Promise<IUser | null>;
+    addFlightToHistory(usuarioID: string, vueloId: string): Promise<IUser | null>;
+    addPointsAndFlightToHistory(usuarioID: string, vueloId: string, puntos: number): Promise<IUser | null>;
 }

@@ -5,11 +5,12 @@ import { Types } from "mongoose";
 import { EstadoVuelo } from "../../../core/observer/observador";
 import { AvionService } from "../../../core/repository/services/AvionService";
 import { ReservaService } from "../../../core/repository/services/ReservaService";
+import { UserService } from "../../../core/repository/services/UserService";
 
 
 
 export class VueloController {
-  constructor(private readonly vueloService: VueloService, private readonly avionService: AvionService, private readonly reservaService: ReservaService) {}
+  constructor(private readonly vueloService: VueloService, private readonly avionService: AvionService, private readonly reservaService: ReservaService, private readonly userService: UserService) {}
 
   crearVuelo = async (req: Request, res: Response) => {
   try {
@@ -169,6 +170,33 @@ actualizarEstadoVuelo = async (req: Request, res: Response) => {
     }
     // Validar que el usuario sea piloto o copiloto (lógica de autenticación pendiente)
     const vueloActualizado = await this.vueloService.actualizarEstadoVuelo(id, estado);
+
+
+    // Si el vuelo fue aterrizado, actualizar horas de vuelo del piloto y copiloto
+    if (estado === EstadoVuelo.ATERRIZADO) {
+      // Calcular duración del vuelo en horas a dos decimales
+      const duracionMs = vuelo.fecha_llegada.getTime() - vuelo.fecha_salida.getTime();
+      const duracionHoras = Math.round((duracionMs / (1000 * 60 * 60)) * 100) / 100; // Dos decimales
+      await this.userService.sumarHorasVueloPiloto(vuelo.tripulacion.piloto_id.toString(), duracionHoras);
+      await this.userService.sumarHorasVueloPiloto(vuelo.tripulacion.copiloto_id.toString(), duracionHoras);
+      // Agregar vuelo al historial de pasajeros con reservas confirmadas
+      const reservas = await this.reservaService.listarReservasPorVuelo(id);
+
+      // Por cada hora de vuelo se otorga 100 puntos
+      const puntosPorVuelo = Math.floor(duracionHoras * 100);
+
+      for (const reserva of reservas) {
+        await this.userService.agregarPuntosYVueloAlHistorial(reserva.id_usuario.toString(), id, puntosPorVuelo);
+      }
+  
+      // Agregar vuelo al historial de la tripulación
+      await this.userService.agregarVueloAlHistorial(vuelo.tripulacion.piloto_id.toString(), id);
+      await this.userService.agregarVueloAlHistorial(vuelo.tripulacion.copiloto_id.toString(), id);
+      for (const sobrecargoId of vuelo.tripulacion.sobrecargos) {
+        await this.userService.agregarVueloAlHistorial(sobrecargoId.toString(), id);
+      }
+    }
+
     res.json(vueloActualizado);
   } catch (error) {
     res.status(500).json({ error: "Error al actualizar el estado del vuelo" });

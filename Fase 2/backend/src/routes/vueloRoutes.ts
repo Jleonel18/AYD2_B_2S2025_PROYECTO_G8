@@ -19,7 +19,7 @@ const reservaRepository = new ReservaRepository();
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 const reservaService = new ReservaService(reservaRepository, userService);
-const vueloController = new VueloController(vueloService, avionService, reservaService);
+const vueloController = new VueloController(vueloService, avionService, reservaService, userService);
 
 export class VueloRoutes {
     public router: Router;  

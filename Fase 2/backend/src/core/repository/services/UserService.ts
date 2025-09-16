@@ -90,4 +90,14 @@ export class UserService {
         return await this.userRepository.updatePoints(pasajero, puntos);
     }
 
+    async agregarVueloAlHistorial(usuarioID: string, vueloId: string): Promise<IUser | null> {
+        return await this.userRepository.addFlightToHistory(usuarioID, vueloId);
+    }
+
+    async agregarPuntosYVueloAlHistorial(usuarioID: string, vueloId: string, puntos: number): Promise<IUser | null> {
+        if (puntos === undefined) {
+            throw new Error("Debe proporcionar puntos para actualizar");
+        }
+        return await this.userRepository.addPointsAndFlightToHistory(usuarioID, vueloId, puntos);
+    }
 }
