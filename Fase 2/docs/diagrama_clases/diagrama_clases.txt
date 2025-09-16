@@ -11,6 +11,7 @@ class Aeropuerto {
   +codigoICAO: string
 }
 
+
 class Avion {
   +_id: string
   +modelo: string
