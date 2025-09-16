@@ -29,7 +29,7 @@ export class UsuarioRoutes {
         this.router.put("/perfil", tokenAuth, authorizeRoles('pasajero'), usuarioController.editarPerfil)
         this.router.post("/recuperar-password", usuarioController.solicitarTokenRecuperacion)
         this.router.post("/verificar-password", usuarioController.verificarYRestablecerContrasena)
-        this.router.patch("/pilotos/:id/horas-vuelo", tokenAuth, authorizeRoles('operaciones'), usuarioController.sumarHorasVueloPiloto);
+        this.router.patch("/pilotos/:id/horas-vuelo", usuarioController.sumarHorasVueloPiloto);
 
     }
 }

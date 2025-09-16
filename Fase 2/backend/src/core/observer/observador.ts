@@ -3,7 +3,8 @@ export enum EstadoVuelo {
     PLANIFICADO = "Planificado",
     INICIADO = "Iniciado",
     CANCELADO = "Cancelado",
-    RETRASADO = "Retrasado"
+    RETRASADO = "Retrasado",
+    ATERRIZADO = "Aterrizado"
 }
 
 export interface Observador {

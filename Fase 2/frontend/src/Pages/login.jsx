@@ -39,7 +39,7 @@ const Login = () => {
         if(data.usuario.tipo === 'operaciones'){
           navigate('/dashboard-admin');
         }else if(data.usuario.tipo === 'piloto'){
-          navigate('/Piloto');
+          navigate('/pilotos');
         }else {
           navigate('/mainpage');
         }
