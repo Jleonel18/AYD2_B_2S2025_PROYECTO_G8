@@ -118,4 +118,18 @@ export class UserRepository implements IUserRepository {
             { new: true }
         );
     }
+
+    async updatePoints(pasajero: string, puntos: number): Promise<IUser | null> {
+        // Primero verificamos que el usuario sea un pasajero
+        const user = await UserModel.findById(pasajero);
+        if (!user || user.tipo !== 'pasajero') {
+            throw new Error("El usuario no es un pasajero o no existe");
+        }
+        // Incrementamos los puntos del pasajero
+        return await UserModel.findByIdAndUpdate(
+            pasajero,
+            { $inc: { puntos: puntos } },
+            { new: true }
+        );
+    }
 }

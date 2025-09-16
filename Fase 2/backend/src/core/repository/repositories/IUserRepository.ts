@@ -17,4 +17,5 @@ export interface IUserRepository {
     saveTokenForgotPassword(userId: string, token: string, expiration: Date): Promise<IUser | null>;
     verifyAndResetPassword(userId: string, plainPassword: string): Promise<IUser | null>;
     addFlightHoursToPilot(pilotId: string, hours: number): Promise<IUser | null>;
+    updatePoints(pasajero: string, puntos: number): Promise<IUser | null>;
 }

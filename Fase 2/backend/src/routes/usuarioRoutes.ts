@@ -30,6 +30,7 @@ export class UsuarioRoutes {
         this.router.post("/recuperar-password", usuarioController.solicitarTokenRecuperacion)
         this.router.post("/verificar-password", usuarioController.verificarYRestablecerContrasena)
         this.router.patch("/pilotos/:id/horas-vuelo", usuarioController.sumarHorasVueloPiloto);
+        this.router.patch("/pasajeros/puntos", tokenAuth, authorizeRoles("operaciones"), usuarioController.sumarPuntosPorHorasVuelo);
 
     }
 }
