@@ -4,7 +4,8 @@ export enum EstadoVuelo {
     INICIADO = "Iniciado",
     CANCELADO = "Cancelado",
     RETRASADO = "Retrasado",
-    ATERRIZADO = "Aterrizado"
+    ATERRIZADO = "Aterrizado",
+    EN_TIEMPO = "En tiempo"
 }
 
 export interface Observador {

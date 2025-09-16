@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 
 const PilotView = () => {
@@ -7,6 +8,10 @@ const PilotView = () => {
   const [updatingFlight, setUpdatingFlight] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showDelayModal, setShowDelayModal] = useState(false);
+  const [selectedFlightForDelay, setSelectedFlightForDelay] = useState(null);
+  const [delayHours, setDelayHours] = useState('');
+  const [delayMinutes, setDelayMinutes] = useState('');
 
   // Estados disponibles para cambio
   const availableStates = [
@@ -97,7 +102,7 @@ const PilotView = () => {
     return diffHours;
   };
 
-  const updateFlightStatus = async (flightId, newStatus) => {
+  const updateFlightStatus = async (flightId, newStatus, delayTime = 0) => {
     const token = sessionStorage.getItem('token');
     setUpdatingFlight(flightId);
     
@@ -117,37 +122,70 @@ const PilotView = () => {
         
         // Si el vuelo se marca como "Aterrizado" (Completado), calculamos y sumamos las horas
         if (newStatus === 'Aterrizado') {
-          const flightHours = calculateFlightHours(
+          const normalFlightHours = calculateFlightHours(
             updatedFlight.fecha_salida, 
             updatedFlight.fecha_llegada
           );
           
+          // Obtener el vuelo actual para conseguir el tiempo de retraso
+          const currentFlight = flights.find(f => f._id === flightId);
+          const delayHours = currentFlight?.tiempoRetraso || 0;
+          
+          const totalFlightHours = normalFlightHours + delayHours;
+          
+          console.log('Horas normales:', normalFlightHours);
+          console.log('Horas de retraso:', delayHours);
+          console.log('Total a sumar:', totalFlightHours);
+          
           // Sumar horas al piloto actual
           if (pilotInfo && updatedFlight.tripulacion?.piloto_id === pilotInfo._id) {
-            await updatePilotFlightHours(pilotInfo._id, flightHours);
+            await updatePilotFlightHours(pilotInfo._id, totalFlightHours);
           }
           
           // Si hay copiloto y es diferente, también sumarle las horas
           if (updatedFlight.tripulacion?.copiloto_id && 
               updatedFlight.tripulacion.copiloto_id !== pilotInfo._id) {
-            await updatePilotFlightHours(updatedFlight.tripulacion.copiloto_id, flightHours);
+            await updatePilotFlightHours(updatedFlight.tripulacion.copiloto_id, totalFlightHours);
           }
           
           // Sumar horas al avión
-          await updateAircraftFlightHours(updatedFlight.aeronave, flightHours);
+          await updateAircraftFlightHours(updatedFlight.aeronave, totalFlightHours);
           
-          setSuccessMessage(`Vuelo completado. Se sumaron ${flightHours} horas de vuelo.`);
+          const retrasoText = delayHours > 0 ? 
+            ` (${normalFlightHours} hrs normales + ${delayHours} hrs de retraso)` : '';
+          setSuccessMessage(`Vuelo completado. Se sumaron ${totalFlightHours} horas de vuelo${retrasoText}.`);
+        } else if (newStatus === 'Retrasado') {
+          // Si se marca como retrasado, agregar el tiempo de retraso
+          if (delayTime > 0) {
+            await updateFlightDelay(flightId, delayTime);
+            setSuccessMessage(`Vuelo marcado como retrasado. Se agregaron ${delayTime} horas de retraso.`);
+          } else {
+            setSuccessMessage(`Estado del vuelo actualizado a: ${newStatus}`);
+          }
+        } else if (newStatus === 'En tiempo') {
+          // Si se cambia a "En tiempo", resetear el tiempo de retraso
+          await updateFlightDelay(flightId, 0, true); // true indica reset completo
+          setSuccessMessage(`Vuelo marcado como "En tiempo". Se resetó el tiempo de retraso.`);
         } else {
           setSuccessMessage(`Estado del vuelo actualizado a: ${newStatus}`);
         }
         
         // Actualizar la lista de vuelos
         setFlights(prevFlights => 
-          prevFlights.map(flight => 
-            flight._id === flightId 
-              ? { ...flight, estado: newStatus }
-              : flight
-          )
+          prevFlights.map(flight => {
+            if (flight._id === flightId) {
+              let updatedFlightData = { ...flight, estado: newStatus };
+              
+              if (newStatus === 'Retrasado' && delayTime > 0) {
+                updatedFlightData.tiempoRetraso = (flight.tiempoRetraso || 0) + delayTime;
+              } else if (newStatus === 'En tiempo') {
+                updatedFlightData.tiempoRetraso = 0; // Reset del retraso
+              }
+              
+              return updatedFlightData;
+            }
+            return flight;
+          })
         );
         
       } else {
@@ -159,6 +197,65 @@ const PilotView = () => {
       setErrorMessage('Error de conexión al actualizar el vuelo');
     } finally {
       setUpdatingFlight(null);
+    }
+  };
+
+  const updateFlightDelay = async (flightId, delayHours, resetDelay = false) => {
+    const token = sessionStorage.getItem('token');
+    
+    try {
+      let newTotalDelay;
+      
+      if (resetDelay) {
+        // Reset completo del tiempo de retraso
+        newTotalDelay = 0;
+      } else {
+        // Sumar tiempo de retraso al existente
+        const flight = flights.find(f => f._id === flightId);
+        const currentDelay = flight?.tiempoRetraso || 0;
+        newTotalDelay = currentDelay + delayHours;
+      }
+      
+      const response = await fetch(`http://localhost:3000/api/vuelos/${flightId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ tiempoRetraso: newTotalDelay }),
+      });
+      
+      if (!response.ok) {
+        console.error('Error al actualizar tiempo de retraso');
+      }
+    } catch (error) {
+      console.error('Error updating flight delay:', error);
+    }
+  };
+
+  const handleDelaySubmit = (e) => {
+    e.preventDefault();
+    const hours = parseFloat(delayHours) || 0;
+    const minutes = parseFloat(delayMinutes) || 0;
+    const totalDelayHours = hours + (minutes / 60);
+    
+    if (totalDelayHours > 0 && selectedFlightForDelay) {
+      updateFlightStatus(selectedFlightForDelay._id, 'Retrasado', totalDelayHours);
+      setShowDelayModal(false);
+      setSelectedFlightForDelay(null);
+      setDelayHours('');
+      setDelayMinutes('');
+    } else {
+      setErrorMessage('Por favor ingresa un tiempo de retraso válido');
+    }
+  };
+
+  const handleStatusChange = (flight, newStatus) => {
+    if (newStatus === 'Retrasado') {
+      setSelectedFlightForDelay(flight);
+      setShowDelayModal(true);
+    } else {
+      updateFlightStatus(flight._id, newStatus);
     }
   };
 
@@ -352,7 +449,7 @@ const PilotView = () => {
                             value=""
                             onChange={(e) => {
                               if (e.target.value) {
-                                updateFlightStatus(flight._id, e.target.value);
+                                handleStatusChange(flight, e.target.value);
                               }
                             }}
                           >
@@ -369,8 +466,20 @@ const PilotView = () => {
                           <div className="text-sm text-gray-400">No modificable</div>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {flightDuration} hrs
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">
+                          <div>{flightDuration} hrs (programadas)</div>
+                          {flight.tiempoRetraso && flight.tiempoRetraso > 0 && (
+                            <div className="text-orange-600 font-medium">
+                              +{flight.tiempoRetraso.toFixed(2)} hrs retraso
+                            </div>
+                          )}
+                          {flight.tiempoRetraso && flight.tiempoRetraso > 0 && (
+                            <div className="text-blue-600 font-medium text-xs">
+                              Total: {(flightDuration + flight.tiempoRetraso).toFixed(2)} hrs
+                            </div>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -380,6 +489,85 @@ const PilotView = () => {
           </div>
         )}
       </div>
+
+      {/* Modal para tiempo de retraso */}
+      {showDelayModal && selectedFlightForDelay && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-96 max-w-90vw">
+            <h2 className="text-xl font-bold mb-4 text-gray-800">
+              Tiempo de Retraso
+            </h2>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">
+                Vuelo: {selectedFlightForDelay.origen} → {selectedFlightForDelay.destino}
+              </p>
+              {selectedFlightForDelay.tiempoRetraso > 0 && (
+                <p className="text-sm text-orange-600">
+                  Retraso actual: {selectedFlightForDelay.tiempoRetraso} horas
+                </p>
+              )}
+            </div>
+            
+            <form onSubmit={handleDelaySubmit}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tiempo de retraso adicional:
+                </label>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      min="0"
+                      max="23"
+                      step="1"
+                      placeholder="Horas"
+                      value={delayHours}
+                      onChange={(e) => setDelayHours(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-xs text-gray-500">Horas</span>
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="number"
+                      min="0"
+                      max="59"
+                      step="1"
+                      placeholder="Minutos"
+                      value={delayMinutes}
+                      onChange={(e) => setDelayMinutes(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-xs text-gray-500">Minutos</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDelayModal(false);
+                    setSelectedFlightForDelay(null);
+                    setDelayHours('');
+                    setDelayMinutes('');
+                  }}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                >
+                  Confirmar Retraso
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Leyenda de estados */}
       <div className="mt-6 bg-white p-4 rounded-lg shadow-sm">
