@@ -199,9 +199,6 @@ Representa la arquitectura interna del software organizada en capas. Desde el fr
 ![diagrama_distribucion](pictures/diagramaDistribucion.png)
 Ilustra la arquitectura completa del sistema distribuido con separación clara en tiers (cliente, web, aplicación, datos). Enfatiza aspectos de escalabilidad con múltiples servidores de aplicación, alta disponibilidad con MongoDB en Replica Set, CDN para contenido estático, y integración con servicios cloud. Incluye componentes de monitoreo y logging para operaciones.
 
-# Diagrama de Clases:
-![diagrama_clases](pictures/diagrama_clases.png)
-
 # Diagrama de Esquemas
 
 ![diagrama_esquemas](pictures/diagrama_esquemas.png)
