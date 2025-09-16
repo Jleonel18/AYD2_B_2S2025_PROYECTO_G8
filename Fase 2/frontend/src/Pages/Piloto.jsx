@@ -137,16 +137,16 @@ const PilotView = () => {
           console.log('Horas de retraso:', delayHours);
           console.log('Total a sumar:', totalFlightHours);
           
-          // Sumar horas al piloto actual
-          if (pilotInfo && updatedFlight.tripulacion?.piloto_id === pilotInfo._id) {
-            await updatePilotFlightHours(pilotInfo._id, totalFlightHours);
-          }
+          // // Sumar horas al piloto actual
+          // if (pilotInfo && updatedFlight.tripulacion?.piloto_id === pilotInfo._id) {
+          //   await updatePilotFlightHours(pilotInfo._id, totalFlightHours);
+          // }
           
-          // Si hay copiloto y es diferente, también sumarle las horas
-          if (updatedFlight.tripulacion?.copiloto_id && 
-              updatedFlight.tripulacion.copiloto_id !== pilotInfo._id) {
-            await updatePilotFlightHours(updatedFlight.tripulacion.copiloto_id, totalFlightHours);
-          }
+          // // Si hay copiloto y es diferente, también sumarle las horas
+          // if (updatedFlight.tripulacion?.copiloto_id && 
+          //     updatedFlight.tripulacion.copiloto_id !== pilotInfo._id) {
+          //   await updatePilotFlightHours(updatedFlight.tripulacion.copiloto_id, totalFlightHours);
+          // }
           
           // Sumar horas al avión
           await updateAircraftFlightHours(updatedFlight.aeronave, totalFlightHours);

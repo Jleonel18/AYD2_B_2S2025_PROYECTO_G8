@@ -132,4 +132,27 @@ export class UserRepository implements IUserRepository {
             { new: true }
         );
     }
+
+    async addFlightToHistory(usuarioID: string, vueloId: string): Promise<IUser | null> {
+        return await UserModel.findByIdAndUpdate(
+            usuarioID,
+            { $push: { vuelos: vueloId } },
+            { new: true }
+        );
+    }
+
+    async addPointsAndFlightToHistory(usuarioID: string, vueloId: string, puntos: number): Promise<IUser | null> {
+        // Hacerlo asi
+        /*
+        return await UserModel.findByIdAndUpdate(
+            usuarioID,
+            { $push: { vuelos: vueloId } },
+            { new: true }
+        );*/
+        return await UserModel.findByIdAndUpdate(
+            usuarioID,
+            { $push: { vuelos: vueloId }, $inc: { puntos: puntos } },
+            { new: true }
+        );
+    }
 }
