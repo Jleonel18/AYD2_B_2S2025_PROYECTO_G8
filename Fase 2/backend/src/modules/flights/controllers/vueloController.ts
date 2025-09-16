@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { VueloService } from "../../../core/repository/services/VueloService";
-import { IVuelo } from "../../../core/repository/models/Vuelo";
+import { VueloService } from "../../../core/repository/services/VueloService.js";
+import { IVuelo } from "../../../core/repository/models/Vuelo.js";
 import { Types } from "mongoose";
-import { EstadoVuelo } from "../../../core/observer/observador";
-import { AvionService } from "../../../core/repository/services/AvionService";
-import { ReservaService } from "../../../core/repository/services/ReservaService";
-import { UserService } from "../../../core/repository/services/UserService";
+import { EstadoVuelo } from "../../../core/observer/observador.js";
+import { AvionService } from "../../../core/repository/services/AvionService.js";
+import { ReservaService } from "../../../core/repository/services/ReservaService.js";
+import { UserService } from "../../../core/repository/services/UserService.js";
 
 
 

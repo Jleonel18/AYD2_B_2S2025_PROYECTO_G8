@@ -1,5 +1,5 @@
-import { IVueloRepository } from './IVueloRepository';
-import { VueloModel, IVuelo } from '../models/Vuelo';
+import { IVueloRepository } from './IVueloRepository.js';
+import { VueloModel, IVuelo } from '../models/Vuelo.js';
 import { Types } from 'mongoose';
 
 export class VueloRepository implements IVueloRepository {

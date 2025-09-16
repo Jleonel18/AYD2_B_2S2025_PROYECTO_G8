@@ -1,12 +1,12 @@
 import "dotenv/config";
 import express, { Application, Request, Response } from "express";
-import { connectDB } from "./config/database";
-import { UsuarioRoutes } from "./routes/usuarioRoutes";
-import { AvionRoutes } from "./routes/avionRoutes";
-import { VueloRoutes } from "./routes/vueloRoutes";
-import { AeropuertoRoutes } from "./routes/aeropuertoRoutes";
+import { connectDB } from "./config/database.js";
+import { UsuarioRoutes } from "./routes/usuarioRoutes.js";
+import { AvionRoutes } from "./routes/avionRoutes.js";
+import { VueloRoutes } from "./routes/vueloRoutes.js";
+import { AeropuertoRoutes } from "./routes/aeropuertoRoutes.js";
 import cors from "cors";
-import { ReservaRoutes } from "./routes/reservaRoutes";
+import { ReservaRoutes } from "./routes/reservaRoutes.js";
 
 
 const app: Application = express();

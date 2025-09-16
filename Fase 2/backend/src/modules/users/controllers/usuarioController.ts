@@ -1,12 +1,12 @@
 import { Request, Response } from "express"
-import {UserService} from "../../../core/repository/services/UserService"
-import { UsuarioType } from "../../../core/factory/usuario"
-import { generarTokenVerificacion, generarUsuario } from "../../../utils/utils"
-import { enviarCorreoRecuperacion, enviarCorreoVerificacion } from "../../../utils/send_email"
+import {UserService} from "../../../core/repository/services/UserService.js"
+import { UsuarioType } from "../../../core/factory/usuario.js"
+import { generarTokenVerificacion, generarUsuario } from "../../../utils/utils.js"
+import { enviarCorreoRecuperacion, enviarCorreoVerificacion } from "../../../utils/send_email.js"
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { hashPassword } from "../../../utils/passwords"
-import { AuthRequest } from "../../../middleware/authMiddleware"
-import { VueloService } from "../../../core/repository/services/VueloService"
+import { hashPassword } from "../../../utils/passwords.js"
+import { AuthRequest } from "../../../middleware/authMiddleware.js"
+import { VueloService } from "../../../core/repository/services/VueloService.js"
 
 export class UsuarioController {
     constructor(private readonly usuarioService: UserService, private readonly vueloService: VueloService) {}

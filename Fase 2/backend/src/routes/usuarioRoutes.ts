@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { UsuarioController } from "../modules/users/controllers/usuarioController";
-import { UserService } from "../core/repository/services/UserService";
-import { UserRepository } from "../core/repository/repositories/UserRepository";
-import { authorizeRoles, tokenAuth } from "../middleware/authMiddleware";
-import { VueloRepository } from "../core/repository/repositories/VueloRepository";
-import { VueloService } from "../core/repository/services/VueloService";
+import { UsuarioController } from "../modules/users/controllers/usuarioController.js";
+import { UserService } from "../core/repository/services/UserService.js";
+import { UserRepository } from "../core/repository/repositories/UserRepository.js";
+import { authorizeRoles, tokenAuth } from "../middleware/authMiddleware.js";
+import { VueloRepository } from "../core/repository/repositories/VueloRepository.js";
+import { VueloService } from "../core/repository/services/VueloService.js";
 
 // Aquí instanciamos dependencias
 const userRepository = new UserRepository();

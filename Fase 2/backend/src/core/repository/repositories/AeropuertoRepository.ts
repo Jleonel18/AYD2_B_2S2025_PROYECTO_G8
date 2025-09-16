@@ -1,5 +1,5 @@
-import { IAeropuertoRepository } from "./IAeropuertoRepository";
-import { AeropuertoModel, IAeropuerto } from "../models/Aeropuerto";
+import { IAeropuertoRepository } from "./IAeropuertoRepository.js";
+import { AeropuertoModel, IAeropuerto } from "../models/Aeropuerto.js";
 
 export class AeropuertoRepository implements IAeropuertoRepository {
     async create(aeropuerto: IAeropuerto): Promise<IAeropuerto> {

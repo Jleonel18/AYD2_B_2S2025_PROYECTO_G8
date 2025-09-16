@@ -1,10 +1,10 @@
-import { EstadoReserva } from "../../../types/reservas";
-import { Observador } from "../../observer/observador";
-import { IReserva } from "../models/Reserva";
-import { IReservaRepository } from "../repositories/IReserva";
-import { ReservaRepository } from "../repositories/ReservaRepository";
-import { UserService } from "./UserService";
-import { enviarCorreoCancelacion } from "../../../utils/send_email";
+import { EstadoReserva } from "../../../types/reservas.js";
+import { Observador } from "../../observer/observador.js";
+import { IReserva } from "../models/Reserva.js";
+import { IReservaRepository } from "../repositories/IReserva.js";
+import { ReservaRepository } from "../repositories/ReservaRepository.js";
+import { UserService } from "./UserService.js";
+import { enviarCorreoCancelacion } from "../../../utils/send_email.js";
 
 export class ReservaService {
     private reservaRepository: IReservaRepository;

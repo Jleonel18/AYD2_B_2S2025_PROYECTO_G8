@@ -1,4 +1,4 @@
-import { IAeropuerto } from "../models/Aeropuerto";
+import { IAeropuerto } from "../models/Aeropuerto.js";
 
 export interface IAeropuertoRepository {
     create(aeropuerto: IAeropuerto): Promise<IAeropuerto>;

@@ -1,5 +1,5 @@
-import { IAeropuertoRepository } from "../repositories/IAeropuertoRepository";
-import { IAeropuerto } from "../models/Aeropuerto";
+import { IAeropuertoRepository } from "../repositories/IAeropuertoRepository.js";
+import { IAeropuerto } from "../models/Aeropuerto.js";
 
 export class AeropuertoService {
     constructor(private aeropuertoRepository: IAeropuertoRepository) {}

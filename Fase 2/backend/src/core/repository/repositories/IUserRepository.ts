@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { IUser } from '../models/User';
+import { IUser } from '../models/User.js';
 
 export interface IUserRepository {
     create(user: Partial<IUser>): Promise<IUser>;

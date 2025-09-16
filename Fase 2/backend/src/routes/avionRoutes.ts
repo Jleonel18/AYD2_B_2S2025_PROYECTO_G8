@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { AvionController } from "../modules/airplanes/controllers/avionController";
-import { AvionService } from "../core/repository/services/AvionService";
-import { AvionRepository } from "../core/repository/repositories/AvionRepository";
-import { tokenAuth, authorizeRoles } from "../middleware/authMiddleware";
+import { AvionController } from "../modules/airplanes/controllers/avionController.js";
+import { AvionService } from "../core/repository/services/AvionService.js";
+import { AvionRepository } from "../core/repository/repositories/AvionRepository.js";
+import { tokenAuth, authorizeRoles } from "../middleware/authMiddleware.js";
 
 const avionRepository = new AvionRepository();
 const avionService = new AvionService(avionRepository);

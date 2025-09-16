@@ -1,9 +1,9 @@
-import { UsuarioType } from "./usuario"
-import Usuario from "./usuario"
-import Piloto from "./piloto"
-import Sobrecargo from "./sobrecargo"
-import Pasajero from "./pasajero"
-import Operaciones from "./operaciones"
+import { UsuarioType } from "./usuario.js"
+import Usuario from "./usuario.js"
+import Piloto from "./piloto.js"
+import Sobrecargo from "./sobrecargo.js"
+import Pasajero from "./pasajero.js"
+import Operaciones from "./operaciones.js"
 
 class UsuarioFactory {
     static crearUsuario(tipo: UsuarioType, datos: any): Usuario {

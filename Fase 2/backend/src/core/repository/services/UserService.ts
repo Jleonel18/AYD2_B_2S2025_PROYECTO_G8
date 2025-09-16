@@ -1,7 +1,7 @@
-import { IUserRepository } from '../repositories/IUserRepository';
-import { IUser } from '../models/User';
-import { UsuarioType } from '../../factory/usuario';
-import UsuarioFactory from '../../factory/usuarioFactory';
+import { IUserRepository } from '../repositories/IUserRepository.js';
+import { IUser } from '../models/User.js';
+import { UsuarioType } from '../../factory/usuario.js';
+import UsuarioFactory from '../../factory/usuarioFactory.js';
 import { ObjectId } from 'mongodb';
 
 export class UserService {

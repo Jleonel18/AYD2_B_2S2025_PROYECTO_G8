@@ -1,5 +1,5 @@
-import { IAvionRepository } from "../repositories/IAvionRepository";
-import { IAvion } from "../models/Avion";
+import { IAvionRepository } from "../repositories/IAvionRepository.js";
+import { IAvion } from "../models/Avion.js";
 
 export class AvionService {
     constructor(private avionRepository: IAvionRepository) {}

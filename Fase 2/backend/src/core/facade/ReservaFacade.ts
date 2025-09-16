@@ -1,11 +1,11 @@
-import { ReservaRepository } from "../repository/repositories/ReservaRepository";
-import { IReserva } from "../repository/models/Reserva";
-import { VueloRepository } from "../repository/repositories/VueloRepository";
-import { AvionRepository } from "../repository/repositories/AvionRepository";
-import { EstadoReserva } from "../../types/reservas";
-import { ReservaService } from "../repository/services/ReservaService";
-import { VueloService } from "../repository/services/VueloService";
-import { AvionService } from "../repository/services/AvionService";
+import { ReservaRepository } from "../repository/repositories/ReservaRepository.js";
+import { IReserva } from "../repository/models/Reserva.js";
+import { VueloRepository } from "../repository/repositories/VueloRepository.js";
+import { AvionRepository } from "../repository/repositories/AvionRepository.js";
+import { EstadoReserva } from "../../types/reservas.js";
+import { ReservaService } from "../repository/services/ReservaService.js";
+import { VueloService } from "../repository/services/VueloService.js";
+import { AvionService } from "../repository/services/AvionService.js";
 
 export class ReservaFacade {
 
