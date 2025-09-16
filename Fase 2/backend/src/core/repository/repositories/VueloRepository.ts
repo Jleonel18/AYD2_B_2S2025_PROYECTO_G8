@@ -1,5 +1,6 @@
 import { IVueloRepository } from './IVueloRepository';
 import { VueloModel, IVuelo } from '../models/Vuelo';
+import { Types } from 'mongoose';
 
 export class VueloRepository implements IVueloRepository {
   async create(vuelo: Partial<IVuelo>): Promise<IVuelo> {
@@ -29,4 +30,19 @@ export class VueloRepository implements IVueloRepository {
   async cancel(id: string): Promise<IVuelo | null> {
     return await VueloModel.findByIdAndUpdate(id, { estado: "Cancelado" }, { new: true });
   } 
+
+  async findVuelosByTrabajador(trabajadorId: string): Promise<IVuelo[]> {
+    if (!Types.ObjectId.isValid(trabajadorId)) {
+      throw new Error(`ID de trabajador inválido: ${trabajadorId}`);
+    }
+
+    return await VueloModel.find({ 
+      $or: [
+        { 'tripulacion.piloto_id': new Types.ObjectId(trabajadorId) },
+        { 'tripulacion.copiloto_id': new Types.ObjectId(trabajadorId) },
+        { 'tripulacion.sobrecargos': new Types.ObjectId(trabajadorId) }
+      ],
+      estado: { $ne: 'Cancelado' }
+    });
+  }
 }

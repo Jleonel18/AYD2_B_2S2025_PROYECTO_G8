@@ -21,10 +21,15 @@ export class AvionRoutes {
 
         this.router.get("/", tokenAuth, avionController.obtenerTodosLosAviones);
 
-        this.router.get("/:id", tokenAuth, avionController.obtenerAvionPorId);
+        this.router.get("/:id", avionController.obtenerAvionPorId);
 
         this.router.put("/:id", tokenAuth, authorizeRoles("operaciones"), avionController.actualizarAvion);
 
         this.router.delete("/:id", tokenAuth, authorizeRoles("operaciones"), avionController.eliminarAvion);
+
+        this.router.patch("/:id/horas-vuelo", avionController.sumarHorasVuelo);
+
+        this.router.get("/estadoHoras/:id", avionController.verificarHorasVuelo);
+        
     }
 }

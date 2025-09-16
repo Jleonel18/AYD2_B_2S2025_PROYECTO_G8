@@ -2,6 +2,7 @@ import { IUserRepository } from './IUserRepository';
 import { UserModel, IUser } from '../models/User';
 import { comparePassword, hashPassword } from '../../../utils/passwords';
 import { flattenObject } from '../../../utils/utils';
+import { ObjectId } from 'mongodb';
 
 export class UserRepository implements IUserRepository {
     async create(user: Partial<IUser>): Promise<IUser> {
@@ -15,6 +16,10 @@ export class UserRepository implements IUserRepository {
 
     async findAll(): Promise<IUser[]> {
         return await UserModel.find();
+    }
+
+    async findWorkers(): Promise<IUser[]> {
+        return await UserModel.find({ tipo: { $in: ['piloto', 'sobrecargo'] } });
     }
 
     async update(id: string, user: Partial<IUser>): Promise<IUser | null> {
@@ -38,7 +43,10 @@ export class UserRepository implements IUserRepository {
         );
     }
     
-    async findByToken(token: string): Promise<IUser | null> {
+    async findByToken(token: string, tipo:string): Promise<IUser | null> {
+        if(tipo === "reset"){
+            return await UserModel.findOne({ 'token_reset.token': token });
+        }
         return await UserModel.findOne({ 'token.token': token });
     }
 
@@ -58,5 +66,92 @@ export class UserRepository implements IUserRepository {
     async editProfile(id: string, datos: Partial<IUser>): Promise<IUser | null> {
         const datos_flattened = flattenObject(datos);
         return await UserModel.findByIdAndUpdate(id, { $set: datos_flattened }, { new: true });
+    }
+
+    async updateWorker(id: string, datos: Partial<IUser>): Promise<IUser | null> {
+        const datos_flattened = flattenObject(datos);
+        return await UserModel.findByIdAndUpdate(id, { $set: datos_flattened }, { new: true });
+    }
+
+    async deleteWorker(id: string): Promise<void> {
+        await UserModel.findByIdAndDelete(id);
+    }
+
+    async saveTokenForgotPassword(userId: string, token: string, expiration: Date): Promise<IUser | null> {
+        
+        return await UserModel.findByIdAndUpdate(
+            userId,
+            {
+                $set: {
+                    token_reset: {
+                        token: token,
+                        expiration: expiration
+                    }
+                }
+            },
+            { new: true }
+        );
+    }
+
+    async verifyAndResetPassword(userId: string, plainPassword: string): Promise<IUser | null> {
+        const hashed = await hashPassword(plainPassword);
+        return await UserModel.findByIdAndUpdate(
+            userId,
+            {
+                contrasena: hashed,
+                $unset: { token_reset: "" }
+            },
+            { new: true }
+        );
+    }
+
+    async addFlightHoursToPilot(pilotId: string, hours: number): Promise<IUser | null> {
+        // Primero verificamos que el usuario sea un piloto
+        const user = await UserModel.findById(pilotId);
+        if (!user || user.tipo !== 'piloto') {
+            throw new Error("El usuario no es un piloto o no existe");
+        }
+        
+        // Incrementamos las horas de vuelo del piloto
+        return await UserModel.findByIdAndUpdate(
+            pilotId,
+            { $inc: { horasVuelo: hours } },
+            { new: true }
+        );
+    }
+
+    async updatePoints(pasajero: string, puntos: number): Promise<IUser | null> {
+        // Primero verificamos que el usuario sea un pasajero
+        const user = await UserModel.findById(pasajero);
+        if (!user || user.tipo !== 'pasajero') {
+            throw new Error("El usuario no es un pasajero o no existe");
+        }
+        // Incrementamos los puntos del pasajero
+        return await UserModel.findByIdAndUpdate(
+            pasajero,
+            { $inc: { puntos: puntos } },
+            { new: true }
+        );
+    }
+
+    async addFlightToHistory(usuarioID: string, vueloId: string): Promise<IUser | null> {
+        return await UserModel.findByIdAndUpdate(
+            usuarioID,
+            { $push: { vuelos: vueloId } },
+            { new: true }
+        );
+    }
+
+    async addPointsAndFlightToHistory(usuarioID: string, vueloId: string, puntos: number): Promise<IUser | null> {
+        return await UserModel.findByIdAndUpdate(
+            usuarioID,
+            { $push: { vuelos: vueloId }, $inc: { puntos: puntos } },
+            { new: true }
+        );
+    }
+
+    async getFlightHistory(usuarioID: string): Promise<ObjectId[] | null> {
+        const user = await UserModel.findById(usuarioID).select('vuelos');
+        return user ? user.vuelos : null;
     }
 }

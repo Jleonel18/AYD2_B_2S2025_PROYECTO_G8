@@ -3,11 +3,15 @@ import { UsuarioController } from "../modules/users/controllers/usuarioControlle
 import { UserService } from "../core/repository/services/UserService";
 import { UserRepository } from "../core/repository/repositories/UserRepository";
 import { authorizeRoles, tokenAuth } from "../middleware/authMiddleware";
+import { VueloRepository } from "../core/repository/repositories/VueloRepository";
+import { VueloService } from "../core/repository/services/VueloService";
 
 // Aquí instanciamos dependencias
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
-const usuarioController = new UsuarioController(userService);
+const vueloRepository = new VueloRepository();
+const vueloService = new VueloService(vueloRepository);
+const usuarioController = new UsuarioController(userService, vueloService);
 
 export class UsuarioRoutes {
     public router: Router;
@@ -19,9 +23,18 @@ export class UsuarioRoutes {
 
     private initializeRoutes() {
         this.router.post("/", usuarioController.crearUsuario);
-        this.router.get("/:id", usuarioController.obtenerUsuario);
+        this.router.get("/", tokenAuth, usuarioController.obtenerUsuario);
+        this.router.get("/trabajadores", tokenAuth, authorizeRoles('operaciones'), usuarioController.obtenerTrabajadores);
+        this.router.get("/trabajadores/:id", tokenAuth, authorizeRoles('operaciones'), usuarioController.obtenerTrabajadorPorId);
+        this.router.put("/trabajadores/:id", tokenAuth, authorizeRoles('operaciones'), usuarioController.actualizarTrabajador);
+        this.router.delete("/trabajadores/:id", tokenAuth, authorizeRoles('operaciones'), usuarioController.eliminarTrabajador);
         this.router.post("/verificar", usuarioController.verificarCorreoGuardarPass)
         this.router.post("/login", usuarioController.login)
         this.router.put("/perfil", tokenAuth, authorizeRoles('pasajero'), usuarioController.editarPerfil)
+        this.router.post("/recuperar-password", usuarioController.solicitarTokenRecuperacion)
+        this.router.post("/verificar-password", usuarioController.verificarYRestablecerContrasena)
+        this.router.patch("/pilotos/:id/horas-vuelo", usuarioController.sumarHorasVueloPiloto);
+        this.router.patch("/pasajeros/puntos", tokenAuth, authorizeRoles("operaciones"), usuarioController.sumarPuntosPorHorasVuelo);
+        this.router.get("/historial-vuelos", tokenAuth, usuarioController.obtenerHistorialVuelos);
     }
 }

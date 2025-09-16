@@ -1,24 +1,75 @@
-import { Link } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
   return (
-    <div className="fixed w-64 h-full bg-gray-800 text-white">
-      <h2 className="text-2xl p-4">AirFlow System</h2>
-      <ul className="mt-6">
-        <li className="px-4 py-2 hover:bg-gray-700">
-          <Link to="/dashboard" className="text-white">Dashboard</Link>
-        </li>
-        <li className="px-4 py-2 bg-gray-700">
-          <Link to="/vuelos" className="text-white">Vuelos</Link>
-        </li>
-        <li className="px-4 py-2 hover:bg-gray-700">
-          <Link to="/tripulacion" className="text-white">Triulación</Link>
-        </li>
-        <li className="px-4 py-2 hover:bg-gray-700">
-          <Link to="/flota-aerea" className="text-white">Flota Aérea</Link>
-        </li>
+    <div className="fixed w-64 h-full bg-[#333446] text-white flex flex-col">
+      <div className="text-2xl font-bold mx-auto py-2">AirFlow System</div>
+      <ul className="mt-6 flex-1">
+        <NavLink
+          to="/dashboard-admin"
+          className={({ isActive }) =>
+            `text-white block ${isActive ? 'bg-[#7F8CAA]' : ''}`
+          }
+        >
+          <li className="px-4 py-2 hover:bg-[#7F8CAA]">
+            Dashboard
+          </li>
+        </NavLink>
+        <NavLink
+          to="/vuelos"
+          className={({ isActive }) =>
+            `text-white block ${isActive ? 'bg-[#7F8CAA]' : ''}`
+          }
+        >
+          <li className="px-4 py-2 hover:bg-[#7F8CAA]">
+            Vuelos
+          </li>
+        </NavLink>
+        <NavLink
+          to="/tripulacion"
+          className={({ isActive }) =>
+            `text-white block ${isActive ? 'bg-[#7F8CAA]' : ''}`
+          }
+        >
+          <li className="px-4 py-2 hover:bg-[#7F8CAA]">
+            Tripulación
+          </li>
+        </NavLink>
+        <NavLink
+          to="/aviones"
+          className={({ isActive }) =>
+            `text-white block ${isActive ? 'bg-[#7F8CAA]' : ''}`
+          }
+        >
+          <li className="px-4 py-2 hover:bg-[#7F8CAA]">
+            Flota Aérea
+          </li>
+        </NavLink>
+        <NavLink
+          to="/aeropuertos"
+          className={({ isActive }) =>
+            `text-white block ${isActive ? 'bg-[#7F8CAA]' : ''}`
+          }
+        >
+          <li className="px-4 py-2 hover:bg-[#7F8CAA]">
+            Aeropuertos
+          </li>
+        </NavLink>
       </ul>
-      <button className="mt-6 w-full text-center py-2 bg-blue-500 hover:bg-blue-600 text-white">
+      <button
+        className="mt-auto w-full text-center py-2 bg-blue-500 hover:bg-blue-600 text-white"
+        onClick={handleLogout}
+      >
         Cerrar sesión
       </button>
     </div>

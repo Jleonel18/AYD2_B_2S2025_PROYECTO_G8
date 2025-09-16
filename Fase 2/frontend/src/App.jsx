@@ -5,12 +5,22 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ProfileUser from './Pages/profileUser'
 import MainPage from './Pages/mainPage'
 import VerifyAccount from './Pages/verifyAccount'
+import ResetPassword from './Pages/ResetPassword'
 import { ToastContainer } from 'react-toastify'
 import Sidebar from './components/Sidebar';
 import React, { useState } from 'react';
 import VuelosPage from './Pages/VuelosPage';
 import AvionesPage from './Pages/AvionesPage';
 import UsuariosPage from './Pages/UsuariosPage';
+import DashboardAdmin from './Pages/DashboardAdmin'
+import Tripulacion from './Pages/Tripulacion'
+import AeropuertosPage from './Pages/AeropuertosPage'
+import Reservas from './Pages/Reservas'
+import Historial from './Pages/Historial'
+import Puntos from './Pages/Puntos'
+import Reservar from './Pages/Reservar'
+import Reserva from './Pages/Reserva'
+import PilotView from './Pages/Piloto'
 
 // Componente de layout para rutas autenticadas
 const AuthenticatedLayout = ({ children }) => {
@@ -42,6 +52,19 @@ function App() {
           <Route path="/mainpage" element={<MainPage />} />
           <Route path="/" element={<MainPage />} />
           <Route path="/verify-account" element={<VerifyAccount />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/reserva/:id_reserva" element={<Reserva />} />
+          <Route path="/reservar" element={<Reservar />} />
+          <Route path="/reservas" element={<Reservas />} />
+          <Route path="/historial" element={<Historial />} />
+          <Route path="/puntos" element={<Puntos />} />
+          <Route path="/pilotos" element={<PilotView />} />
+
+          <Route path="/dashboard-admin" element={
+            <AuthenticatedLayout>
+              <DashboardAdmin />
+            </AuthenticatedLayout>
+          } />
           <Route
             path="/vuelos"
             element={
@@ -66,6 +89,23 @@ function App() {
               </AuthenticatedLayout>
             }
           />
+          <Route path="/tripulacion" element={
+            <AuthenticatedLayout>
+              <Tripulacion />
+            </AuthenticatedLayout>
+          } />
+          <Route path="/aeropuertos" element={
+            <AuthenticatedLayout>
+              <AeropuertosPage />
+            </AuthenticatedLayout>
+          } />
+
+          <Route path="/pilotos" element={
+            <AuthenticatedLayout>
+              <PilotView />
+            </AuthenticatedLayout>
+          } />
+
         </Routes>
       </BrowserRouter>
     </>

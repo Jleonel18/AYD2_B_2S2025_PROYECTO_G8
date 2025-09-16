@@ -60,4 +60,62 @@ export class AvionController {
             res.status(500).json({ error: "Error al eliminar avión" });
         }
     }
+
+    sumarHorasVuelo = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const { horas } = req.body;
+            
+            if (!horas || typeof horas !== 'number') {
+                return res.status(400).json({ 
+                    error: "Debe proporcionar un número válido de horas" 
+                });
+            }
+            
+            const avionActualizado = await this.avionService.addFlightHoursToAvion(id, horas);
+            let estadoNuevo: any;
+            
+            if (!avionActualizado) {
+                return res.status(404).json({ error: "Avión no encontrado" });
+            }
+
+            if(avionActualizado.horas_Vuelo > avionActualizado.limite_horas) {
+                estadoNuevo = await this.avionService.updateAvion(id, { estado: 'Fuera de servicio' } as IAvion);
+            }
+            
+            res.json({
+                message: `Se agregaron ${horas} horas de vuelo al avión`,
+                avion: estadoNuevo || avionActualizado
+            });
+        } catch (error) {
+            res.status(400).json({ error: (error as Error).message });
+        }
+    }
+
+    verificarHorasVuelo = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const avion = await this.avionService.getAvionById(id);
+            if (!avion) {
+                return res.status(404).json({ error: "Avión no encontrado" });
+            }
+            if (avion.horas_Vuelo > avion.limite_horas) {
+                return res.status(200).json({ 
+                    horasSuperadas: true,
+                    message: "El avión ha superado el límite de horas de vuelo", 
+                    avion 
+                });
+            } else {
+                return res.status(200).json({   
+                    horasSuperadas: false,
+                    message: "El avión está dentro del límite de horas de vuelo",
+                    avion
+                });
+            }
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" });
+        }
+    //horas_Vuelo
+    //limite_horas
+    }
 }
