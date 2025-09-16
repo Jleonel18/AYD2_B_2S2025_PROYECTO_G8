@@ -144,7 +144,7 @@ const MainPage = () => {
         </div>
 
         {/* Filters Section */}
-        <div className="flex mb-6 w-full max-w-6xl">
+        {/* <div className="flex mb-6 w-full max-w-6xl">
           <button className="bg-[#7F8CAA] hover:bg-[#6c7a8a] text-white px-6 py-2 rounded-lg mr-3 transition-colors">
             Filtros
           </button>
@@ -154,7 +154,7 @@ const MainPage = () => {
           <button className="bg-[#B8CFCE] hover:bg-[#a3b3b3] text-[#333446] px-6 py-2 rounded-lg ml-auto transition-colors">
             Buscar
           </button>
-        </div>
+        </div> */}
 
         {/* Flights Grid */}
         <div className="grid gap-6 w-full max-w-6xl">
@@ -249,7 +249,7 @@ const MainPage = () => {
 
       {/* Login Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/30 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl w-full max-w-md mx-4">
             <h2 className="text-2xl font-bold mb-4 text-[#333446]">
               Necesitas iniciar sesión
@@ -271,7 +271,7 @@ const MainPage = () => {
 
       {/* Flight Details Modal */}
       {isDetailModalOpen && selectedFlight && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/30 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="bg-[#333446] text-white p-6 rounded-t-xl">
