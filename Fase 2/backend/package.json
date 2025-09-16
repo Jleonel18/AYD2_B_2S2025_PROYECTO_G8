@@ -7,7 +7,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/app.ts",
-    "start": "ts-node src/app.ts"
+    "build": "tsc",
+    "start": "ts-node src/app.ts",
+    "start-node": "node dist/app.js"
   },
   "keywords": [],
   "author": "",
