@@ -45,4 +45,12 @@ export class VueloRepository implements IVueloRepository {
       estado: { $ne: 'Cancelado' }
     });
   }
+
+  async getStatisticsVuelos(): Promise<{ totalVuelos: number; totalVuelosCompletados: number; totalVuelosCancelados: number; totalVuelosPlanificados: number; }> {
+    const totalVuelos = await VueloModel.countDocuments();
+    const totalVuelosCompletados = await VueloModel.countDocuments({ estado: 'Aterrizado' });
+    const totalVuelosCancelados = await VueloModel.countDocuments({ estado: 'Cancelado' });
+    const totalVuelosPlanificados = await VueloModel.countDocuments({ estado: 'Planificado' });
+    return { totalVuelos, totalVuelosCompletados, totalVuelosCancelados, totalVuelosPlanificados };
+  }
 }

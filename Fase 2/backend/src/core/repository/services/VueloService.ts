@@ -84,4 +84,8 @@ export class VueloService {
         return true; // El avión está disponible
     }
 
+    async getStatisticsVuelos(): Promise<{ totalVuelos: number; totalVuelosCompletados: number; totalVuelosCancelados: number; totalVuelosPlanificados: number; }> {
+        return await this.vueloRepository.getStatisticsVuelos();
+    }
+
 }

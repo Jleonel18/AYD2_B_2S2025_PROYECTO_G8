@@ -9,4 +9,5 @@ export interface IVueloRepository {
   updateEstado(id: string, nuevoEstado: string): Promise<IVuelo | null>;
   cancel(id: string): Promise<IVuelo | null>;
   findVuelosByTrabajador(trabajadorId: string): Promise<IVuelo[]>;
+  getStatisticsVuelos(): Promise<{ totalVuelos: number, totalVuelosCompletados: number, totalVuelosCancelados: number, totalVuelosPlanificados: number }>;
 }

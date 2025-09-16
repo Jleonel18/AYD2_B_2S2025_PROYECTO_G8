@@ -7,9 +7,10 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { hashPassword } from "../../../utils/passwords.js"
 import { AuthRequest } from "../../../middleware/authMiddleware.js"
 import { VueloService } from "../../../core/repository/services/VueloService.js"
+import { AvionService } from "../../../core/repository/services/AvionService.js"
 
 export class UsuarioController {
-    constructor(private readonly usuarioService: UserService, private readonly vueloService: VueloService) {}
+    constructor(private readonly usuarioService: UserService, private readonly vueloService: VueloService, private readonly avionesService: AvionService) {}
 
 
     crearUsuario = async (req: Request, res: Response) => {
@@ -439,6 +440,21 @@ export class UsuarioController {
             const vuelosInfo = await Promise.all(historial.map(vueloId => this.vueloService.obtenerVuelo(vueloId.toString())));
 
             res.json({ vuelos: vuelosInfo });
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" });
+        }
+    }
+
+    obtenerEstadisticasAdmin = async (req: AuthRequest, res: Response) => {
+        try {
+            const estadisticasUsuarios = await this.usuarioService.getStatisticsUsers();
+            const estadisticasAviones = await this.avionesService.getStatisticsAviones();
+            const estadisticasVuelos = await this.vueloService.getStatisticsVuelos();
+            res.json({
+                usuarios: estadisticasUsuarios,
+                aviones: estadisticasAviones,
+                vuelos: estadisticasVuelos
+            });
         } catch (error) {
             res.status(500).json({ error: "Error en servidor" });
         }
