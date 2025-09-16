@@ -13,6 +13,9 @@ RUN npm install --omit=dev
 # Copiar el resto del código (incluyendo dist y .env si lo quieres dentro del contenedor)
 COPY . .
 
+# Compilar el código TypeScript
+RUN npm run build
+
 # Exponer el puerto (usa el mismo que en tu .env, ej. 3000)
 EXPOSE 3000
 

@@ -39,7 +39,7 @@ export class AvionRepository implements IAvionRepository {
             { $group: { _id: null, total: { $sum: "$horas_Vuelo" } } }
         ]);
         const averageFlightHours = totalAviones > 0 ? (totalHoras[0]?.total || 0) / totalAviones : 0;
-        const totalAvionesCriticos = await AvionModel.countDocuments({ estado: 'critico' });
+        const totalAvionesCriticos = await AvionModel.countDocuments({ estado: 'Fuera de servicio' });
         return { totalAviones, averageFlightHours, totalAvionesCriticos };
     }
 }
