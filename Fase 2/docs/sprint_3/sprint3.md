@@ -4,6 +4,19 @@
 
 https://drive.google.com/file/d/19iqsWOZ8GABfN_vPiUVUFC-S2GUtBDNp/view?usp=drive_link
 
+**Escala de puntos utilizada:** Escala de Fibonacci: 1,2,3,5,8
+
+| ID | Caso de Uso | Prioridad | Estimación |
+| --- | --- | --- | --- |
+| 19 | CDU006.2: Otorgar Puntos de Fidelización | Alta | 2 |
+| 20 | CDU006.3: Gestionar Historial y Notificaciones | Alta | 3 |
+| 21 | Actualización del Diagrama de Clases | Baja | 3 |
+| 22 | Creación de Contenedor en Backend | Media | 2 |
+| 23 | Creación de Contenedor en Frontend | Media | 2 |
+| 24 | Implementación Docker Compose | Media | 3 |
+| 25 | Despliegue del Frontend | Baja | 3 |
+| 26 | Despliegue del Backend | Baja | 3 |
+
 ## Daily 1:
 
 
