@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const AvionesPage = () => {
   const [aviones, setAviones] = useState([]);
   const [newAvion, setNewAvion] = useState({
@@ -43,7 +45,7 @@ const AvionesPage = () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/aviones/', {
+      const response = await fetch(`${apiUrl}/aviones/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -65,7 +67,7 @@ const AvionesPage = () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/aviones/', {
+      const response = await fetch(`${apiUrl}/aviones/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -104,7 +106,7 @@ const AvionesPage = () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/aviones/${editingAvion._id}`, {
+      const response = await fetch(`${apiUrl}/aviones/${editingAvion._id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -136,7 +138,7 @@ const AvionesPage = () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/aviones/${id}`, {
+      const response = await fetch(`${apiUrl}/aviones/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
