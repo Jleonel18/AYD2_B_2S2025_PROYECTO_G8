@@ -1,5 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const PilotView = () => {
   const [flights, setFlights] = useState([]);
@@ -31,7 +32,7 @@ const PilotView = () => {
   const fetchPilotInfo = async () => {
     const token = sessionStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:3000/api/users/', {
+      const response = await fetch(`${apiUrl}/users/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -53,7 +54,7 @@ const PilotView = () => {
     
     try {
       // Obtener todos los vuelos
-      const response = await fetch('http://localhost:3000/api/vuelos', {
+      const response = await fetch(`${apiUrl}/vuelos`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -64,7 +65,7 @@ const PilotView = () => {
         const allFlights = await response.json();
         
         // Obtener info del piloto para filtrar sus vuelos
-        const userResponse = await fetch('http://localhost:3000/api/users/', {
+        const userResponse = await fetch(`${apiUrl}/users/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -108,7 +109,7 @@ const PilotView = () => {
     
     try {
       // Primero actualizamos el estado del vuelo
-      const response = await fetch(`http://localhost:3000/api/vuelos/${flightId}`, {
+      const response = await fetch(`${apiUrl}/vuelos/${flightId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -216,7 +217,7 @@ const PilotView = () => {
         newTotalDelay = currentDelay + delayHours;
       }
       
-      const response = await fetch(`http://localhost:3000/api/vuelos/${flightId}`, {
+      const response = await fetch(`${apiUrl}/vuelos/${flightId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -263,7 +264,7 @@ const PilotView = () => {
     const token = sessionStorage.getItem('token');
     
     try {
-      const response = await fetch(`http://localhost:3000/api/users/pilotos/${pilotId}/horas-vuelo`, {
+      const response = await fetch(`${apiUrl}/users/pilotos/${pilotId}/horas-vuelo`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -284,7 +285,7 @@ const PilotView = () => {
     const token = sessionStorage.getItem('token');
     
     try {
-      const response = await fetch(`http://localhost:3000/api/aviones/${aircraftId}/horas-vuelo`, {
+      const response = await fetch(`${apiUrl}/aviones/${aircraftId}/horas-vuelo`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
