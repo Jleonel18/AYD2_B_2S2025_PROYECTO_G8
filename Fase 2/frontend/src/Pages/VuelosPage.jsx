@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const VuelosPage = () => {
   const [flights, setFlights] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -27,7 +29,7 @@ const VuelosPage = () => {
       if (!token) console.error('No token found in sessionStorage');
       try {
         // Fetch flights
-        const flightsResponse = await fetch('http://localhost:3000/api/vuelos', {
+        const flightsResponse = await fetch(`${apiUrl}/vuelos`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -42,7 +44,7 @@ const VuelosPage = () => {
         }
 
         // Fetch airports
-        const airportsResponse = await fetch('http://localhost:3000/api/aeropuertos/', {
+        const airportsResponse = await fetch(`${apiUrl}/aeropuertos/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -57,7 +59,7 @@ const VuelosPage = () => {
         }
 
         // Fetch workers
-        const workersResponse = await fetch('http://localhost:3000/api/users/trabajadores', {
+        const workersResponse = await fetch(`${apiUrl}/users/trabajadores`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -74,7 +76,7 @@ const VuelosPage = () => {
         }
 
         // Fetch aircrafts
-        const aircraftsResponse = await fetch('http://localhost:3000/api/aviones/', {
+        const aircraftsResponse = await fetch(`${apiUrl}/aviones/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -184,7 +186,7 @@ const VuelosPage = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/api/vuelos', {
+      const response = await fetch(`${apiUrl}/vuelos`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
