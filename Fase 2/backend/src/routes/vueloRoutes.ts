@@ -33,6 +33,6 @@ export class VueloRoutes {
         this.router.get("/", vueloController.listarVuelos);
         this.router.get("/:id", vueloController.obtenerVuelo);
         this.router.put("/:id", vueloController.actualizarEstadoVuelo);
-        this.router.patch("/:id", vueloController.cancelarVuelo);
+        this.router.patch("/:id", tokenAuth, authorizeRoles("operaciones"), vueloController.cancelarVuelo);
     }
 }

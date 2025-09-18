@@ -150,6 +150,15 @@ export class VueloController {
       if (!vuelo) {
         return res.status(404).json({ error: "Vuelo no encontrado" });
       }
+
+      if(EstadoVuelo.CANCELADO === vuelo.estado) {
+        return res.status(400).json({ error: "El vuelo ya está cancelado" });
+      }
+      
+      if(vuelo.estado !== EstadoVuelo.PLANIFICADO && vuelo.estado !== EstadoVuelo.RETRASADO) {
+        return res.status(400).json({ error: "Solo se pueden cancelar vuelos en estado 'Planificado' o 'Retrasado'" });
+      }
+
       await this.reservaService.cancelarReservasPorVuelo(id);
       const vueloCancelado = await this.vueloService.cancelarVuelo(id);
       res.json(vueloCancelado);
