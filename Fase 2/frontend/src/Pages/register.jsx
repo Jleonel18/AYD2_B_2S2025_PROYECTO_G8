@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 const apiUrl = import.meta.env.VITE_API_URL
+import imagen_avion from '../assets/plane.png';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -106,7 +107,7 @@ const Register = () => {
   return (
     <div className="flex h-screen">
       <div className="w-1/2 bg-[#333446] flex items-center justify-center">
-        <img src="../assets/plane.png" alt="Background" className="object-cover w-full h-full" />
+        <img src={imagen_avion} alt="Background" className="object-cover w-full h-full" />
       </div>
       <div className="w-1/2 bg-[#EAEFEF] flex items-center justify-center">
         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg w-2/3">
