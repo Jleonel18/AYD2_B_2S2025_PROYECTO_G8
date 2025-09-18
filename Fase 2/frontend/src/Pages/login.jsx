@@ -98,7 +98,7 @@ const Login = () => {
   return (
     <div className="flex h-screen">
       <div className="w-1/2 bg-[#333446]">
-        <img src="../images/plane.png" alt="Background" className="object-cover w-full h-full" />
+        <img src="../assets/plane.png" alt="Background" className="object-cover w-full h-full" />
       </div>
       <div className="w-1/2 bg-[#EAEFEF] flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-lg w-96">
