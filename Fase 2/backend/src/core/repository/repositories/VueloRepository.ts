@@ -13,7 +13,7 @@ export class VueloRepository implements IVueloRepository {
   }
 
   async findAll(): Promise<IVuelo[]> {
-    return await VueloModel.find();
+    return await VueloModel.find({ estado: 'Planificado' });
   }
 
   async update(id: string, vuelo: Partial<IVuelo>): Promise<IVuelo | null> {
