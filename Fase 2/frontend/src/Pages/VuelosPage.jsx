@@ -17,6 +17,7 @@ const VuelosPage = () => {
     piloto_id: '',
     copiloto_id: '',
     sobrecargos: [],
+    numero_vuelo: '', // Added for flight number
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [showDetails, setShowDetails] = useState(false);
@@ -109,22 +110,24 @@ const VuelosPage = () => {
     }
   };
 
-  // Helper function to get airport name by ID
   const getAirportName = (airportId) => {
     const airport = airports.find(a => a._id === airportId);
     return airport ? airport.nombre : airportId;
   };
 
-  // Helper function to get aircraft model by ID
   const getAircraftModel = (aircraftId) => {
     const aircraft = aircrafts.find(a => a._id === aircraftId);
     return aircraft ? aircraft.modelo : aircraftId;
   };
 
-  // Helper function to get worker name by ID
   const getWorkerName = (workerId) => {
     const worker = [...workers.pilots, ...workers.cabinCrew].find(w => w._id === workerId);
     return worker ? worker.nombre : workerId;
+  };
+
+  // Helper function to generate or retrieve flight number
+  const getFlightNumber = (flight) => {
+    return flight.numero_vuelo || `FL${flight._id.substring(0, 6).toUpperCase()}`; // Fallback if numero_vuelo is not available
   };
 
   const handleInputChange = (e) => {
@@ -176,6 +179,7 @@ const VuelosPage = () => {
     };
 
     const payload = {
+      numero_vuelo: formData.numero_vuelo || `FL${Date.now().toString(36).toUpperCase()}`, // Generate flight number if not provided
       origen: formData.origen,
       destino: formData.destino,
       fecha_salida: formData.fecha_salida + 'Z',
@@ -208,12 +212,12 @@ const VuelosPage = () => {
           piloto_id: '',
           copiloto_id: '',
           sobrecargos: [],
+          numero_vuelo: '',
         });
         setErrorMessage('');
         setMaxSobrecargos(0);
       } else {
         const errorText = await response.json();
-        console.log("El error es:", errorText.error);
         setErrorMessage(errorText.error || 'Error desconocido al crear el vuelo');
       }
     } catch (error) {
@@ -237,19 +241,19 @@ const VuelosPage = () => {
           </button>
         </div>
         <div className="mt-4 text-sm text-gray-600 flex space-x-4">
-        <span className="text-blue-500">Planificado</span>
-        <span className="text-green-500">Iniciado</span>
-        <span className="text-green-500">En tiempo</span>
-        <span className="text-orange-500">Retrasado</span>
-        <span className="text-red-500">Cancelado</span>
-        <span className="text-purple-500">Aterrizado</span>
-      </div>
+          <span className="text-blue-500">Planificado</span>
+          <span className="text-green-500">Iniciado</span>
+          <span className="text-green-500">En tiempo</span>
+          <span className="text-orange-500">Retrasado</span>
+          <span className="text-red-500">Cancelado</span>
+          <span className="text-purple-500">Aterrizado</span>
+        </div>
       </div>
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-200 text-gray-700">
             <tr>
-              <th className="p-4 border-b-2 border-gray-300">ID</th>
+              <th className="p-4 border-b-2 border-gray-300">No. Vuelo</th>
               <th className="p-4 border-b-2 border-gray-300">Origen</th>
               <th className="p-4 border-b-2 border-gray-300">Destino</th>
               <th className="p-4 border-b-2 border-gray-300">Salida</th>
@@ -262,7 +266,7 @@ const VuelosPage = () => {
           <tbody>
             {flights.map((flight) => (
               <tr key={flight._id} className="hover:bg-gray-100 transition duration-150">
-                <td className="p-4 border-b border-gray-200">{flight._id}</td>
+                <td className="p-4 border-b border-gray-200">{getFlightNumber(flight)}</td>
                 <td className="p-4 border-b border-gray-200">{getAirportName(flight.origen)}</td>
                 <td className="p-4 border-b border-gray-200">{getAirportName(flight.destino)}</td>
                 <td className="p-4 border-b border-gray-200">{new Date(flight.fecha_salida).toLocaleString()}</td>
@@ -298,6 +302,17 @@ const VuelosPage = () => {
             )}
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block mb-2 text-gray-700">Número de Vuelo</label>
+                  <input
+                    type="text"
+                    name="numero_vuelo"
+                    value={formData.numero_vuelo}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ej: FL1234"
+                  />
+                </div>
                 <div>
                   <label className="block mb-2 text-gray-700">Origen</label>
                   <select
@@ -449,7 +464,7 @@ const VuelosPage = () => {
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Detalles del Vuelo</h2>
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <p className="text-gray-700"><strong>ID:</strong> {selectedFlight._id}</p>
+                <p className="text-gray-700"><strong>Número de Vuelo:</strong> {getFlightNumber(selectedFlight)}</p>
                 <p className="text-gray-700"><strong>Origen:</strong> {getAirportName(selectedFlight.origen)}</p>
                 <p className="text-gray-700"><strong>Destino:</strong> {getAirportName(selectedFlight.destino)}</p>
                 <p className="text-gray-700"><strong>Salida:</strong> {new Date(selectedFlight.fecha_salida).toLocaleString()}</p>
