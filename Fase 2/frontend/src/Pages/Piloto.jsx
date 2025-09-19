@@ -92,26 +92,11 @@ const PilotView = () => {
   };
 
   const handleLogout = async () => {
-    const token = sessionStorage.getItem('token');
-    try {
-      const response = await fetch(`${apiUrl}/auth/logout`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        sessionStorage.removeItem('token');
-        navigate('/login');
-      } else {
-        setErrorMessage('Error al cerrar sesión');
-      }
-    } catch (error) {
-      console.error('Error during logout:', error);
-      setErrorMessage('Error de conexión al cerrar sesión');
-    }
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login'); // Redirect to login page after logout
   };
 
   const calculateFlightHours = (fechaSalida, fechaLlegada) => {
