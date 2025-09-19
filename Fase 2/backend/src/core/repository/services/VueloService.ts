@@ -27,6 +27,10 @@ export class VueloService {
         return await this.vueloRepository.findAll();
     }
 
+    async listarVuelosPlanificados(): Promise<IVuelo[]> {
+        return await this.vueloRepository.findAllPlanificados();
+    }
+
     async actualizarEstadoVuelo(id: string, nuevoEstado: string): Promise<IVuelo | null> {
         const vuelo = await this.vueloRepository.updateEstado(id, nuevoEstado);
         return vuelo;

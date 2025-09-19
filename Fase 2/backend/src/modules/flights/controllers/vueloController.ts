@@ -144,6 +144,15 @@ export class VueloController {
     }
   };
 
+  listarVuelosPlanificados = async (req: Request, res: Response) => {
+    try {
+      const vuelos = await this.vueloService.listarVuelosPlanificados();
+      res.json(vuelos);
+    } catch (error) {
+      res.status(500).json({ error: "Error al listar vuelos planificados" });
+    }
+  };
+
   cancelarVuelo = async (req: Request, res: Response) => {
     try {
       const id = req.params.id;

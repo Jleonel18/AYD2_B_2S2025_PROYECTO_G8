@@ -31,6 +31,7 @@ export class VueloRoutes {
     private initializeRoutes() {
         this.router.post("/", tokenAuth, authorizeRoles("operaciones"), vueloController.crearVuelo);
         this.router.get("/", vueloController.listarVuelos);
+        this.router.get("/planificados", vueloController.listarVuelosPlanificados);
         this.router.get("/:id", vueloController.obtenerVuelo);
         this.router.put("/:id", vueloController.actualizarEstadoVuelo);
         this.router.patch("/:id", tokenAuth, authorizeRoles("operaciones"), vueloController.cancelarVuelo);

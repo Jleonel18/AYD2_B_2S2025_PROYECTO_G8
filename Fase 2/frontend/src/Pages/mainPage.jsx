@@ -19,7 +19,7 @@ const MainPage = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${apiUrl}/vuelos`, {
+    fetch(`${apiUrl}/vuelos/planificados`, {
       headers: hasToken ? { 'Authorization': `Bearer ${sessionStorage.getItem('token')}` } : {},
     })
       .then((response) => response.json())
