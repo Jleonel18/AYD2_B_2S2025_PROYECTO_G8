@@ -44,6 +44,12 @@ export class UsuarioController {
                 return res.status(400).json({ error: "El pasaporte no debe estar vencido" })
             }
 
+            // Validar que el correo no esté en uso
+            const correoExistente = await this.usuarioService.obtenerUsuarioPorCorreo(datos.correo)
+            if(correoExistente) {
+                return res.status(400).json({ error: "El correo ya está en uso" })
+            }
+
             const usuario_unico = generarUsuario(datos.nombre)
             datos.usuario = usuario_unico
 
