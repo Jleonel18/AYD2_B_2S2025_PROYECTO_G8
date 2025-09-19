@@ -4,6 +4,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 const AvionesPage = () => {
   const [aviones, setAviones] = useState([]);
+  const [aeropuertos, setAeropuertos] = useState([]); // Nuevo estado para aeropuertos
   const [newAvion, setNewAvion] = useState({
     modelo: '',
     capacidadMaxima: '',
@@ -39,6 +40,7 @@ const AvionesPage = () => {
 
   useEffect(() => {
     fetchAviones();
+    fetchAeropuertos(); // Cargar aeropuertos al iniciar
   }, []);
 
   const fetchAviones = async () => {
@@ -62,6 +64,25 @@ const AvionesPage = () => {
     }
   };
 
+  // Nueva función para cargar aeropuertos
+  const fetchAeropuertos = async () => {
+    try {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch(`${apiUrl}/aeropuertos/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAeropuertos(data);
+      }
+    } catch (err) {
+      console.error('Error al cargar aeropuertos:', err);
+    }
+  };
+
   const handleCreateAvion = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -77,7 +98,8 @@ const AvionesPage = () => {
           ...newAvion,
           capacidadMaxima: parseInt(newAvion.capacidadMaxima),
           horas_Vuelo: parseInt(newAvion.horas_Vuelo) || 0,
-          limite_horas: parseInt(newAvion.limite_horas)
+          limite_horas: parseInt(newAvion.limite_horas),
+          id_aeropuerto_actual: newAvion.id_aeropuerto_actual || null
         }),
       });
       if (!response.ok) throw new Error('Error al crear el avión');
@@ -116,7 +138,8 @@ const AvionesPage = () => {
           ...editingAvion,
           capacidadMaxima: parseInt(editingAvion.capacidadMaxima),
           horas_Vuelo: parseInt(editingAvion.horas_Vuelo),
-          limite_horas: parseInt(editingAvion.limite_horas)
+          limite_horas: parseInt(editingAvion.limite_horas),
+          id_aeropuerto_actual: editingAvion.id_aeropuerto_actual || null
         }),
       });
       if (!response.ok) throw new Error('Error al actualizar el avión');
@@ -165,6 +188,12 @@ const AvionesPage = () => {
     if (porcentaje >= 90) return { color: 'text-red-600', text: 'Crítico' };
     if (porcentaje >= 75) return { color: 'text-yellow-600', text: 'Atención' };
     return { color: 'text-green-600', text: 'Normal' };
+  };
+
+  // Función para obtener el nombre del aeropuerto por ID
+  const getAeropuertoNombre = (id) => {
+    const aeropuerto = aeropuertos.find(a => a._id === id);
+    return aeropuerto ? `${aeropuerto.nombre} (${aeropuerto.codigo})` : 'No asignado';
   };
 
   if (loading && aviones.length === 0) {
@@ -231,6 +260,9 @@ const AvionesPage = () => {
                 Estado
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Aeropuerto Actual
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Horas de Vuelo
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -260,6 +292,9 @@ const AvionesPage = () => {
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full text-white bg-${estadoColors[avion.estado]}`}>
                       {avion.estado}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {getAeropuertoNombre(avion.id_aeropuerto_actual)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {avion.horas_Vuelo} / {avion.limite_horas} hrs
@@ -358,6 +393,23 @@ const AvionesPage = () => {
                 >
                   {estadoOptions.map(estado => (
                     <option key={estado} value={estado}>{estado}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Aeropuerto Actual
+                </label>
+                <select
+                  value={newAvion.id_aeropuerto_actual}
+                  onChange={(e) => setNewAvion({ ...newAvion, id_aeropuerto_actual: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Seleccionar aeropuerto</option>
+                  {aeropuertos.map(aeropuerto => (
+                    <option key={aeropuerto._id} value={aeropuerto._id}>
+                      {aeropuerto.nombre} ({aeropuerto.codigo})
+                    </option>
                   ))}
                 </select>
               </div>
@@ -464,6 +516,23 @@ const AvionesPage = () => {
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Aeropuerto Actual
+                </label>
+                <select
+                  value={editingAvion.id_aeropuerto_actual || ''}
+                  onChange={(e) => setEditingAvion({ ...editingAvion, id_aeropuerto_actual: e.target.value })}
+                  className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Seleccionar aeropuerto</option>
+                  {aeropuertos.map(aeropuerto => (
+                    <option key={aeropuerto._id} value={aeropuerto._id}>
+                      {aeropuerto.nombre} ({aeropuerto.codigo})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Horas de Vuelo
                 </label>
                 <input
@@ -537,6 +606,10 @@ const AvionesPage = () => {
                 <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full text-white bg-${estadoColors[selectedAvion.estado]} ml-2`}>
                   {selectedAvion.estado}
                 </span>
+              </div>
+              <div>
+                <strong className="text-gray-700">Aeropuerto Actual:</strong>
+                <p className="text-gray-600">{getAeropuertoNombre(selectedAvion.id_aeropuerto_actual)}</p>
               </div>
               <div>
                 <strong className="text-gray-700">Horas de Vuelo:</strong>
