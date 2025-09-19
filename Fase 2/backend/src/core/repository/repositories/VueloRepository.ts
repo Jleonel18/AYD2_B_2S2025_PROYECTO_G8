@@ -13,6 +13,10 @@ export class VueloRepository implements IVueloRepository {
   }
 
   async findAll(): Promise<IVuelo[]> {
+    return await VueloModel.find();
+  }
+
+  async findAllPlanificados(): Promise<IVuelo[]> {
     return await VueloModel.find({ estado: 'Planificado' });
   }
 

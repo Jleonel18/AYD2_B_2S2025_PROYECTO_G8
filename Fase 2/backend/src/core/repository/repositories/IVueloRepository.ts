@@ -4,6 +4,7 @@ export interface IVueloRepository {
   create(vuelo: Partial<IVuelo>): Promise<IVuelo>;
   findById(id: string): Promise<IVuelo | null>;
   findAll(): Promise<IVuelo[]>;
+  findAllPlanificados(): Promise<IVuelo[]>;
   update(id: string, vuelo: Partial<IVuelo>): Promise<IVuelo | null>;
   delete(id: string): Promise<void>;
   updateEstado(id: string, nuevoEstado: string): Promise<IVuelo | null>;
