@@ -96,7 +96,7 @@ const Register = () => {
         toast.success('Se han validado tus datos. Hemos enviado un correo. Por favor verifica tu cuenta.');
         redirectToLogin();
       } else {
-        toast.error(data.message || 'Error en el registro');
+        toast.error(data.error || 'Error en el registro');
       }
     } catch (error) {
       toast.error('Error en el registro');
