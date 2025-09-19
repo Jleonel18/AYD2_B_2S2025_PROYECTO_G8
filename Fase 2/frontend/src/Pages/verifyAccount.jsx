@@ -47,7 +47,7 @@ const VerifyAccount = () => {
                 toast.success(data.message || 'Cuenta verificada exitosamente');
                 navigate('/login');
             } else {
-                toast.error(data.message || 'Error al verificar la cuenta. Inténtalo de nuevo.');
+                toast.error(data.error || 'Error al verificar la cuenta. Inténtalo de nuevo.');
             }
         } catch (error) {
             toast.error('Error al verificar la cuenta. Inténtalo de nuevo.');
