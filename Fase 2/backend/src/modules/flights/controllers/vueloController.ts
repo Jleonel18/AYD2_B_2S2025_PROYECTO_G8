@@ -83,7 +83,8 @@ export class VueloController {
         (_: string, index: number) => !disponibilidades[index]
       );
       if (sobrecargoNoDisponible) {
-        return res.status(400).json({ error: `El sobrecargo ${sobrecargoNoDisponible} ya tiene un vuelo asignado en la misma fecha` });
+        const sobrecargoNombre = await this.userService.obtenerUsuario(sobrecargoNoDisponible);
+        return res.status(400).json({ error: `El sobrecargo ${sobrecargoNombre?.nombre} ya tiene un vuelo asignado en la misma fecha` });
       }
     }
 
