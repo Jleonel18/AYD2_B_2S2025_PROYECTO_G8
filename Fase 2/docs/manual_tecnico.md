@@ -2,6 +2,29 @@
 
 A continuación, se presenta el manual técnico y las estrategias que se usarán para llevar a cabo la aplicación AirFlow System.
 
+Para el proyecto Airflow System se plantea usar dos estilos arquitectónicos: Arquitectura cliente-servidor con capas.
+
+# Justificación:
+
+La justificación del diseño arquitectónico cliente-servidor con capas es por varias razones.
+
+- Alta escalabilidad: La escalabilidad con capas es bastante conveniente para una aplicación de vuelos.
+- Despliegue sencillo: El despliegue sencillo que ofrece cliente-servidor es mucho mejor que un estilo arquitectónico basado en microservicios, ya que microservicios requiere orquestación de contenedores.
+- Costo bajo: No requiere una infraestructura compleja, como lo requeriría microservicios.
+- Facilidad en SCRUM: La arquitectura cliente-servidor ha sido desarrollada previamente por los estudiantes, debido a eso se toma como arquitectura conocida y fácil de implementar.
+
+**Ejemplo de Flujo en AirFlow System**
+
+1. **Cliente**: Pasajero accede a http://ip:3000/reservas, selecciona un vuelo.
+2. **Capa de Presentación**: Llama a POST /api/vuelos/reservar con datos.
+3. **Capa de Lógica**: VueloService valida capacidad, asigna asiento, notifica via Observer.
+4. **Capa de Datos**: VueloRepository actualiza MongoDB.
+5. **Respuesta**: Cliente muestra confirmación.
+
+# Diagrama de la arquitectura:
+
+![arquitectura](./pictures/arquitectura.png)
+
 # Patrones de Diseño a Usar:
 
 Para la aplicación AirFlow System se tendrá contemplado usar 5 patrones de diseño dependiendo de la necesidad de la aplicación. Los patrones de diseño a usar serán:
