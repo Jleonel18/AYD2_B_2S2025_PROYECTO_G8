@@ -36,6 +36,7 @@ https://drive.google.com/file/d/1oEqA0SyvVl1bRpisEmMEVz6kAYOLAWda/view?usp=drive
 
 ### José Leonel López Ajvix
 
+
 - **¿Qué se hizo el día anterior?** El día anterior se empezó con el jira para el tercer y último sprint y además se hizo el diagrama de clases
 - **¿Qué se hará el día de hoy?** El día de hoy se hará la contenerización para poder desplegar en la nube.
 - **Se tiene algún impedimento:** No, por el momento se puede trabajar sin ningún problema.
