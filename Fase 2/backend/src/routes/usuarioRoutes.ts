@@ -1,17 +1,21 @@
 import { Router } from "express";
-import { UsuarioController } from "../modules/users/controllers/usuarioController";
-import { UserService } from "../core/repository/services/UserService";
-import { UserRepository } from "../core/repository/repositories/UserRepository";
-import { authorizeRoles, tokenAuth } from "../middleware/authMiddleware";
-import { VueloRepository } from "../core/repository/repositories/VueloRepository";
-import { VueloService } from "../core/repository/services/VueloService";
+import { UsuarioController } from "../modules/users/controllers/usuarioController.js";
+import { UserService } from "../core/repository/services/UserService.js";
+import { UserRepository } from "../core/repository/repositories/UserRepository.js";
+import { authorizeRoles, tokenAuth } from "../middleware/authMiddleware.js";
+import { VueloRepository } from "../core/repository/repositories/VueloRepository.js";
+import { VueloService } from "../core/repository/services/VueloService.js";
+import { AvionRepository } from "../core/repository/repositories/AvionRepository.js";
+import { AvionService } from "../core/repository/services/AvionService.js";
 
 // Aquí instanciamos dependencias
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 const vueloRepository = new VueloRepository();
 const vueloService = new VueloService(vueloRepository);
-const usuarioController = new UsuarioController(userService, vueloService);
+const avionRepository = new AvionRepository();
+const avionesService = new AvionService(avionRepository);
+const usuarioController = new UsuarioController(userService, vueloService, avionesService);
 
 export class UsuarioRoutes {
     public router: Router;
@@ -36,5 +40,6 @@ export class UsuarioRoutes {
         this.router.patch("/pilotos/:id/horas-vuelo", usuarioController.sumarHorasVueloPiloto);
         this.router.patch("/pasajeros/puntos", tokenAuth, authorizeRoles("operaciones"), usuarioController.sumarPuntosPorHorasVuelo);
         this.router.get("/historial-vuelos", tokenAuth, usuarioController.obtenerHistorialVuelos);
+        this.router.get("/estadisticas", tokenAuth, authorizeRoles("operaciones"), usuarioController.obtenerEstadisticasAdmin);
     }
 }

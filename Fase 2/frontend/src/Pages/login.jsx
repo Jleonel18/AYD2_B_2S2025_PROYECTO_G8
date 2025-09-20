@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'
 const apiUrl = import.meta.env.VITE_API_URL
+import imagen_avion from '../assets/plane.png';
 
 const Login = () => {
   
@@ -98,7 +99,7 @@ const Login = () => {
   return (
     <div className="flex h-screen">
       <div className="w-1/2 bg-[#333446]">
-        <img src="../images/plane.png" alt="Background" className="object-cover w-full h-full" />
+        <img src={imagen_avion} alt="Background" className="object-cover w-full h-full" />
       </div>
       <div className="w-1/2 bg-[#EAEFEF] flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-lg w-96">

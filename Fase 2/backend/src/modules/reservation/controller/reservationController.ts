@@ -1,11 +1,11 @@
 import { Request, Response } from "express"
-import { AuthRequest } from "../../../middleware/authMiddleware"
-import { ReservaService } from "../../../core/repository/services/ReservaService";
-import { ReservaFacade } from "../../../core/facade/ReservaFacade";
-import { generarCodigoQR } from "../../../utils/qr";
-import { enviarCorreoActualizacionReserva, enviarQRReserva } from "../../../utils/send_email";
-import { UserService } from "../../../core/repository/services/UserService";
-import { VueloService } from "../../../core/repository/services/VueloService";
+import { AuthRequest } from "../../../middleware/authMiddleware.js"
+import { ReservaService } from "../../../core/repository/services/ReservaService.js";
+import { ReservaFacade } from "../../../core/facade/ReservaFacade.js";
+import { generarCodigoQR } from "../../../utils/qr.js";
+import { enviarCorreoActualizacionReserva, enviarQRReserva } from "../../../utils/send_email.js";
+import { UserService } from "../../../core/repository/services/UserService.js";
+import { VueloService } from "../../../core/repository/services/VueloService.js";
 
 
 export class ReservaController {

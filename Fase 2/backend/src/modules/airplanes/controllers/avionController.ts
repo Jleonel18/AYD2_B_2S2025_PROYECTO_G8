@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AvionService } from "../../../core/repository/services/AvionService";
-import { IAvion } from "../../../core/repository/models/Avion";
+import { AvionService } from "../../../core/repository/services/AvionService.js";
+import { IAvion } from "../../../core/repository/models/Avion.js";
 
 export class AvionController {
     constructor(private readonly avionService: AvionService) {}

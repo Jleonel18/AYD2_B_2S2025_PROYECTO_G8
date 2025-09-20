@@ -1,5 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Added for navigation after logout
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const PilotView = () => {
   const [flights, setFlights] = useState([]);
@@ -12,6 +14,7 @@ const PilotView = () => {
   const [selectedFlightForDelay, setSelectedFlightForDelay] = useState(null);
   const [delayHours, setDelayHours] = useState('');
   const [delayMinutes, setDelayMinutes] = useState('');
+  const navigate = useNavigate(); // Added for navigation
 
   // Estados disponibles para cambio
   const availableStates = [
@@ -19,7 +22,7 @@ const PilotView = () => {
     'Iniciado', 
     'En tiempo',
     'Retrasado',
-    'Aterrizado', // Equivalente a "Completado"
+    'Aterrizado',
     'Cancelado'
   ];
 
@@ -31,7 +34,7 @@ const PilotView = () => {
   const fetchPilotInfo = async () => {
     const token = sessionStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:3000/api/users/', {
+      const response = await fetch(`${apiUrl}/users/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -52,8 +55,7 @@ const PilotView = () => {
     setLoading(true);
     
     try {
-      // Obtener todos los vuelos
-      const response = await fetch('http://localhost:3000/api/vuelos', {
+      const response = await fetch(`${apiUrl}/vuelos`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -62,9 +64,7 @@ const PilotView = () => {
 
       if (response.ok) {
         const allFlights = await response.json();
-        
-        // Obtener info del piloto para filtrar sus vuelos
-        const userResponse = await fetch('http://localhost:3000/api/users/', {
+        const userResponse = await fetch(`${apiUrl}/users/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -74,13 +74,10 @@ const PilotView = () => {
         if (userResponse.ok) {
           const userData = await userResponse.json();
           const pilotId = userData._id;
-          
-          // Filtrar solo los vuelos donde este piloto participa
           const pilotFlights = allFlights.filter(flight => 
             flight.tripulacion?.piloto_id === pilotId || 
             flight.tripulacion?.copiloto_id === pilotId
           );
-          
           setFlights(pilotFlights);
         }
       } else {
@@ -94,11 +91,19 @@ const PilotView = () => {
     }
   };
 
+  const handleLogout = async () => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login'); // Redirect to login page after logout
+  };
+
   const calculateFlightHours = (fechaSalida, fechaLlegada) => {
     const salida = new Date(fechaSalida);
     const llegada = new Date(fechaLlegada);
     const diffMs = llegada.getTime() - salida.getTime();
-    const diffHours = Math.round((diffMs / (1000 * 60 * 60)) * 100) / 100; // Redondear a 2 decimales
+    const diffHours = Math.round((diffMs / (1000 * 60 * 60)) * 100) / 100;
     return diffHours;
   };
 
@@ -107,8 +112,7 @@ const PilotView = () => {
     setUpdatingFlight(flightId);
     
     try {
-      // Primero actualizamos el estado del vuelo
-      const response = await fetch(`http://localhost:3000/api/vuelos/${flightId}`, {
+      const response = await fetch(`${apiUrl}/vuelos/${flightId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -120,42 +124,25 @@ const PilotView = () => {
       if (response.ok) {
         const updatedFlight = await response.json();
         
-        // Si el vuelo se marca como "Aterrizado" (Completado), calculamos y sumamos las horas
         if (newStatus === 'Aterrizado') {
           const normalFlightHours = calculateFlightHours(
             updatedFlight.fecha_salida, 
             updatedFlight.fecha_llegada
           );
-          
-          // Obtener el vuelo actual para conseguir el tiempo de retraso
           const currentFlight = flights.find(f => f._id === flightId);
           const delayHours = currentFlight?.tiempoRetraso || 0;
-          
           const totalFlightHours = normalFlightHours + delayHours;
           
           console.log('Horas normales:', normalFlightHours);
           console.log('Horas de retraso:', delayHours);
           console.log('Total a sumar:', totalFlightHours);
           
-          // // Sumar horas al piloto actual
-          // if (pilotInfo && updatedFlight.tripulacion?.piloto_id === pilotInfo._id) {
-          //   await updatePilotFlightHours(pilotInfo._id, totalFlightHours);
-          // }
-          
-          // // Si hay copiloto y es diferente, también sumarle las horas
-          // if (updatedFlight.tripulacion?.copiloto_id && 
-          //     updatedFlight.tripulacion.copiloto_id !== pilotInfo._id) {
-          //   await updatePilotFlightHours(updatedFlight.tripulacion.copiloto_id, totalFlightHours);
-          // }
-          
-          // Sumar horas al avión
           await updateAircraftFlightHours(updatedFlight.aeronave, totalFlightHours);
           
           const retrasoText = delayHours > 0 ? 
             ` (${normalFlightHours} hrs normales + ${delayHours} hrs de retraso)` : '';
           setSuccessMessage(`Vuelo completado. Se sumaron ${totalFlightHours} horas de vuelo${retrasoText}.`);
         } else if (newStatus === 'Retrasado') {
-          // Si se marca como retrasado, agregar el tiempo de retraso
           if (delayTime > 0) {
             await updateFlightDelay(flightId, delayTime);
             setSuccessMessage(`Vuelo marcado como retrasado. Se agregaron ${delayTime} horas de retraso.`);
@@ -163,14 +150,12 @@ const PilotView = () => {
             setSuccessMessage(`Estado del vuelo actualizado a: ${newStatus}`);
           }
         } else if (newStatus === 'En tiempo') {
-          // Si se cambia a "En tiempo", resetear el tiempo de retraso
-          await updateFlightDelay(flightId, 0, true); // true indica reset completo
+          await updateFlightDelay(flightId, 0, true);
           setSuccessMessage(`Vuelo marcado como "En tiempo". Se resetó el tiempo de retraso.`);
         } else {
           setSuccessMessage(`Estado del vuelo actualizado a: ${newStatus}`);
         }
         
-        // Actualizar la lista de vuelos
         setFlights(prevFlights => 
           prevFlights.map(flight => {
             if (flight._id === flightId) {
@@ -179,7 +164,7 @@ const PilotView = () => {
               if (newStatus === 'Retrasado' && delayTime > 0) {
                 updatedFlightData.tiempoRetraso = (flight.tiempoRetraso || 0) + delayTime;
               } else if (newStatus === 'En tiempo') {
-                updatedFlightData.tiempoRetraso = 0; // Reset del retraso
+                updatedFlightData.tiempoRetraso = 0;
               }
               
               return updatedFlightData;
@@ -207,16 +192,14 @@ const PilotView = () => {
       let newTotalDelay;
       
       if (resetDelay) {
-        // Reset completo del tiempo de retraso
         newTotalDelay = 0;
       } else {
-        // Sumar tiempo de retraso al existente
         const flight = flights.find(f => f._id === flightId);
         const currentDelay = flight?.tiempoRetraso || 0;
         newTotalDelay = currentDelay + delayHours;
       }
       
-      const response = await fetch(`http://localhost:3000/api/vuelos/${flightId}`, {
+      const response = await fetch(`${apiUrl}/vuelos/${flightId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -263,7 +246,7 @@ const PilotView = () => {
     const token = sessionStorage.getItem('token');
     
     try {
-      const response = await fetch(`http://localhost:3000/api/users/pilotos/${pilotId}/horas-vuelo`, {
+      const response = await fetch(`${apiUrl}/users/pilotos/${pilotId}/horas-vuelo`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -284,7 +267,7 @@ const PilotView = () => {
     const token = sessionStorage.getItem('token');
     
     try {
-      const response = await fetch(`http://localhost:3000/api/aviones/${aircraftId}/horas-vuelo`, {
+      const response = await fetch(`${apiUrl}/aviones/${aircraftId}/horas-vuelo`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -314,14 +297,13 @@ const PilotView = () => {
   };
 
   const canChangeStatus = (currentStatus) => {
-    // Lógica de negocio: qué estados pueden cambiar a cuáles
     const statusTransitions = {
       'Planificado': ['Iniciado', 'Cancelado', 'Retrasado'],
       'Iniciado': ['En tiempo', 'Retrasado', 'Aterrizado'],
       'En tiempo': ['Aterrizado', 'Retrasado'],
       'Retrasado': ['Aterrizado', 'En tiempo'],
-      'Aterrizado': [], // No se puede cambiar desde aterrizado
-      'Cancelado': [] // No se puede cambiar desde cancelado
+      'Aterrizado': [],
+      'Cancelado': []
     };
     
     return statusTransitions[currentStatus] || [];
@@ -337,21 +319,28 @@ const PilotView = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Panel del Piloto</h1>
-        {pilotInfo && (
-          <div className="bg-white p-4 rounded-lg shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-700">
-              Bienvenido, {pilotInfo.nombre}
-            </h2>
-            <p className="text-gray-600">
-              Horas de vuelo: {pilotInfo.horasVuelo || 0} hrs
-            </p>
-          </div>
-        )}
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Panel del Piloto</h1>
+          {pilotInfo && (
+            <div className="bg-white p-4 rounded-lg shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-700">
+                Bienvenido, {pilotInfo.nombre}
+              </h2>
+              <p className="text-gray-600">
+                Horas de vuelo: {pilotInfo.horasVuelo || 0} hrs
+              </p>
+            </div>
+          )}
+        </div>
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+        >
+          Cerrar Sesión
+        </button>
       </div>
 
-      {/* Mensajes de estado */}
       {errorMessage && (
         <div className="mb-4 p-4 bg-red-50 text-red-700 border border-red-200 rounded-lg flex justify-between items-center">
           <span>{errorMessage}</span>
@@ -376,7 +365,6 @@ const PilotView = () => {
         </div>
       )}
 
-      {/* Lista de vuelos */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <div className="px-6 py-4 bg-gray-100 border-b">
           <h2 className="text-xl font-semibold text-gray-800">Mis Vuelos Asignados</h2>
@@ -490,7 +478,6 @@ const PilotView = () => {
         )}
       </div>
 
-      {/* Modal para tiempo de retraso */}
       {showDelayModal && selectedFlightForDelay && (
         <div className="fixed inset-0 backdrop-blur-sm bg-black/30 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-96 max-w-90vw">
@@ -569,7 +556,6 @@ const PilotView = () => {
         </div>
       )}
 
-      {/* Leyenda de estados */}
       <div className="mt-6 bg-white p-4 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold text-gray-800 mb-3">Estados de Vuelo</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">

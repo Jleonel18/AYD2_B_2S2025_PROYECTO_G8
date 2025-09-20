@@ -1,7 +1,7 @@
-import { IUserRepository } from './IUserRepository';
-import { UserModel, IUser } from '../models/User';
-import { comparePassword, hashPassword } from '../../../utils/passwords';
-import { flattenObject } from '../../../utils/utils';
+import { IUserRepository } from './IUserRepository.js';
+import { UserModel, IUser } from '../models/User.js';
+import { comparePassword, hashPassword } from '../../../utils/passwords.js';
+import { flattenObject } from '../../../utils/utils.js';
 import { ObjectId } from 'mongodb';
 
 export class UserRepository implements IUserRepository {
@@ -153,5 +153,12 @@ export class UserRepository implements IUserRepository {
     async getFlightHistory(usuarioID: string): Promise<ObjectId[] | null> {
         const user = await UserModel.findById(usuarioID).select('vuelos');
         return user ? user.vuelos : null;
+    }
+
+    async getStatisticsUsers(): Promise<{ totalUsers: number; totalPilots: number; totalFlightAttendants: number; }> {
+        const totalUsers = await UserModel.countDocuments({tipo: 'pasajero' });
+        const totalPilots = await UserModel.countDocuments({ tipo: 'piloto' });
+        const totalFlightAttendants = await UserModel.countDocuments({ tipo: 'sobrecargo' });
+        return { totalUsers, totalPilots, totalFlightAttendants };
     }
 }

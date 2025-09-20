@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import NavbarComponent from '../components/NavbarComponent';
+import NavbarComponent from '../components/navbarComponent';
 import { getUserInfo } from '../utils/auth';
 const apiUrl = import.meta.env.VITE_API_URL;
 

@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { VueloService } from "../../../core/repository/services/VueloService";
-import { IVuelo } from "../../../core/repository/models/Vuelo";
+import { VueloService } from "../../../core/repository/services/VueloService.js";
+import { IVuelo } from "../../../core/repository/models/Vuelo.js";
 import { Types } from "mongoose";
-import { EstadoVuelo } from "../../../core/observer/observador";
-import { AvionService } from "../../../core/repository/services/AvionService";
-import { ReservaService } from "../../../core/repository/services/ReservaService";
-import { UserService } from "../../../core/repository/services/UserService";
+import { EstadoVuelo } from "../../../core/observer/observador.js";
+import { AvionService } from "../../../core/repository/services/AvionService.js";
+import { ReservaService } from "../../../core/repository/services/ReservaService.js";
+import { UserService } from "../../../core/repository/services/UserService.js";
 
 
 
@@ -83,7 +83,8 @@ export class VueloController {
         (_: string, index: number) => !disponibilidades[index]
       );
       if (sobrecargoNoDisponible) {
-        return res.status(400).json({ error: `El sobrecargo ${sobrecargoNoDisponible} ya tiene un vuelo asignado en la misma fecha` });
+        const sobrecargoNombre = await this.userService.obtenerUsuario(sobrecargoNoDisponible);
+        return res.status(400).json({ error: `El sobrecargo ${sobrecargoNombre?.nombre} ya tiene un vuelo asignado en la misma fecha` });
       }
     }
 
@@ -143,6 +144,15 @@ export class VueloController {
     }
   };
 
+  listarVuelosPlanificados = async (req: Request, res: Response) => {
+    try {
+      const vuelos = await this.vueloService.listarVuelosPlanificados();
+      res.json(vuelos);
+    } catch (error) {
+      res.status(500).json({ error: "Error al listar vuelos planificados" });
+    }
+  };
+
   cancelarVuelo = async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
@@ -150,6 +160,15 @@ export class VueloController {
       if (!vuelo) {
         return res.status(404).json({ error: "Vuelo no encontrado" });
       }
+
+      if(EstadoVuelo.CANCELADO === vuelo.estado) {
+        return res.status(400).json({ error: "El vuelo ya está cancelado" });
+      }
+      
+      if(vuelo.estado !== EstadoVuelo.PLANIFICADO && vuelo.estado !== EstadoVuelo.RETRASADO) {
+        return res.status(400).json({ error: "Solo se pueden cancelar vuelos en estado 'Planificado' o 'Retrasado'" });
+      }
+
       await this.reservaService.cancelarReservasPorVuelo(id);
       const vueloCancelado = await this.vueloService.cancelarVuelo(id);
       res.json(vueloCancelado);

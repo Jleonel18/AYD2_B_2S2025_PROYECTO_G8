@@ -1,7 +1,7 @@
-import { IUserRepository } from '../repositories/IUserRepository';
-import { IUser } from '../models/User';
-import { UsuarioType } from '../../factory/usuario';
-import UsuarioFactory from '../../factory/usuarioFactory';
+import { IUserRepository } from '../repositories/IUserRepository.js';
+import { IUser } from '../models/User.js';
+import { UsuarioType } from '../../factory/usuario.js';
+import UsuarioFactory from '../../factory/usuarioFactory.js';
 import { ObjectId } from 'mongodb';
 
 export class UserService {
@@ -104,5 +104,9 @@ export class UserService {
 
     async obtenerHistorialDeVuelos(usuarioID: string): Promise<ObjectId[] | null> {
         return await this.userRepository.getFlightHistory(usuarioID);
+    }
+
+    async getStatisticsUsers(): Promise<{ totalUsers: number; totalPilots: number; totalFlightAttendants: number; }> {
+        return await this.userRepository.getStatisticsUsers();
     }
 }

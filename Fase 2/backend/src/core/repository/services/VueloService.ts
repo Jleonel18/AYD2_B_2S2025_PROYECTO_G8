@@ -1,7 +1,7 @@
-import { IVueloRepository } from '../repositories/IVueloRepository';
-import { VueloModel, IVuelo } from '../models/Vuelo';
+import { IVueloRepository } from '../repositories/IVueloRepository.js';
+import { VueloModel, IVuelo } from '../models/Vuelo.js';
 import { Types } from 'mongoose';
-import { EstadoVuelo } from '../../observer/observador';
+import { EstadoVuelo } from '../../observer/observador.js';
 
 export class VueloService {
     private vueloRepository: IVueloRepository;
@@ -25,6 +25,10 @@ export class VueloService {
 
     async listarVuelos(): Promise<IVuelo[]> {
         return await this.vueloRepository.findAll();
+    }
+
+    async listarVuelosPlanificados(): Promise<IVuelo[]> {
+        return await this.vueloRepository.findAllPlanificados();
     }
 
     async actualizarEstadoVuelo(id: string, nuevoEstado: string): Promise<IVuelo | null> {
@@ -82,6 +86,10 @@ export class VueloService {
 
         console.log(`El avión ${aeronave} está disponible`);
         return true; // El avión está disponible
+    }
+
+    async getStatisticsVuelos(): Promise<{ totalVuelos: number; totalVuelosCompletados: number; totalVuelosCancelados: number; totalVuelosPlanificados: number; }> {
+        return await this.vueloRepository.getStatisticsVuelos();
     }
 
 }

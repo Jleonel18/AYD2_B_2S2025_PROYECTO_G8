@@ -1,15 +1,16 @@
 import { Request, Response } from "express"
-import {UserService} from "../../../core/repository/services/UserService"
-import { UsuarioType } from "../../../core/factory/usuario"
-import { generarTokenVerificacion, generarUsuario } from "../../../utils/utils"
-import { enviarCorreoRecuperacion, enviarCorreoVerificacion } from "../../../utils/send_email"
+import {UserService} from "../../../core/repository/services/UserService.js"
+import { UsuarioType } from "../../../core/factory/usuario.js"
+import { generarTokenVerificacion, generarUsuario } from "../../../utils/utils.js"
+import { enviarCorreoRecuperacion, enviarCorreoVerificacion } from "../../../utils/send_email.js"
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { hashPassword } from "../../../utils/passwords"
-import { AuthRequest } from "../../../middleware/authMiddleware"
-import { VueloService } from "../../../core/repository/services/VueloService"
+import { hashPassword } from "../../../utils/passwords.js"
+import { AuthRequest } from "../../../middleware/authMiddleware.js"
+import { VueloService } from "../../../core/repository/services/VueloService.js"
+import { AvionService } from "../../../core/repository/services/AvionService.js"
 
 export class UsuarioController {
-    constructor(private readonly usuarioService: UserService, private readonly vueloService: VueloService) {}
+    constructor(private readonly usuarioService: UserService, private readonly vueloService: VueloService, private readonly avionesService: AvionService) {}
 
 
     crearUsuario = async (req: Request, res: Response) => {
@@ -41,6 +42,12 @@ export class UsuarioController {
             
             if(tipo === "pasajero" && new Date(datos.pasaporte.fecha_vencimiento) < new Date()) {
                 return res.status(400).json({ error: "El pasaporte no debe estar vencido" })
+            }
+
+            // Validar que el correo no esté en uso
+            const correoExistente = await this.usuarioService.obtenerUsuarioPorCorreo(datos.correo)
+            if(correoExistente) {
+                return res.status(400).json({ error: "El correo ya está en uso" })
             }
 
             const usuario_unico = generarUsuario(datos.nombre)
@@ -439,6 +446,21 @@ export class UsuarioController {
             const vuelosInfo = await Promise.all(historial.map(vueloId => this.vueloService.obtenerVuelo(vueloId.toString())));
 
             res.json({ vuelos: vuelosInfo });
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" });
+        }
+    }
+
+    obtenerEstadisticasAdmin = async (req: AuthRequest, res: Response) => {
+        try {
+            const estadisticasUsuarios = await this.usuarioService.getStatisticsUsers();
+            const estadisticasAviones = await this.avionesService.getStatisticsAviones();
+            const estadisticasVuelos = await this.vueloService.getStatisticsVuelos();
+            res.json({
+                usuarios: estadisticasUsuarios,
+                aviones: estadisticasAviones,
+                vuelos: estadisticasVuelos
+            });
         } catch (error) {
             res.status(500).json({ error: "Error en servidor" });
         }

@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const VuelosPage = () => {
   const [flights, setFlights] = useState([]);
@@ -15,19 +18,21 @@ const VuelosPage = () => {
     piloto_id: '',
     copiloto_id: '',
     sobrecargos: [],
+    numero_vuelo: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [showDetails, setShowDetails] = useState(false);
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [maxSobrecargos, setMaxSobrecargos] = useState(0);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [flightToCancel, setFlightToCancel] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const token = sessionStorage.getItem('token');
       if (!token) console.error('No token found in sessionStorage');
       try {
-        // Fetch flights
-        const flightsResponse = await fetch('http://localhost:3000/api/vuelos', {
+        const flightsResponse = await fetch(`${apiUrl}/vuelos`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -41,8 +46,7 @@ const VuelosPage = () => {
           console.error('Failed to fetch flights:', await flightsResponse.text());
         }
 
-        // Fetch airports
-        const airportsResponse = await fetch('http://localhost:3000/api/aeropuertos/', {
+        const airportsResponse = await fetch(`${apiUrl}/aeropuertos/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -56,8 +60,7 @@ const VuelosPage = () => {
           console.error('Failed to fetch airports:', await airportsResponse.text());
         }
 
-        // Fetch workers
-        const workersResponse = await fetch('http://localhost:3000/api/users/trabajadores', {
+        const workersResponse = await fetch(`${apiUrl}/users/trabajadores`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -73,8 +76,7 @@ const VuelosPage = () => {
           console.error('Failed to fetch workers:', await workersResponse.text());
         }
 
-        // Fetch aircrafts
-        const aircraftsResponse = await fetch('http://localhost:3000/api/aviones/', {
+        const aircraftsResponse = await fetch(`${apiUrl}/aviones/`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -107,22 +109,23 @@ const VuelosPage = () => {
     }
   };
 
-  // Helper function to get airport name by ID
   const getAirportName = (airportId) => {
     const airport = airports.find(a => a._id === airportId);
     return airport ? airport.nombre : airportId;
   };
 
-  // Helper function to get aircraft model by ID
   const getAircraftModel = (aircraftId) => {
     const aircraft = aircrafts.find(a => a._id === aircraftId);
     return aircraft ? aircraft.modelo : aircraftId;
   };
 
-  // Helper function to get worker name by ID
   const getWorkerName = (workerId) => {
     const worker = [...workers.pilots, ...workers.cabinCrew].find(w => w._id === workerId);
     return worker ? worker.nombre : workerId;
+  };
+
+  const getFlightNumber = (flight) => {
+    return flight.numero_vuelo || `FL${flight._id.substring(0, 6).toUpperCase()}`;
   };
 
   const handleInputChange = (e) => {
@@ -174,6 +177,7 @@ const VuelosPage = () => {
     };
 
     const payload = {
+      numero_vuelo: formData.numero_vuelo || `FL${Date.now().toString(36).toUpperCase()}`,
       origen: formData.origen,
       destino: formData.destino,
       fecha_salida: formData.fecha_salida + 'Z',
@@ -184,7 +188,7 @@ const VuelosPage = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/api/vuelos', {
+      const response = await fetch(`${apiUrl}/vuelos`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -206,12 +210,12 @@ const VuelosPage = () => {
           piloto_id: '',
           copiloto_id: '',
           sobrecargos: [],
+          numero_vuelo: '',
         });
         setErrorMessage('');
         setMaxSobrecargos(0);
       } else {
         const errorText = await response.json();
-        console.log("El error es:", errorText.error);
         setErrorMessage(errorText.error || 'Error desconocido al crear el vuelo');
       }
     } catch (error) {
@@ -225,19 +229,69 @@ const VuelosPage = () => {
     setShowDetails(true);
   };
 
+  const handleCancelClick = (flightId) => {
+    setFlightToCancel(flightId);
+    setShowCancelModal(true);
+  };
+
+  const cancelarVuelo = async (flightId) => {
+    const token = sessionStorage.getItem('token');
+    try {
+      const response = await fetch(`${apiUrl}/vuelos/${flightId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ estado: 'Cancelado' }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setFlights((prev) =>
+          prev.map((flight) =>
+            flight._id === flightId ? { ...flight, estado: 'Cancelado' } : flight
+          )
+        );
+        if (selectedFlight && selectedFlight._id === flightId) {
+          setSelectedFlight((prev) => ({ ...prev, estado: 'Cancelado' }));
+        }
+        toast.success('Vuelo cancelado exitosamente');
+        setShowCancelModal(false);
+        setFlightToCancel(null);
+      } else {
+        console.error('Failed to cancel flight:', data.error);
+        toast.error(data.error);
+      }
+    } catch (error) {
+      console.error('Error cancelling flight:', error);
+      toast.error('Error de conexión al cancelar el vuelo');
+    }
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Lista de Vuelos</h1>
-        <button onClick={() => setShowForm(true)} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
-          + Nuevo Vuelo
-        </button>
+      <div className="flex flex-col mb-6">
+        <div className='flex justify-between'>
+          <h1 className="text-3xl font-bold text-gray-800">Lista de Vuelos</h1>
+          <button onClick={() => setShowForm(true)} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+            + Nuevo Vuelo
+          </button>
+        </div>
+        <div className="mt-4 text-sm text-gray-600 flex space-x-4">
+          <span className="text-blue-500">Planificado</span>
+          <span className="text-green-500">Iniciado</span>
+          <span className="text-green-500">En tiempo</span>
+          <span className="text-orange-500">Retrasado</span>
+          <span className="text-red-500">Cancelado</span>
+          <span className="text-purple-500">Aterrizado</span>
+        </div>
       </div>
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-200 text-gray-700">
             <tr>
-              <th className="p-4 border-b-2 border-gray-300">ID</th>
+              <th className="p-4 border-b-2 border-gray-300">No. Vuelo</th>
               <th className="p-4 border-b-2 border-gray-300">Origen</th>
               <th className="p-4 border-b-2 border-gray-300">Destino</th>
               <th className="p-4 border-b-2 border-gray-300">Salida</th>
@@ -250,7 +304,7 @@ const VuelosPage = () => {
           <tbody>
             {flights.map((flight) => (
               <tr key={flight._id} className="hover:bg-gray-100 transition duration-150">
-                <td className="p-4 border-b border-gray-200">{flight._id}</td>
+                <td className="p-4 border-b border-gray-200">{getFlightNumber(flight)}</td>
                 <td className="p-4 border-b border-gray-200">{getAirportName(flight.origen)}</td>
                 <td className="p-4 border-b border-gray-200">{getAirportName(flight.destino)}</td>
                 <td className="p-4 border-b border-gray-200">{new Date(flight.fecha_salida).toLocaleString()}</td>
@@ -261,20 +315,12 @@ const VuelosPage = () => {
                 </td>
                 <td className="p-4 border-b border-gray-200 text-center">
                   <button onClick={() => handleViewDetails(flight)} className="text-blue-500 mr-3 hover:text-blue-700"><span role="img" aria-label="view">👁️</span></button>
-                  <button className="text-red-500 hover:text-red-700"><span role="img" aria-label="delete">❌</span></button>
+                  <button onClick={() => handleCancelClick(flight._id)} className="text-red-500 hover:text-red-700"><span role="img" aria-label="delete">❌</span></button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-      <div className="mt-4 text-sm text-gray-600 flex space-x-4">
-        <span className="text-blue-500">Planificado</span>
-        <span className="text-green-500">Iniciado</span>
-        <span className="text-green-500">En tiempo</span>
-        <span className="text-orange-500">Retrasado</span>
-        <span className="text-red-500">Cancelado</span>
-        <span className="text-purple-500">Aterrizado</span>
       </div>
 
       {showForm && (
@@ -294,6 +340,17 @@ const VuelosPage = () => {
             )}
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block mb-2 text-gray-700">Número de Vuelo</label>
+                  <input
+                    type="text"
+                    name="numero_vuelo"
+                    value={formData.numero_vuelo}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ej: FL1234"
+                  />
+                </div>
                 <div>
                   <label className="block mb-2 text-gray-700">Origen</label>
                   <select
@@ -445,7 +502,7 @@ const VuelosPage = () => {
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Detalles del Vuelo</h2>
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <p className="text-gray-700"><strong>ID:</strong> {selectedFlight._id}</p>
+                <p className="text-gray-700"><strong>Número de Vuelo:</strong> {getFlightNumber(selectedFlight)}</p>
                 <p className="text-gray-700"><strong>Origen:</strong> {getAirportName(selectedFlight.origen)}</p>
                 <p className="text-gray-700"><strong>Destino:</strong> {getAirportName(selectedFlight.destino)}</p>
                 <p className="text-gray-700"><strong>Salida:</strong> {new Date(selectedFlight.fecha_salida).toLocaleString()}</p>
@@ -468,6 +525,32 @@ const VuelosPage = () => {
                 className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-200"
               >
                 Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCancelModal && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 bg-opacity-50 flex items-center justify-center overflow-y-auto">
+          <div className="bg-white p-6 rounded-lg w-1/3">
+            <h2 className="text-xl font-bold mb-4 text-gray-800">Confirmar Cancelación</h2>
+            <p className="text-gray-700 mb-6">¿Estás seguro de que deseas cancelar el vuelo {getFlightNumber(flights.find(f => f._id === flightToCancel))}? Esta acción no se puede deshacer.</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => {
+                  setShowCancelModal(false);
+                  setFlightToCancel(null);
+                }}
+                className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-200"
+              >
+                No, mantener vuelo
+              </button>
+              <button
+                onClick={() => cancelarVuelo(flightToCancel)}
+                className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition duration-200"
+              >
+                Sí, cancelar vuelo
               </button>
             </div>
           </div>

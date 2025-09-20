@@ -1,5 +1,5 @@
-import Usuario from "./usuario";
-import { UsuarioType } from "./usuario";
+import Usuario from "./usuario.js";
+import { UsuarioType } from "./usuario.js";
 
 class Operaciones extends Usuario {
     constructor(nombre: string, edad: number, correo: string, telefono: string, direccion: string, 

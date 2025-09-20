@@ -1,5 +1,5 @@
-import { IAvionRepository } from "../repositories/IAvionRepository";
-import { IAvion } from "../models/Avion";
+import { IAvionRepository } from "../repositories/IAvionRepository.js";
+import { IAvion } from "../models/Avion.js";
 
 export class AvionService {
     constructor(private avionRepository: IAvionRepository) {}
@@ -46,6 +46,10 @@ export class AvionService {
     async getEstadoAvion(id: string): Promise<string | null> {
         const avion = await this.avionRepository.findById(id);
         return avion ? avion.estado : null;
+    }
+
+    async getStatisticsAviones(): Promise<{ totalAviones: number; averageFlightHours: number; totalAvionesCriticos: number; }> {
+        return await this.avionRepository.getStatisticsAviones();
     }
 
 }

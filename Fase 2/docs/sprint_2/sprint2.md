@@ -6,6 +6,21 @@
 
 ## Sprint Planning:
 
+**Escala de puntos utilizada:** Escala de Fibonacci: 1,2,3,5,8
+
+| ID | Casos de Uso | Prioridad | Estimación (Story Points) |
+| --- | --- | --- | --- |
+| 9 | CDU002.3: Actualizar Experiencia Post-Vuelo | Media | 3 |
+| 10 | CDU003.2: Monitorear y Acumular Horas de Vuelo | Media | 5 |
+| 11 | CDU003.3: Verificar y Certificar Mantenimiento | Media | 5 |
+| 12 | CDU004.3: Reservar Vuelo y Asiento | Alta | 8 |
+| 13 | CDU005.1: Realizar Check-in | Baja | 5 |
+| 14 | CDU005.2: Realizar Embarque | Alta | 8 |
+| 15 | CDU005.3: Seguimiento de Vuelo | Baja | 3 |
+| 16 | CDU006.1: Comprar Maletas Extra | Media | 3 |
+| 17 | CDU006.2: Otorgar Puntos de Fidelización | Baja | 2 |
+| 18 | CDU006.3: Gestionar Historial y Notificaciones | Baja | 3 |
+
 ### Link de Reunión:
 
 https://drive.google.com/file/d/1iMaYPjF-mzpILaVkTjVqkc5kIbhvD3pw/view?usp=drive_link
@@ -133,6 +148,19 @@ https://drive.google.com/file/d/1YmEyXaWsYLadL6oT6nzm5b-01skORyEs/view?usp=drive
 ![alt text](image-10.png)
 
 ## Sprint Retrospective:
+
+| ID | Story Points | Finalizado | Justificación |
+| --- | --- | --- | --- |
+| 9 | 3 | Sí |  |
+| 10 | 5 | Sí |  |
+| 11 | 5 | Sí |  |
+| 12 | 8 | Sí |  |
+| 13 | 5 | Sí |  |
+| 14 | 8 | Sí |  |
+| 15 | 3 | Sí |  |
+| 16 | 3 | Sí |  |
+| 17 | 2 | No | Cuestiones de tiempo y traslape en horarios de trabajo con el equipo de trabajo |
+| 18 | 3 | Noi | Cuestiones de tiempo y traslape en horarios de trabajo con el equipo de trabajo |
 
 ### Link de la Grabación:
 

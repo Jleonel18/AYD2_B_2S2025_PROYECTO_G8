@@ -1,20 +1,18 @@
-# Imagen base
-FROM node:lts-buster
-
-# Establecer directorio de trabajo
+# Etapa 1: build
+FROM node:lts-slim AS builder
 WORKDIR /app
-
-# Copiar package.json y package-lock.json primero (para cache)
 COPY package*.json ./
-
-# Instalar dependencias
-RUN npm install --omit=dev
-
-# Copiar el resto del código (incluyendo dist y .env si lo quieres dentro del contenedor)
+RUN npm install
 COPY . .
+RUN npm run build  # genera dist/
 
-# Exponer el puerto (usa el mismo que en tu .env, ej. 3000)
+# Etapa 2: runtime
+FROM node:lts-slim
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --omit=dev   # instala solo dependencias de prod
+COPY --from=builder /app/dist ./dist
+COPY .env ./
+
 EXPOSE 3000
-
-# Comando de inicio (ejecuta lo ya compilado)
 CMD ["npm", "run", "start-node"]

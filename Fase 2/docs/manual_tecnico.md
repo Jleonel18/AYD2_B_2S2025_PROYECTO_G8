@@ -2,6 +2,29 @@
 
 A continuación, se presenta el manual técnico y las estrategias que se usarán para llevar a cabo la aplicación AirFlow System.
 
+Para el proyecto Airflow System se plantea usar dos estilos arquitectónicos: Arquitectura cliente-servidor con capas.
+
+# Justificación:
+
+La justificación del diseño arquitectónico cliente-servidor con capas es por varias razones.
+
+- Alta escalabilidad: La escalabilidad con capas es bastante conveniente para una aplicación de vuelos.
+- Despliegue sencillo: El despliegue sencillo que ofrece cliente-servidor es mucho mejor que un estilo arquitectónico basado en microservicios, ya que microservicios requiere orquestación de contenedores.
+- Costo bajo: No requiere una infraestructura compleja, como lo requeriría microservicios.
+- Facilidad en SCRUM: La arquitectura cliente-servidor ha sido desarrollada previamente por los estudiantes, debido a eso se toma como arquitectura conocida y fácil de implementar.
+
+**Ejemplo de Flujo en AirFlow System**
+
+1. **Cliente**: Pasajero accede a http://ip:3000/reservas, selecciona un vuelo.
+2. **Capa de Presentación**: Llama a POST /api/vuelos/reservar con datos.
+3. **Capa de Lógica**: VueloService valida capacidad, asigna asiento, notifica via Observer.
+4. **Capa de Datos**: VueloRepository actualiza MongoDB.
+5. **Respuesta**: Cliente muestra confirmación.
+
+# Diagrama de la arquitectura:
+
+![arquitectura](./pictures/arquitectura.png)
+
 # Patrones de Diseño a Usar:
 
 Para la aplicación AirFlow System se tendrá contemplado usar 5 patrones de diseño dependiendo de la necesidad de la aplicación. Los patrones de diseño a usar serán:
@@ -431,6 +454,51 @@ El modelo de datos presentado está diseñado para una base de datos NoSQL basad
 | **Reglas de negocio** | ● Vuelo requiere piloto, copiloto y sobrecargos suficientes (1 por 50 pasajeros).<br>● Cancelable si <50% capacidad o sin tripulación.<br>● Notificar cambios por email. |
 | **Reglas de calidad** | ● Procesos (planificación, actualización) no excedan 5 minutos.<br>● Interfaz responsive con indicadores visuales (verde #00FF00 para éxito, rojo #FF0000 para errores).<br>● Notificaciones en <30 segundos. |
 
+## Caso de Uso CDU001.1: Planificar Vuelo
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Planificar Vuelo (Un nombre descriptivo corto) |
+| **Código** | CDU001.1 (Un código correlativo que lo identifique) |
+| **Actores** | Personal de Operaciones (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Permite al personal de operaciones ingresar detalles como origen, destino, fechas, aeronave y tripulación para crear un nuevo vuelo, validando la disponibilidad de recursos y asegurando el cumplimiento de normativas para una planificación eficiente y segura. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Aeronaves y tripulación disponibles en el sistema, acceso autenticado del personal, no conflictos en horarios existentes. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Vuelo creado y marcado como "Planificado", recursos asignados temporalmente, notificaciones internas enviadas si aplica. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Personal ingresa origen, destino y fechas.<br>2. Selecciona aeronave y tripulación.<br>3. Sistema valida disponibilidad y normativas.<br>4. Vuelo se guarda como "Planificado". |
+| **Flujos alternos** | FA1: Conflicto de horarios o recursos (FA = Flujo Alterno)<br>FA1.1 Notificación de error<br>FA1.2 Sugerir alternativas<br>FA1.3 Reingresar datos<br>FA1.4 Se continúa con el flujo principal (2)<br>FA2: Datos incompletos<br>FA2.1 Resaltar campos obligatorios<br>FA2.2 Completar datos<br>FA2.3 Se continúa con el flujo principal (1) |
+| **Reglas de negocio** | ● Vuelo debe tener piloto, copiloto y sobrecargos (1 por 50 pasajeros esperados).<br>● Validar rutas permitidas por normativas.<br>● Asignación automática si no se selecciona manualmente. |
+| **Reglas de calidad** | ● Planificación no exceda 3 minutos.<br>● Interfaz con mapas interactivos para rutas.<br>● Confirmación visual en verde (#00FF00). |
+
+## Caso de Uso CDU001.2: Actualizar Estado de Vuelo
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Actualizar Estado de Vuelo (Un nombre descriptivo corto) |
+| **Código** | CDU001.2 (Un código correlativo que lo identifique) |
+| **Actores** | Piloto/Copiloto, Personal de Operaciones (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Facilita la actualización en tiempo real de los estados del vuelo como "Iniciado", "En tiempo", "Retrasado" o "Aterrizado" por parte de la tripulación o operaciones, asegurando que todos los involucrados reciban información precisa y oportuna para la gestión operativa. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Vuelo en estado "Planificado" o superior, acceso autenticado, conexión estable para actualizaciones en vuelo. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Estado del vuelo actualizado, notificaciones enviadas a pasajeros y operaciones, recursos liberados si es "Aterrizado". (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Actor selecciona vuelo activo.<br>2. Elige nuevo estado (e.g., "Iniciado").<br>3. Sistema valida transición de estado.<br>4. Actualiza y notifica cambios. |
+| **Flujos alternos** | FA1: Transición de estado inválida (FA = Flujo Alterno)<br>FA1.1 Notificación de error<br>FA1.2 Seleccionar estado válido<br>FA1.3 Se continúa con el flujo principal (2)<br>FA2: Conexión perdida<br>FA2.1 Guardar actualización offline<br>FA2.2 Sincronizar al reconectar<br>FA2.3 Se continúa con el flujo principal (3) |
+| **Reglas de negocio** | ● Estados secuenciales: Planificado → Iniciado → En tiempo/Retrasado → Aterrizado.<br>● Notificar a pasajeros por email/SMS para retrasos.<br>● Registro de hora exacta de actualización. |
+| **Reglas de calidad** | ● Actualización en <10 segundos.<br>● Indicadores visuales: amarillo para retraso (#FFFF00).<br>● Soporte mobile para tripulación. |
+
+## Caso de Uso CDU001.3: Cancelar Vuelo
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Cancelar Vuelo (Un nombre descriptivo corto) |
+| **Código** | CDU001.3 (Un código correlativo que lo identifique) |
+| **Actores** | Personal de Operaciones (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Permite la cancelación de un vuelo planificado bajo ciertas condiciones, liberando recursos como aeronave y tripulación, anulando reservas y notificando a pasajeros para minimizar impactos y cumplir con políticas de la aerolínea. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Vuelo en estado "Planificado" o "Retrasado" no iniciado, justificación válida, acceso autenticado. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Vuelo marcado como "Cancelado", reservas anuladas, recursos liberados, notificaciones enviadas. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Personal selecciona vuelo a cancelar.<br>2. Ingresa razón de cancelación.<br>3. Sistema valida condiciones.<br>4. Cancela, libera recursos y notifica. |
+| **Flujos alternos** | FA1: Cancelación no permitida (vuelo iniciado) (FA = Flujo Alterno)<br>FA1.1 Notificación de error<br>FA1.2 Fin del flujo<br>FA2: Reservas no anuladas completamente<br>FA2.1 Reintento automático<br>FA2.2 Notificar manualmente<br>FA2.3 Se continúa con el flujo principal (4) |
+| **Reglas de negocio** | ● Cancelable si <50% capacidad o sin tripulación completa.<br>● Reembolso automático para pasajeros.<br>● Registro de auditoría para cancelaciones. |
+| **Reglas de calidad** | ● Proceso <2 minutos.<br>● Confirmación en rojo (#FF0000) con mensaje claro.<br>● Notificaciones en <30 segundos. |
+
 ## Caso de Uso CDU002: Gestión de Tripulación
 
 ● CDU002.1: Registrar Tripulación
@@ -453,6 +521,51 @@ El modelo de datos presentado está diseñado para una base de datos NoSQL basad
 | **Flujos alternos** | FA1: Datos inválidos/duplicados (FA = Flujo Alterno)<br>FA1.1 Notificación<br>FA1.2 Corregir datos<br>FA1.3 Se continúa con el flujo principal (1)<br>FA2: Tripulación no disponible<br>FA2.1 Buscar alternativas<br>FA2.2 Reasignar<br>FA2.3 Se continúa con el flujo principal (3)<br>FA3: Error en actualización automática<br>FA3.1 Ingreso manual por piloto<br>FA3.2 Se continúa con el flujo principal (5) |
 | **Reglas de negocio** | ● Pilotos requieren horas de vuelo, sobrecargos conteo de vuelos.<br>● Un sobrecargo por 50 pasajeros.<br>● No asignaciones simultáneas. |
 | **Reglas de calidad** | ● Registro <3 minutos, asignación <2 minutos.<br>● Actualizaciones automáticas <10 segundos.<br>● Botones en azul (#0000FF), campos obligatorios en rojo. |
+
+## Caso de Uso CDU002.1: Registrar Tripulación
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Registrar Tripulación (Un nombre descriptivo corto) |
+| **Código** | CDU002.1 (Un código correlativo que lo identifique) |
+| **Actores** | Personal de Operaciones (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Facilita el ingreso de nuevos miembros de tripulación como pilotos o sobrecargos, validando datos personales y certificaciones para asegurar que cumplan con los requisitos normativos y se integren al sistema de gestión de recursos humanos. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Datos únicos y válidos (identificación, certificaciones), acceso autenticado, no duplicados en el sistema. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Miembro de tripulación registrado, disponible para asignaciones, notificación de bienvenida enviada. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Personal ingresa nombre, identificación y tipo (piloto/sobrecargo).<br>2. Adjunta certificaciones.<br>3. Sistema valida datos.<br>4. Registra y confirma. |
+| **Flujos alternos** | FA1: Datos inválidos o duplicados (FA = Flujo Alterno)<br>FA1.1 Notificación de error<br>FA1.2 Corregir o editar<br>FA1.3 Se continúa con el flujo principal (1)<br>FA2: Certificaciones vencidas<br>FA2.1 Rechazo temporal<br>FA2.2 Solicitar actualización<br>FA2.3 Fin del flujo |
+| **Reglas de negocio** | ● Pilotos deben tener licencia vigente, sobrecargos entrenamiento básico.<br>● Campos obligatorios: nombre, ID, fecha de nacimiento.<br>● Integración con base de datos externa si aplica. |
+| **Reglas de calidad** | ● Registro <2 minutos.<br>● Formularios con validación en tiempo real.<br>● Botón "Registrar" en azul (#0000FF). |
+
+## Caso de Uso CDU002.2: Asignar Tripulación a Vuelo
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Asignar Tripulación a Vuelo (Un nombre descriptivo corto) |
+| **Código** | CDU002.2 (Un código correlativo que lo identifique) |
+| **Actores** | Personal de Operaciones, Sistema (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Permite asignar pilotos, copilotos y sobrecargos a un vuelo específico, verificando disponibilidad y requisitos como el número mínimo de sobrecargos por pasajeros para garantizar operaciones seguras y eficientes. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Vuelo planificado, tripulación registrada y disponible, no conflictos en horarios. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Tripulación asignada, vuelo actualizado, notificaciones enviadas a tripulación. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Personal selecciona vuelo.<br>2. Busca y asigna tripulación.<br>3. Sistema valida (disponibilidad, ratios).<br>4. Confirma asignación. |
+| **Flujos alternos** | FA1: Tripulación no disponible (FA = Flujo Alterno)<br>FA1.1 Sugerir alternativas<br>FA1.2 Reasignar<br>FA1.3 Se continúa con el flujo principal (2)<br>FA2: Ratio insuficiente<br>FA2.1 Notificar error<br>FA2.2 Agregar más miembros<br>FA2.3 Se continúa con el flujo principal (3) |
+| **Reglas de negocio** | ● 1 sobrecargo por 50 pasajeros.<br>● No asignaciones simultáneas en vuelos.<br>● Prioridad por experiencia. |
+| **Reglas de calidad** | ● Asignación <1 minuto.<br>● Lista desplegable para búsquedas.<br>● Confirmación en verde (#00FF00). |
+
+## Caso de Uso CDU002.3: Actualizar Experiencia Post-Vuelo
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Actualizar Experiencia Post-Vuelo (Un nombre descriptivo corto) |
+| **Código** | CDU002.3 (Un código correlativo que lo identifique) |
+| **Actores** | Sistema, Piloto/Copiloto (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Actualiza automáticamente o manualmente las horas de vuelo para pilotos y el conteo de vuelos para sobrecargos al finalizar un vuelo, asegurando un registro preciso para futuras asignaciones y cumplimiento de requisitos de experiencia. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Vuelo en estado "Aterrizado", datos de duración disponibles, acceso si manual. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Experiencia actualizada, reportes generados, alertas si se alcanzan hitos. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Sistema detecta aterrizaje.<br>2. Calcula horas/conteo.<br>3. Actualiza perfiles de tripulación.<br>4. Notifica cambios. |
+| **Flujos alternos** | FA1: Error en cálculo automático (FA = Flujo Alterno)<br>FA1.1 Permitir ingreso manual<br>FA1.2 Validar datos<br>FA1.3 Se continúa con el flujo principal (2)<br>FA2: Datos incompletos<br>FA2.1 Solicitar verificación<br>FA2.2 Fin del flujo si no resuelto |
+| **Reglas de negocio** | ● Horas para pilotos, conteo para sobrecargos.<br>● Actualización obligatoria para licencias.<br>● Auditoría de cambios. |
+| **Reglas de calidad** | ● Actualización <5 segundos.<br>● Dashboard de experiencia visible.<br>● Notificaciones en <10 segundos. |
 
 ## Caso de Uso CDU003: Gestión de Flota Aérea
 
@@ -477,6 +590,51 @@ El modelo de datos presentado está diseñado para una base de datos NoSQL basad
 | **Reglas de negocio** | ● Límites de mantenimiento: 200 horas grandes, 150 medianas, 100 pequeñas.<br>● Bloqueo si excede límite.<br>● Certificación obligatoria para liberar. |
 | **Reglas de calidad** | ● Registro <3 minutos, certificación <15 minutos.<br>● Actualización horas <5 segundos.<br>● Botón "Certificar" verde (#00FF00). |
 
+## Caso de Uso CDU003.1: Registrar Aeronave
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Registrar Aeronave (Un nombre descriptivo corto) |
+| **Código** | CDU003.1 (Un código correlativo que lo identifique) |
+| **Actores** | Personal de Operaciones (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Permite ingresar una nueva aeronave en el sistema con detalles como modelo, capacidad y horas iniciales de vuelo, validando unicidad para integrar la flota y asegurar un seguimiento preciso de su uso y mantenimiento. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Datos únicos (matrícula), certificados de aeronavegabilidad, acceso autenticado. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Aeronave registrada, disponible para asignaciones, reportes iniciales generados. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Personal ingresa modelo, capacidad y matrícula.<br>2. Adjunta documentos.<br>3. Sistema valida unicidad.<br>4. Registra y confirma. |
+| **Flujos alternos** | FA1: Datos duplicados (FA = Flujo Alterno)<br>FA1.1 Notificación<br>FA1.2 Editar matrícula<br>FA1.3 Se continúa con el flujo principal (1)<br>FA2: Documentos inválidos<br>FA2.1 Rechazo<br>FA2.2 Subir nuevos<br>FA2.3 Se continúa con el flujo principal (2) |
+| **Reglas de negocio** | ● Clasificación por tamaño: grande (>200 asientos), mediana, pequeña.<br>● Horas iniciales deben ser >=0.<br>● Integración con reguladores. |
+| **Reglas de calidad** | ● Registro <2 minutos.<br>● Validación automática de campos.<br>● Botón "Registrar" en azul (#0000FF). |
+
+## Caso de Uso CDU003.2: Monitorear y Acumular Horas de Vuelo
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Monitorear y Acumular Horas de Vuelo (Un nombre descriptivo corto) |
+| **Código** | CDU003.2 (Un código correlativo que lo identifique) |
+| **Actores** | Sistema, Personal de Operaciones (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Acumula automáticamente las horas de vuelo de una aeronave tras cada viaje completado, monitoreando contra límites de mantenimiento para generar alertas y prevenir usos excesivos que comprometan la seguridad. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Vuelo aterrizado, datos de duración disponibles, aeronave registrada. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Horas actualizadas, alertas enviadas si cerca del límite, reportes disponibles. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Sistema detecta fin de vuelo.<br>2. Calcula horas acumuladas.<br>3. Actualiza registro de aeronave.<br>4. Verifica límites y alerta si aplica. |
+| **Flujos alternos** | FA1: Datos de duración incorrectos (FA = Flujo Alterno)<br>FA1.1 Permitir corrección manual<br>FA1.2 Recalcular<br>FA1.3 Se continúa con el flujo principal (2)<br>FA2: Límite no excedido<br>FA2.1 No alerta<br>FA2.2 Fin del flujo |
+| **Reglas de negocio** | ● Acumulación por vuelo real.<br>● Límites: 200h grandes, 150h medianas, 100h pequeñas.<br>● Alertas a 80% del límite. |
+| **Reglas de calidad** | ● Actualización <3 segundos.<br>● Gráficos de monitoreo en dashboard.<br>● Alertas en rojo (#FF0000). |
+
+## Caso de Uso CDU003.3: Verificar y Certificar Mantenimiento
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Verificar y Certificar Mantenimiento (Un nombre descriptivo corto) |
+| **Código** | CDU003.3 (Un código correlativo que lo identifique) |
+| **Actores** | Técnico de Mantenimiento, Sistema (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Permite al técnico inspeccionar la aeronave y certificar el mantenimiento completado, liberándola para vuelos futuros o manteniéndola bloqueada si falla, asegurando cumplimiento de estándares de seguridad y regulaciones. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Aeronave bloqueada por límite de horas, inspección física realizada, acceso autenticado. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Mantenimiento certificado, aeronave liberada o bloqueada, horas reseteadas si aplica. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Técnico selecciona aeronave.<br>2. Ingresa resultados de inspección.<br>3. Sistema valida completitud.<br>4. Certifica y libera. |
+| **Flujos alternos** | FA1: Inspección falla (FA = Flujo Alterno)<br>FA1.1 Mantener bloqueo<br>FA1.2 Notificar reparaciones pendientes<br>FA1.3 Fin del flujo<br>FA2: Datos incompletos<br>FA2.1 Solicitar más info<br>FA2.2 Se continúa con el flujo principal (2) |
+| **Reglas de negocio** | ● Certificación resetea contador de horas.<br>● Obligatoria para desbloqueo.<br>● Registro de técnico responsable. |
+| **Reglas de calidad** | ● Certificación <10 minutos.<br>● Formularios con checklists.<br>● Botón "Certificar" verde (#00FF00). |
+
 ## Caso de Uso CDU004: Gestión de Pasajeros y Reservas
 
 ● CDU004.1: Registrar Perfil de Pasajero
@@ -499,6 +657,53 @@ El modelo de datos presentado está diseñado para una base de datos NoSQL basad
 | **Flujos alternos** | FA1: Datos inválidos (FA = Flujo Alterno)<br>FA1.1 Notificación<br>FA1.2 Corregir datos<br>FA1.3 Se continúa con el flujo principal (1)<br>FA2: Asiento ocupado<br>FA2.1 Mostrar alternativas<br>FA2.2 Re-elegir<br>FA2.3 Se continúa con el flujo principal (4)<br>FA3: Email no verificado<br>FA3.1 Reenviar<br>FA3.2 Timeout tras 24h |
 | **Reglas de negocio** | ● Datos obligatorios: nombre, nacimiento, pasaporte.<br>● 2 maletas de 50 libras por asiento.<br>● Verificación por email. |
 | **Reglas de calidad** | ● Registro/reserva <3 minutos.<br>● Formularios seguros (HTTPS).<br>● Botones en azul (#0000FF). |
+
+
+## Caso de Uso CDU004.1: Registrar Perfil de Pasajero
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Registrar Perfil de Pasajero (Un nombre descriptivo corto) |
+| **Código** | CDU004.1 (Un código correlativo que lo identifique) |
+| **Actores** | Pasajero (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Permite al pasajero crear un perfil nuevo con datos personales básicos, validando información y enviando verificación por email para asegurar autenticidad y facilitar futuras reservas y servicios personalizados. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Acceso a internet, email válido, no perfil existente con mismos datos. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Perfil creado pendiente de verificación, email enviado, acceso limitado hasta activación. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Pasajero ingresa nombre, pasaporte y email.<br>2. Sistema valida formato.<br>3. Envía email de verificación.<br>4. Pasajero confirma enlace. |
+| **Flujos alternos** | FA1: Datos inválidos (FA = Flujo Alterno)<br>FA1.1 Notificación<br>FA1.2 Corregir<br>FA1.3 Se continúa con el flujo principal (1)<br>FA2: Email duplicado<br>FA2.1 Sugerir login<br>FA2.2 Fin del flujo |
+| **Reglas de negocio** | ● Obligatorios: nombre, fecha nacimiento, pasaporte.<br>● Verificación en 24h.<br>● Cumplir GDPR para datos. |
+| **Reglas de calidad** | ● Registro <1 minuto.<br>● Formularios responsive.<br>● Seguridad HTTPS. |
+
+## Caso de Uso CDU004.2: Modificar Perfil de Pasajero
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Modificar Perfil de Pasajero (Un nombre descriptivo corto) |
+| **Código** | CDU004.2 (Un código correlativo que lo identifique) |
+| **Actores** | Pasajero (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Facilita la actualización de datos en el perfil del pasajero, como dirección o preferencias, validando cambios y requiriendo re-verificación si es crítico, para mantener información actualizada y mejorar personalización. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Perfil activo y verificado, autenticación por login, cambios no críticos sin verificación extra. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Perfil actualizado, cambios reflejados en reservas, notificación de confirmación. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Pasajero inicia sesión.<br>2. Edita campos (e.g., email).<br>3. Sistema valida.<br>4. Guarda y confirma. |
+| **Flujos alternos** | FA1: Cambio crítico (pasaporte) (FA = Flujo Alterno)<br>FA1.1 Requerir verificación email<br>FA1.2 Confirmar<br>FA1.3 Se continúa con el flujo principal (3)<br>FA2: Datos inválidos<br>FA2.1 Notificar<br>FA2.2 Corregir<br>FA2.3 Se continúa con el flujo principal (2) |
+| **Reglas de negocio** | ● No modificar pasaporte sin documentos.<br>● Historial de cambios registrado.<br>● Notificar si afecta reservas. |
+| **Reglas de calidad** | ● Modificación <1 minuto.<br>● Interfaz intuitiva.<br>● Botones en azul (#0000FF). |
+
+## Caso de Uso CDU004.3: Reservar Vuelo y Asiento
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Reservar Vuelo y Asiento (Un nombre descriptivo corto) |
+| **Código** | CDU004.3 (Un código correlativo que lo identifique) |
+| **Actores** | Pasajero (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Permite seleccionar un vuelo disponible, elegir asiento y completar la reserva generando un boleto QR, validando pago y disponibilidad para una experiencia de reserva fluida y segura. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Perfil verificado, vuelos planificados con asientos, método de pago válido. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Reserva completada, boleto QR generado, estado "Pendiente de Check-in". (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Pasajero busca vuelo.<br>2. Selecciona asiento.<br>3. Procesa pago.<br>4. Genera QR. |
+| **Flujos alternos** | FA1: Asiento ocupado (FA = Flujo Alterno)<br>FA1.1 Mostrar mapa alternativas<br>FA1.2 Re-elegir<br>FA1.3 Se continúa con el flujo principal (2)<br>FA2: Pago fallido<br>FA2.1 Reintentar<br>FA2.2 Cancelar reserva |
+| **Reglas de negocio** | ● 2 maletas incluidas.<br>● Pago seguro.<br>● Cancelación gratuita en 24h. |
+| **Reglas de calidad** | ● Reserva <2 minutos.<br>● Mapa de asientos interactivo.<br>● Confirmación verde (#00FF00). |
+
 
 ## Caso de Uso CDU005: Procesos de Check-in y Embarque
 
@@ -523,6 +728,51 @@ El modelo de datos presentado está diseñado para una base de datos NoSQL basad
 | **Reglas de negocio** | ● Check-in obligatorio para equipaje, disponible 24h antes.<br>● Escaneo QR para embarque.<br>● Notificar todos los cambios. |
 | **Reglas de calidad** | ● Check-in <5 minutos, embarque <2 segundos por QR.<br>● Interfaz mobile-friendly.<br>● Notificaciones <1 minuto. |
 
+## Caso de Uso CDU005.1: Realizar Check-in
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Realizar Check-in (Un nombre descriptivo corto) |
+| **Código** | CDU005.1 (Un código correlativo que lo identifique) |
+| **Actores** | Pasajero, Agente de Seguridad (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Permite al pasajero o agente confirmar la presencia y documentar equipaje online o en aeropuerto, cambiando el estado de la reserva para preparar el embarque y asegurar cumplimiento de requisitos de viaje. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Reserva activa, dentro de ventana de 24h-1h antes del vuelo, documentos válidos. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Check-in completado, estado "Pendiente de Abordaje", pase de abordar generado. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Accede a check-in (online/app).<br>2. Verifica datos y maletas.<br>3. Confirma.<br>4. Genera pase. |
+| **Flujos alternos** | FA1: Fuera de tiempo (FA = Flujo Alterno)<br>FA1.1 Dirigir a aeropuerto<br>FA1.2 Fin del flujo<br>FA2: Maletas extras<br>FA2.1 Procesar pago<br>FA2.2 Se continúa con el flujo principal (2) |
+| **Reglas de negocio** | ● Obligatorio para equipaje.<br>● Verificar pasaporte/visas.<br>● Actualizar asientos si cambia. |
+| **Reglas de calidad** | ● Proceso <3 minutos.<br>● Mobile-friendly.<br>● Confirmación verde (#00FF00). |
+
+## Caso de Uso CDU005.2: Realizar Embarque
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Realizar Embarque (Un nombre descriptivo corto) |
+| **Código** | CDU005.2 (Un código correlativo que lo identifique) |
+| **Actores** | Agente de Embarque, Pasajero (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Facilita el escaneo de códigos QR en la puerta de embarque para confirmar el abordaje del pasajero, actualizando el estado y asegurando que solo pasajeros con check-in completado accedan al avión. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Check-in completado, QR válido, vuelo en estado de embarque. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Pasajero marcado "Abordado", conteo de pasajeros actualizado, alertas si no show. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Agente escanea QR.<br>2. Verifica identidad.<br>3. Confirma abordaje.<br>4. Actualiza sistema. |
+| **Flujos alternos** | FA1: QR inválido (FA = Flujo Alterno)<br>FA1.1 Verificar manualmente<br>FA1.2 Re-emitir QR<br>FA1.3 Se continúa con el flujo principal (1)<br>FA2: Sin check-in<br>FA2.1 Realizar en sitio<br>FA2.2 Se continúa con el flujo principal (2) |
+| **Reglas de negocio** | ● Escaneo obligatorio.<br>● Verificar seguridad.<br>● Actualizar manifiesto. |
+| **Reglas de calidad** | ● Escaneo <1 segundo.<br>● Dispositivos móviles.<br>● Sonido de éxito. |
+
+## Caso de Uso CDU005.3: Seguimiento de Vuelo
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Seguimiento de Vuelo (Un nombre descriptivo corto) |
+| **Código** | CDU005.3 (Un código correlativo que lo identifique) |
+| **Actores** | Pasajero, Sistema (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Proporciona actualizaciones en tiempo real sobre el estado del vuelo a pasajeros, incluyendo retrasos o cambios de puerta, mediante notificaciones para mejorar la experiencia y reducir incertidumbre en el aeropuerto. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Reserva activa, cambios en estado del vuelo, preferencias de notificación configuradas. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Notificaciones enviadas, pasajero informado, logs de entrega. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Sistema detecta cambio de estado.<br>2. Envía notificación (app/email).<br>3. Pasajero accede a detalles.<br>4. Actualiza seguimiento. |
+| **Flujos alternos** | FA1: Notificación fallida (FA = Flujo Alterno)<br>FA1.1 Reintento<br>FA1.2 Usar alternativo (SMS)<br>FA1.3 Se continúa con el flujo principal (2)<br>FA2: No cambios<br>FA2.1 No acción<br>FA2.2 Fin del flujo |
+| **Reglas de negocio** | ● Notificar todos cambios.<br>● Prioridad por app push.<br>● Opt-out disponible. |
+| **Reglas de calidad** | ● Notificaciones <30 segundos.<br>● Dashboard en app.<br>● Colores: amarillo para retraso (#FFFF00). |
+
 ## Caso de Uso CDU006: Servicios Adicionales y Fidelización
 
 ● CDU006.1: Comprar Maletas Extra
@@ -545,6 +795,53 @@ El modelo de datos presentado está diseñado para una base de datos NoSQL basad
 | **Flujos alternos** | FA1: Límite de maletas excedido (FA = Flujo Alterno)<br>FA1.1 Error<br>FA1.2 Reducir cantidad<br>FA1.3 Se continúa con el flujo principal (2)<br>FA2: Error en cálculo de puntos<br>FA2.1 Ajuste manual<br>FA2.2 Se continúa con el flujo principal (4)<br>FA3: Notificación fallida<br>FA3.1 Reintento automático<br>FA3.2 Se continúa con el flujo principal (5) |
 | **Reglas de negocio** | ● Máximo 3 maletas extra de 50 libras.<br>● 100 puntos por hora de vuelo.<br>● Notificar todos los cambios. |
 | **Reglas de calidad** | ● Pago <2 minutos, notificaciones <1 minuto.<br>● Interfaz con dashboard de puntos.<br>● Botones verdes (#00FF00) para compras. |
+
+
+## Caso de Uso CDU006.1: Comprar Maletas Extra
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Comprar Maletas Extra (Un nombre descriptivo corto) |
+| **Código** | CDU006.1 (Un código correlativo que lo identifique) |
+| **Actores** | Pasajero, Sistema (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Permite al pasajero agregar maletas adicionales durante la reserva o check-in, procesando el pago y actualizando la reserva para acomodar equipaje extra sin exceder límites, mejorando flexibilidad en viajes. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Reserva activa, no exceder máximo de maletas, método de pago válido. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Maletas agregadas, pago confirmado, reserva actualizada. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Pasajero selecciona cantidad de maletas.<br>2. Visualiza costo.<br>3. Procesa pago.<br>4. Actualiza reserva. |
+| **Flujos alternos** | FA1: Límite excedido (FA = Flujo Alterno)<br>FA1.1 Error<br>FA1.2 Reducir cantidad<br>FA1.3 Se continúa con el flujo principal (1)<br>FA2: Pago fallido<br>FA2.1 Reintentar<br>FA2.2 Cancelar compra |
+| **Reglas de negocio** | ● Máximo 3 extras de 50 libras.<br>● Costo por maleta fijo.<br>● Integración con gateway de pago. |
+| **Reglas de calidad** | ● Compra <1 minuto.<br>● Interfaz simple.<br>● Botón verde (#00FF00). |
+
+## Caso de Uso CDU006.2: Otorgar Puntos de Fidelización
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Otorgar Puntos de Fidelización (Un nombre descriptivo corto) |
+| **Código** | CDU006.2 (Un código correlativo que lo identifique) |
+| **Actores** | Sistema (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Calcula y suma puntos de fidelidad automáticamente al pasajero basado en horas de vuelo al aterrizar, actualizando el saldo para incentivar lealtad y permitir redenciones futuras en servicios. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Vuelo aterrizado, perfil con programa de fidelidad, datos de duración. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Puntos sumados, notificación enviada, historial actualizado. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Detecta aterrizaje.<br>2. Calcula puntos (100 por hora).<br>3. Suma a saldo.<br>4. Notifica pasajero. |
+| **Flujos alternos** | FA1: Error en cálculo (FA = Flujo Alterno)<br>FA1.1 Ajuste manual por soporte<br>FA1.2 Recalcular<br>FA1.3 Se continúa con el flujo principal (2)<br>FA2: Sin programa activo<br>FA2.1 No sumar<br>FA2.2 Sugerir inscripción |
+| **Reglas de negocio** | ● 100 puntos/hora.<br>● Válido solo vuelos completos.<br>● Expiración anual. |
+| **Reglas de calidad** | ● Otorgamiento <5 segundos.<br>● Dashboard de puntos.<br>● Notificaciones push. |
+
+## Caso de Uso CDU006.3: Gestionar Historial y Notificaciones
+
+| **Campo** | **Detalle** |
+| --- | --- |
+| **Nombre** | Gestionar Historial y Notificaciones (Un nombre descriptivo corto) |
+| **Código** | CDU006.3 (Un código correlativo que lo identifique) |
+| **Actores** | Pasajero, Sistema (Todos los actores que interactúan con el caso de uso) |
+| **Descripción** | Mantiene un registro del historial de vuelos y puntos del pasajero, enviando notificaciones sobre cambios o promociones para fomentar engagement y proporcionar transparencia en el programa de fidelización. (Descripción del caso de uso, describe su propósito, no es tan breve, es aceptable al menos 20 palabras) |
+| **Precondiciones** | Perfil autenticado, eventos generadores de notificaciones, historial existente. (Son las condiciones que se deben cumplir para que se lleve a cabo el caso de uso y con esto nos aseguramos de que el caso de uso tenga sentido) |
+| **Post Condiciones** | Historial actualizado, notificaciones entregadas, preferencias aplicadas. (Son las condiciones que buscamos obtener después de que se realiza el caso de uso, tanto en su flujo normal como en sus flujos alternos) |
+| **Flujo principal** | 1. Sistema actualiza historial post-vuelo.<br>2. Detecta evento (e.g., puntos sumados).<br>3. Envía notificación.<br>4. Pasajero visualiza historial. |
+| **Flujos alternos** | FA1: Notificación fallida (FA = Flujo Alterno)<br>FA1.1 Reintento<br>FA1.2 Registrar en log<br>FA1.3 Se continúa con el flujo principal (3)<br>FA2: Preferencia opt-out<br>FA2.1 No enviar<br>FA2.2 Fin del flujo |
+| **Reglas de negocio** | ● Historial accesible siempre.<br>● Notificar cambios clave.<br>● Cumplir privacidad. |
+| **Reglas de calidad** | ● Actualización <10 segundos.<br>● Lista cronológica.<br>● Notificaciones <1 minuto. |
+
 
 # Tablero Kanban
 

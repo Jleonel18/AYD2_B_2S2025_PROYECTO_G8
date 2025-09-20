@@ -663,13 +663,27 @@ const Tripulacion = () => {
                     </p>
                 </div>
                 {selectedUsuario.tipo === 'piloto' && (
-                    <div>
-                    <label className="block text-sm font-medium text-gray-700">Número de Licencia</label>
-                    <p className="mt-1 text-sm text-gray-900">
-                        {selectedUsuario.numero_licencia || 'N/A'}
-                    </p>
-                    </div>
+                    <>
+                        <div>
+                        <label className="block text-sm font-medium text-gray-700">Número de Licencia</label>
+                        <p className="mt-1 text-sm text-gray-900">
+                            {selectedUsuario.numero_licencia || 'N/A'}
+                        </p>
+                        </div>
+                        <div>
+                        <label className="block text-sm font-medium text-gray-700">Horas de vuelo</label>
+                        <p className="mt-1 text-sm text-gray-900">
+                            {selectedUsuario.horasVuelo || 0} horas
+                        </p>
+                        </div>
+                    </>
                 )}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Cantidad de vuelos</label>
+                    <p className="mt-1 text-sm text-gray-900">
+                        {selectedUsuario.vuelos.length || 0} vuelos
+                    </p>
+                </div>
                 </div>
                 <div className="mt-6 flex justify-end">
                 <button

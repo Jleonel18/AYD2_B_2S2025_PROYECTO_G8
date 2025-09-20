@@ -1,5 +1,5 @@
-import { IVueloRepository } from './IVueloRepository';
-import { VueloModel, IVuelo } from '../models/Vuelo';
+import { IVueloRepository } from './IVueloRepository.js';
+import { VueloModel, IVuelo } from '../models/Vuelo.js';
 import { Types } from 'mongoose';
 
 export class VueloRepository implements IVueloRepository {
@@ -14,6 +14,10 @@ export class VueloRepository implements IVueloRepository {
 
   async findAll(): Promise<IVuelo[]> {
     return await VueloModel.find();
+  }
+
+  async findAllPlanificados(): Promise<IVuelo[]> {
+    return await VueloModel.find({ estado: 'Planificado' });
   }
 
   async update(id: string, vuelo: Partial<IVuelo>): Promise<IVuelo | null> {
@@ -44,5 +48,13 @@ export class VueloRepository implements IVueloRepository {
       ],
       estado: { $ne: 'Cancelado' }
     });
+  }
+
+  async getStatisticsVuelos(): Promise<{ totalVuelos: number; totalVuelosCompletados: number; totalVuelosCancelados: number; totalVuelosPlanificados: number; }> {
+    const totalVuelos = await VueloModel.countDocuments();
+    const totalVuelosCompletados = await VueloModel.countDocuments({ estado: 'Aterrizado' });
+    const totalVuelosCancelados = await VueloModel.countDocuments({ estado: 'Cancelado' });
+    const totalVuelosPlanificados = await VueloModel.countDocuments({ estado: 'Planificado' });
+    return { totalVuelos, totalVuelosCompletados, totalVuelosCancelados, totalVuelosPlanificados };
   }
 }

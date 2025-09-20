@@ -1,6 +1,6 @@
-import { EstadoReserva } from "../../../types/reservas";
-import { ReservaModel, IReserva } from "../models/Reserva";
-import { IReservaRepository } from "./IReserva";
+import { EstadoReserva } from "../../../types/reservas.js";
+import { ReservaModel, IReserva } from "../models/Reserva.js";
+import { IReservaRepository } from "./IReserva.js";
 
 export class ReservaRepository implements IReservaRepository {
     async crearReserva(reserva: IReserva): Promise<IReserva> {

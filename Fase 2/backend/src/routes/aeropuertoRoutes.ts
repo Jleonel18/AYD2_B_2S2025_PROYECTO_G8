@@ -1,8 +1,8 @@
 import {Router } from "express";
-import { AeropuertoController } from "../modules/airports/controllers/aeropuertoController";
-import { AeropuertoService } from "../core/repository/services/AeropuertoService";
-import { AeropuertoRepository } from "../core/repository/repositories/AeropuertoRepository";
-import { tokenAuth, authorizeRoles } from "../middleware/authMiddleware";
+import { AeropuertoController } from "../modules/airports/controllers/aeropuertoController.js";
+import { AeropuertoService } from "../core/repository/services/AeropuertoService.js";
+import { AeropuertoRepository } from "../core/repository/repositories/AeropuertoRepository.js";
+import { tokenAuth, authorizeRoles } from "../middleware/authMiddleware.js";
 
 const aeropuertoRepository = new AeropuertoRepository();
 const aeropuertoService = new AeropuertoService(aeropuertoRepository);

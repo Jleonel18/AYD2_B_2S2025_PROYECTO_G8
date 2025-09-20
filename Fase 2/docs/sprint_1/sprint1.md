@@ -4,6 +4,20 @@
 
 https://drive.google.com/file/d/1USXH3H7VpnqVYCb4b7yyWKqLyllEpZIM/view?usp=drive_link
 
+
+**Escala de puntos utilizada:** Escala de Fibonacci: 1,2,3,5,8
+
+| ID | Casos de Uso | Prioridad | Estimación (Story Points) |
+| --- | --- | --- | --- |
+| 1 | CDU004.1: Registrar Perfil de Pasajero | Alta | 2 |
+| 2 | CDU004.2: Modificar Perfil de Pasajero | Media | 2 |
+| 3 | CDU002.1: Registrar Tripulación | Alta | 2 |
+| 4 |  CDU002.2:  Asignar Tripulación a Vuelo | Media | 5 |
+| 5 | CDU001.1: Planificar Vuelo | Alta | 8 |
+| 6 | CDU003.1: Registro de Aeronave | Media | 3 |
+| 7 | CDU001.2: Actualizar Estado de Vuelo | Media | 5 |
+| 8 | CDU001.3: Cancelar Vuelo | Media | 5 |
+
 ## Daily 1:
 
 ### Link:
@@ -117,6 +131,17 @@ https://drive.google.com/file/d/1j2HVVDsGefFhRNjJyJLNnsg2Z0Dhw5es/view?usp=shari
 - **Se tiene algún impedimento:** Por el momento no tengo ningun impedimento y puedo seguir avanzando libremente.
 
 ## Sprint Retrospective:
+
+| ID | Story Points | Finalizado | Justificación |
+| --- | --- | --- | --- |
+| 1 | 2 | Sí |  |
+| 2 | 2 | Sí |  |
+| 3 | 2 | Sí |  |
+| 4 | 5 | Sí |  |
+| 5 | 8 | Sí |  |
+| 6 | 3 | Sí |  |
+| 7 | 5 | Sí |  |
+| 8 | 5 | Sí |  |
 
 ### Link:
 

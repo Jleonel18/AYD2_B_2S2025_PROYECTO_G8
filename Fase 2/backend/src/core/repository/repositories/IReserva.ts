@@ -1,5 +1,5 @@
-import { EstadoReserva } from "../../../types/reservas";
-import { IReserva } from "../models/Reserva";
+import { EstadoReserva } from "../../../types/reservas.js";
+import { IReserva } from "../models/Reserva.js";
 
 export interface IReservaRepository {
     crearReserva(reserva: IReserva): Promise<IReserva>;

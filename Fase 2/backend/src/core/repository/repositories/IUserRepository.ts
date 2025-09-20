@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { IUser } from '../models/User';
+import { IUser } from '../models/User.js';
 
 export interface IUserRepository {
     create(user: Partial<IUser>): Promise<IUser>;
@@ -22,4 +22,5 @@ export interface IUserRepository {
     addFlightToHistory(usuarioID: string, vueloId: string): Promise<IUser | null>;
     addPointsAndFlightToHistory(usuarioID: string, vueloId: string, puntos: number): Promise<IUser | null>;
     getFlightHistory(usuarioID: string): Promise<ObjectId[] | null>;
+    getStatisticsUsers(): Promise<{ totalUsers: number, totalPilots: number, totalFlightAttendants: number }>;
 }
