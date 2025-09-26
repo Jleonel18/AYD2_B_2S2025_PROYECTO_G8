@@ -6,11 +6,17 @@ import { EstadoVuelo } from "../../../core/observer/observador.js";
 import { AvionService } from "../../../core/repository/services/AvionService.js";
 import { ReservaService } from "../../../core/repository/services/ReservaService.js";
 import { UserService } from "../../../core/repository/services/UserService.js";
+import { EstadoReserva } from "../../../types/reservas.js";
+import { ReservaFacade } from "../../../core/facade/ReservaFacade.js";
+import { enviarCorreoReservaEstado } from "../../../utils/send_email.js";
+import { generarCodigoQR } from "../../../utils/qr.js";
 
 
 
 export class VueloController {
-  constructor(private readonly vueloService: VueloService, private readonly avionService: AvionService, private readonly reservaService: ReservaService, private readonly userService: UserService) {}
+  constructor(private readonly vueloService: VueloService, private readonly avionService: AvionService, private readonly reservaService: ReservaService, private readonly userService: UserService
+    , private readonly reservaFacade: ReservaFacade
+  ) {}
 
   crearVuelo = async (req: Request, res: Response) => {
   try {
@@ -215,6 +221,12 @@ actualizarEstadoVuelo = async (req: Request, res: Response) => {
 
       for (const reserva of reservas) {
         await this.userService.agregarPuntosYVueloAlHistorial(reserva.id_usuario.toString(), id, puntosPorVuelo);
+        const reservaActualizada = await this.reservaFacade.cambiarEstadoReserva(reserva._id.toString());
+        if(!reservaActualizada) continue;
+        const qrCode = await generarCodigoQR(reservaActualizada._id.toString())
+        const user = await this.userService.obtenerUsuario(reserva.id_usuario.toString());
+        if(!user) continue;
+        await enviarCorreoReservaEstado({ correoDestino: user.correo, nombre: user.nombre, codigo_reserva: reservaActualizada.codigo_reserva, qrCode: qrCode, estado: reservaActualizada.estado as EstadoReserva });
       }
   
       // Agregar vuelo al historial de la tripulación

@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer'
+import { EstadoReserva } from '../types/reservas';
+
 
 interface EnviarCorreoParams {
     correoDestino: string;
@@ -14,12 +16,12 @@ interface EnviarCorreoCancelacionParams {
     codigo_reserva: string;
 }
 
-interface EnviarQRReservaParams {
+interface EnviarCorreoReservaParams {
     correoDestino: string;
     nombre: string;
     codigo_reserva: string;
     qrCode: string;
-    estado: string;
+    estado: EstadoReserva
 }
 
 export async function enviarCorreoCancelacion({ correoDestino, nombre, reservaId, codigo_reserva }: EnviarCorreoCancelacionParams) {
@@ -244,25 +246,59 @@ export async function enviarCorreoRecuperacion({ correoDestino, nombre, token }:
     }
 }
 
-export async function enviarQRReserva({ correoDestino, nombre, codigo_reserva, qrCode, estado }: EnviarQRReservaParams) {
-    try {
-        const transport = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
+export async function enviarCorreoReservaEstado({
+  correoDestino,
+  nombre,
+  codigo_reserva,
+  qrCode,
+  estado,
+}: EnviarCorreoReservaParams) {
+  try {
+    const transport = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-        const qrBase64Data = qrCode.replace(/^data:image\/png;base64,/, "");
+    const qrBase64Data = qrCode.replace(/^data:image\/png;base64,/, "");
 
-        // Hacer HTML guiandote del diseño anterior
-        const htmlMensaje = `
+    let titulo = "";
+    let mensajePrincipal = "";
+
+    switch (estado) {
+      case "Pendiente de Check-in":
+        titulo = `¡Gracias por tu reserva, ${nombre}!`;
+        mensajePrincipal =
+          "Hemos generado tu boleto. Presenta este código QR al momento de tu <strong>check-in</strong>.";
+        break;
+
+      case "Pendiente de Abordaje":
+        titulo = `¡Tu vuelo está próximo, ${nombre}!`;
+        mensajePrincipal =
+          "Recuerda mostrar este código QR al momento de tu <strong>abordaje</strong>.";
+        break;
+
+      case "Abordado":
+        titulo = `¡Buen viaje, ${nombre}!`;
+        mensajePrincipal =
+          "Esperamos que disfrutes tu experiencia. Guarda este correo por cualquier consulta relacionada con tu vuelo.";
+        break;
+
+      case "Aterrizado":
+        titulo = `¡Esperamos que hayas disfrutado tu viaje, ${nombre}!`;
+        mensajePrincipal =
+          'Gracias por volar con AirFlow. Nos encantaría conocer tu opinión, por favor deja tu <a href="https://airflow.com/feedback" style="color:#0e1d30; font-weight:bold;">feedback aquí</a>.';
+        break;
+    }
+
+    const htmlMensaje = `
     <!DOCTYPE html>
     <html lang="es">
     <head>
       <meta charset="UTF-8" />
-      <title>Tu código QR de reserva</title>
+      <title>Estado de tu reserva</title>
     </head>
     <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f6f8; color:#333;">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:auto; background-color:#fff; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
@@ -277,9 +313,9 @@ export async function enviarQRReserva({ correoDestino, nombre, codigo_reserva, q
         <!-- Cuerpo -->
         <tr>
           <td style="padding:30px; text-align:center;">
-            <h2 style="margin:0; color:#0e1d30;">¡Gracias por tu reserva, ${nombre}!</h2>
+            <h2 style="margin:0; color:#0e1d30;">${titulo}</h2>
             <p style="font-size:16px; margin:20px 0; line-height:1.5;">
-              Hemos generado tu boleto. Presenta este código QR al momento de tu <strong>check-in</strong>.
+              ${mensajePrincipal}
             </p>
             
             <div style="margin:25px 0;">
@@ -307,115 +343,25 @@ export async function enviarQRReserva({ correoDestino, nombre, codigo_reserva, q
     </html>
     `;
 
-        // Enviar correo
-        const info = await transport.sendMail({
-            from: `"AirFlow System" <${process.env.EMAIL_USER}>`,
-            to: correoDestino,
-            subject: "Tu código QR de reserva",
-            html: htmlMensaje,
-            attachments: [
-                {
-                    filename: 'qrcode.png',
-                    content: qrBase64Data,
-                    encoding: 'base64',
-                    cid: 'qrCodeImage'
-                }
-            ]
-        });
+    const info = await transport.sendMail({
+      from: `"AirFlow System" <${process.env.EMAIL_USER}>`,
+      to: correoDestino,
+      subject: `Actualización de tu reserva (${estado})`,
+      html: htmlMensaje,
+      attachments: [
+        {
+          filename: "qrcode.png",
+          content: qrBase64Data,
+          encoding: "base64",
+          cid: "qrCodeImage",
+        },
+      ],
+    });
 
-        console.log("Correo enviado:", info.messageId);
-        return true;
-
-    } catch (error) {
-        console.error("Error al enviar correo con QR de reserva:", error);
-        return false;
-    }
-}
-
-export async function enviarCorreoActualizacionReserva({ correoDestino, nombre, codigo_reserva, qrCode, estado }: EnviarQRReservaParams) {
-    try {
-        const transport = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
-
-        const qrBase64Data = qrCode.replace(/^data:image\/png;base64,/, "");
-
-        // Hacer HTML guiandote del diseño anterior
-        const htmlMensaje = `
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-      <meta charset="UTF-8" />
-      <title>Actualizacion de tu reserva</title>
-    </head>
-    <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f6f8; color:#333;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:auto; background-color:#fff; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
-        
-        <!-- Header -->
-        <tr>
-          <td style="background-color:#0e1d30; padding:20px; text-align:center; color:#ffffff;">
-            <img src="https://i.imgur.com/9Tp4bis.jpeg" alt="AirFlow Logo" width="240" style="display:block; margin:auto;" />
-          </td>
-        </tr>
-        
-        <!-- Cuerpo -->
-        <tr>
-          <td style="padding:30px; text-align:center;">
-            <h2 style="margin:0; color:#0e1d30;">¡Se ha actualizado el estado de tu reserva, ${nombre}!</h2>
-            <p style="font-size:16px; margin:20px 0; line-height:1.5;">
-              Aquí está el código QR actualizado de tu reserva.
-            </p>
-            
-            <div style="margin:25px 0;">
-              <img src="cid:qrCodeImage" alt="Código QR de reserva" style="width:200px; height:200px;" />
-            </div>
-
-            <p style="font-size:16px; margin:10px 0;">
-              Código de Reserva: <strong>${codigo_reserva}</strong>
-            </p>
-            
-            <p style="font-size:14px; color:#555; margin-top:30px;">
-              Estado de la reserva: <strong>${estado}</strong>
-            </p>
-          </td>
-        </tr>
-
-        <!-- Footer -->
-        <tr>
-          <td style="background-color:#f0f0f0; text-align:center; padding:15px; font-size:12px; color:#888;">
-            © ${new Date().getFullYear()} AirFlow System - Todos los derechos reservados
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-    `;
-
-        // Enviar correo
-        const info = await transport.sendMail({
-            from: `"AirFlow System" <${process.env.EMAIL_USER}>`,
-            to: correoDestino,
-            subject: "Actualización de tu reserva",
-            html: htmlMensaje,
-            attachments: [
-                {
-                    filename: 'qrcode.png',
-                    content: qrBase64Data,
-                    encoding: 'base64',
-                    cid: 'qrCodeImage'
-                }
-            ]
-        });
-
-        console.log("Correo enviado:", info.messageId);
-        return true;
-
-    } catch (error) {
-        console.error("Error al enviar correo con QR de reserva:", error);
-        return false;
-    }
+    console.log("Correo enviado:", info.messageId);
+    return true;
+  } catch (error) {
+    console.error("Error al enviar correo de reserva:", error);
+    return false;
+  }
 }

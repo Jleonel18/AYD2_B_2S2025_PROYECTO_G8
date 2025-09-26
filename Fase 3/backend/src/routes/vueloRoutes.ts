@@ -9,6 +9,7 @@ import { ReservaService } from '../core/repository/services/ReservaService.js';
 import { ReservaRepository } from '../core/repository/repositories/ReservaRepository.js';
 import { UserRepository } from '../core/repository/repositories/UserRepository.js';
 import { UserService } from '../core/repository/services/UserService.js';
+import { ReservaFacade } from '../core/facade/ReservaFacade.js';
 
 
 const vueloRepository = new VueloRepository();
@@ -19,7 +20,8 @@ const reservaRepository = new ReservaRepository();
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 const reservaService = new ReservaService(reservaRepository, userService);
-const vueloController = new VueloController(vueloService, avionService, reservaService, userService);
+const reservaFacade = new ReservaFacade(vueloService, avionService, reservaService);
+const vueloController = new VueloController(vueloService, avionService, reservaService, userService, reservaFacade);
 
 export class VueloRoutes {
     public router: Router;  
