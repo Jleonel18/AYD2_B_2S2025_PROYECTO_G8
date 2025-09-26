@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  backend:
+    image: josedgo/backend-ayd2:latest
+    container_name: backend
+    ports:
+      - "3000:3000"
+
+  frontend:
+    image: franklinonp/frontend-ayd2:latest
+    container_name: frontend
+    ports:
+      - "8080:8080"
+    environment:
+      - VITE_API_URL=http://backend:3000/api
+    depends_on:
+      - backend
