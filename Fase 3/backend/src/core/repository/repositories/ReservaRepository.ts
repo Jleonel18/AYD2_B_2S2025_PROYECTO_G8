@@ -58,6 +58,7 @@ export class ReservaRepository implements IReservaRepository {
         // Asignar maletas a la reserva
         reserva.maletas = maletas;
         reserva.estado = EstadoReserva.pendiente_abordaje;
+        reserva.fecha_checkin = new Date();
 
         await reserva.save();
         return reserva;
