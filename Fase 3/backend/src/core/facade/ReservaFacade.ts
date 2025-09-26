@@ -137,8 +137,9 @@ export class ReservaFacade {
         }
         else if (reserva.estado === EstadoReserva.pendiente_abordaje) {
             estado = EstadoReserva.abordado;
-        }
-        else {
+        }else if (reserva.estado === EstadoReserva.abordado) {
+            estado = EstadoReserva.aterrizado;
+        }else {
             throw new Error("La reserva no está en un estado válido para cambiar");
         }
 

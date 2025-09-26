@@ -3,9 +3,10 @@ import { AuthRequest } from "../../../middleware/authMiddleware.js"
 import { ReservaService } from "../../../core/repository/services/ReservaService.js";
 import { ReservaFacade } from "../../../core/facade/ReservaFacade.js";
 import { generarCodigoQR } from "../../../utils/qr.js";
-import { enviarCorreoActualizacionReserva, enviarQRReserva } from "../../../utils/send_email.js";
+import { enviarCorreoReservaEstado } from "../../../utils/send_email.js";
 import { UserService } from "../../../core/repository/services/UserService.js";
 import { VueloService } from "../../../core/repository/services/VueloService.js";
+import { EstadoReserva } from "../../../types/reservas.js";
 
 
 export class ReservaController {
@@ -33,7 +34,7 @@ export class ReservaController {
                 throw new Error("El usuario asociado a la reserva no existe");
             }
 
-            await enviarQRReserva({ correoDestino: usuario.correo, nombre: usuario.nombre, codigo_reserva: reservaCreada.codigo_reserva, qrCode, estado: reservaCreada.estado });
+            await enviarCorreoReservaEstado({ correoDestino: usuario.correo, nombre: usuario.nombre, codigo_reserva: reservaCreada.codigo_reserva, qrCode, estado: reservaCreada.estado as EstadoReserva });
 
             res.status(201).json({message: "Reserva creada exitosamente", reserva: reservaCreada});
         } catch (error: any) {
@@ -119,7 +120,7 @@ export class ReservaController {
 
                 const qrCode = await generarCodigoQR(reservaActualizada._id.toString())
 
-                await enviarCorreoActualizacionReserva({ correoDestino: req.user.correo, nombre: req.user.nombre, codigo_reserva: reservaActualizada.codigo_reserva, qrCode: qrCode, estado: reservaActualizada.estado });
+                await enviarCorreoReservaEstado({ correoDestino: req.user.correo, nombre: req.user.nombre, codigo_reserva: reservaActualizada.codigo_reserva, qrCode: qrCode, estado: reservaActualizada.estado as EstadoReserva });
 
                 res.status(200).json({ message: "Check-in realizado exitosamente", reserva: reservaActualizada });
             } else {
@@ -139,7 +140,12 @@ export class ReservaController {
             if (reservaActualizada) {
                 const qrCode = await generarCodigoQR(reservaActualizada._id.toString())
 
-                await enviarCorreoActualizacionReserva({ correoDestino: req.user.correo, nombre: req.user.nombre, codigo_reserva: reservaActualizada.codigo_reserva, qrCode: qrCode, estado: reservaActualizada.estado });
+                const user = await this.userService.obtenerUsuario(reservaActualizada.id_usuario.toString());
+                if(!user) {
+                    throw new Error("El usuario asociado a la reserva no existe");
+                }
+
+                await enviarCorreoReservaEstado({ correoDestino: user.correo, nombre: user.nombre, codigo_reserva: reservaActualizada.codigo_reserva, qrCode: qrCode, estado: reservaActualizada.estado as EstadoReserva });
                 res.status(200).json({ message: "Estado de reserva actualizado exitosamente", reserva: reservaActualizada });
             } else {
                 res.status(404).json({ error: "Reserva no encontrada" });
