@@ -243,6 +243,8 @@ const Reserva = () => {
                 return <span className="text-green-600 font-semibold">{estado}</span>;
             case 'Cancelada':
                 return <span className="text-red-600 font-semibold">{estado}</span>;
+            case 'Aterrizado':
+                return <span className="text-purple-600 font-semibold">{estado}</span>;
             default:
                 return <span className="text-gray-600 font-semibold">{estado}</span>;
         }
