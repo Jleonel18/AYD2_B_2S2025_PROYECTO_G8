@@ -24,6 +24,13 @@ export class VueloRepository implements IVueloRepository {
     return await VueloModel.findByIdAndUpdate(id, vuelo, { new: true });
   }
 
+  async findByAvion(idAvion: string): Promise<IVuelo[]> {
+    if (!Types.ObjectId.isValid(idAvion)) {
+      throw new Error(`ID de avión inválido: ${idAvion}`);
+    }
+    return await VueloModel.find({ aeronave: new Types.ObjectId(idAvion) });
+  }
+
   async delete(id: string): Promise<void> {
     await VueloModel.findByIdAndDelete(id);
   }

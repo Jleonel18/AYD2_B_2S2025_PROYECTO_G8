@@ -23,6 +23,11 @@ export class VueloService {
         return await this.vueloRepository.findById(id);
     }
 
+    async avionEstaAsignadoAVuelo(idAvion: string): Promise<boolean> {
+        const vuelos = await this.vueloRepository.findByAvion(idAvion);
+        return vuelos.length > 0;
+    }
+
     async listarVuelos(): Promise<IVuelo[]> {
         return await this.vueloRepository.findAll();
     }

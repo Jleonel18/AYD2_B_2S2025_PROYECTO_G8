@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { AvionService } from "../../../core/repository/services/AvionService.js";
 import { IAvion } from "../../../core/repository/models/Avion.js";
+import { VueloService } from "../../../core/repository/services/VueloService.js";
 
 export class AvionController {
-    constructor(private readonly avionService: AvionService) {}
+    constructor(private readonly avionService: AvionService, private readonly vueloService: VueloService) {}
 
     crearAvion = async (req: Request, res: Response) => {
         try {
@@ -55,6 +56,11 @@ export class AvionController {
             if (!eliminado) {
                 return res.status(404).json({ error: "Avión no encontrado" });
             }
+            
+            if(await this.vueloService.avionEstaAsignadoAVuelo(req.params.id)) {
+                return res.status(400).json({ error: "No se puede eliminar el avión porque está asignado a uno o más vuelos." });
+            }
+            
             res.status(204).send();
         } catch (error) {
             res.status(500).json({ error: "Error al eliminar avión" });
