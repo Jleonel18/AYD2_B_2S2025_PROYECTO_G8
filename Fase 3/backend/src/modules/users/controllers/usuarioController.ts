@@ -133,6 +133,10 @@ export class UsuarioController {
                 return res.status(400).json({ message: "Usuario o contraseña incorrectos" })
             }
 
+            if(!usuarioEncontrado.activo) {
+                return res.status(403).json({ message: "Hay un problema con tu cuenta, por favor contacta al soporte" })
+            }
+
             const data = {
                 id: usuarioEncontrado._id,
                 usuario: usuarioEncontrado.usuario,
@@ -460,6 +464,39 @@ export class UsuarioController {
                 usuarios: estadisticasUsuarios,
                 aviones: estadisticasAviones,
                 vuelos: estadisticasVuelos
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" });
+        }
+    }
+
+    obtenerPasajeros = async (req: AuthRequest, res: Response) => {
+        try {
+            const pasajeros = await this.usuarioService.listarPasajeros();
+            res.json(pasajeros);
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" });
+        }
+    }
+
+    editarEstadoUsuario = async (req: AuthRequest, res: Response) => {
+        try {
+            const { id } = req.params;
+
+            if(id !== req.user.id && req.user.tipo !== 'operaciones') {
+                return res.status(403).json({ error: "No tienes permisos para cambiar el estado de este usuario" });
+            }
+            
+            const usuarioActual = await this.usuarioService.obtenerUsuario(id);
+            if (!usuarioActual) {
+                return res.status(404).json({ error: "Usuario no encontrado" });
+            }
+
+            const nuevoEstado = !usuarioActual.activo; // Alternar el estado actual
+            const usuarioActualizado = await this.usuarioService.actualizarEstado(id, nuevoEstado);
+            res.json({
+                message: `El estado del usuario ha sido actualizado a ${nuevoEstado ? 'activo' : 'inactivo'}.`,
+                usuario: usuarioActualizado
             });
         } catch (error) {
             res.status(500).json({ error: "Error en servidor" });

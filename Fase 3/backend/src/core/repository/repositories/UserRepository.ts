@@ -18,6 +18,10 @@ export class UserRepository implements IUserRepository {
         return await UserModel.find();
     }
 
+    async findPassengers(): Promise<IUser[]> {
+        return await UserModel.find({ tipo: 'pasajero' });
+    }
+
     async findWorkers(): Promise<IUser[]> {
         return await UserModel.find({ tipo: { $in: ['piloto', 'sobrecargo'] } });
     }
@@ -66,6 +70,10 @@ export class UserRepository implements IUserRepository {
     async editProfile(id: string, datos: Partial<IUser>): Promise<IUser | null> {
         const datos_flattened = flattenObject(datos);
         return await UserModel.findByIdAndUpdate(id, { $set: datos_flattened }, { new: true });
+    }
+
+    async updateStatus(id: string, activo: boolean): Promise<IUser | null> {
+        return await UserModel.findByIdAndUpdate(id, { activo: activo }, { new: true });
     }
 
     async updateWorker(id: string, datos: Partial<IUser>): Promise<IUser | null> {

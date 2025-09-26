@@ -41,5 +41,7 @@ export class UsuarioRoutes {
         this.router.patch("/pasajeros/puntos", tokenAuth, authorizeRoles("operaciones"), usuarioController.sumarPuntosPorHorasVuelo);
         this.router.get("/historial-vuelos", tokenAuth, usuarioController.obtenerHistorialVuelos);
         this.router.get("/estadisticas", tokenAuth, authorizeRoles("operaciones"), usuarioController.obtenerEstadisticasAdmin);
+        this.router.get("/pasajeros", tokenAuth, authorizeRoles('operaciones'), usuarioController.obtenerPasajeros);
+        this.router.patch("/:id/estado", tokenAuth, authorizeRoles('operaciones', 'pasajero'), usuarioController.editarEstadoUsuario);
     }
 }
