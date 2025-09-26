@@ -9,6 +9,7 @@ export interface IReserva extends Document {
     fecha_reserva: Date;
     estado: string;
     codigo_reserva: string;
+    fecha_checkin: Date;
     maletas: { tipo: string; peso: number }[];
 }
 
@@ -20,6 +21,7 @@ const ReservaSchema = new Schema<IReserva>({
     fecha_reserva: { type: Date, required: true },
     estado: { type: String, required: true },
     codigo_reserva: { type: String, required: true },
+    fecha_checkin: { type: Date, required: true, default: null },
     maletas: { type: [{ tipo: String, peso: Number }], required: false },
 }, {
     timestamps: true,
