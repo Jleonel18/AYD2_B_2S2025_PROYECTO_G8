@@ -3,10 +3,14 @@ import { AvionController } from "../modules/airplanes/controllers/avionControlle
 import { AvionService } from "../core/repository/services/AvionService.js";
 import { AvionRepository } from "../core/repository/repositories/AvionRepository.js";
 import { tokenAuth, authorizeRoles } from "../middleware/authMiddleware.js";
+import { VueloService } from "../core/repository/services/VueloService.js";
+import { VueloRepository } from "../core/repository/repositories/VueloRepository.js";
 
 const avionRepository = new AvionRepository();
 const avionService = new AvionService(avionRepository);
-const avionController = new AvionController(avionService);
+const vueloRepository = new VueloRepository();
+const vueloService = new VueloService(vueloRepository);
+const avionController = new AvionController(avionService,vueloService);
 
 export class AvionRoutes {
     public router: Router;
