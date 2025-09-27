@@ -21,7 +21,8 @@ export class AvionService {
     }
 
     async deleteAvion(id: string): Promise<boolean> {
-        return await this.avionRepository.delete(id);
+        const updated = await this.avionRepository.updateEstado(id, 'Eliminado');
+        return updated !== null;
     }
 
     async avionEstaEnAeropuerto(idAvion: string, idAeropuerto: string): Promise<boolean> {
