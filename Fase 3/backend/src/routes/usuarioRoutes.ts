@@ -27,7 +27,6 @@ export class UsuarioRoutes {
 
     private initializeRoutes() {
         this.router.post("/", usuarioController.crearUsuario);
-        this.router.get("/", tokenAuth, usuarioController.obtenerUsuario);
         this.router.get("/trabajadores", tokenAuth, authorizeRoles('operaciones'), usuarioController.obtenerTrabajadores);
         this.router.get("/trabajadores/:id", tokenAuth, authorizeRoles('operaciones'), usuarioController.obtenerTrabajadorPorId);
         this.router.put("/trabajadores/:id", tokenAuth, authorizeRoles('operaciones'), usuarioController.actualizarTrabajador);
@@ -41,5 +40,8 @@ export class UsuarioRoutes {
         this.router.patch("/pasajeros/puntos", tokenAuth, authorizeRoles("operaciones"), usuarioController.sumarPuntosPorHorasVuelo);
         this.router.get("/historial-vuelos", tokenAuth, usuarioController.obtenerHistorialVuelos);
         this.router.get("/estadisticas", tokenAuth, authorizeRoles("operaciones"), usuarioController.obtenerEstadisticasAdmin);
+        this.router.get("/pasajeros", tokenAuth, authorizeRoles('operaciones'), usuarioController.obtenerPasajeros);
+        this.router.get("/:id", tokenAuth, usuarioController.obtenerUsuario);
+        this.router.patch("/:id/estado", tokenAuth, authorizeRoles('operaciones', 'pasajero'), usuarioController.editarEstadoUsuario);
     }
 }

@@ -78,7 +78,13 @@ export class UsuarioController {
 
     obtenerUsuario = async (req: AuthRequest, res: Response) => {
         try {
-            const usuario = await this.usuarioService.obtenerUsuario(req.user.id)
+            const { id } = req.params
+
+            if(id && id !== req.user.id && req.user.tipo !== 'operaciones') {
+                return res.status(403).json({ error: "No tienes permisos para ver este usuario" })
+            }
+
+            const usuario = await this.usuarioService.obtenerUsuario(id)
             if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" })
             //console.log(usuario)
             res.json(usuario)
@@ -131,6 +137,10 @@ export class UsuarioController {
             const usuarioEncontrado = await this.usuarioService.login(usuario, contrasena)
             if (!usuarioEncontrado) {
                 return res.status(400).json({ message: "Usuario o contraseña incorrectos" })
+            }
+
+            if(!usuarioEncontrado.activo) {
+                return res.status(403).json({ message: "Hay un problema con tu cuenta, por favor contacta al soporte" })
             }
 
             const data = {
@@ -460,6 +470,39 @@ export class UsuarioController {
                 usuarios: estadisticasUsuarios,
                 aviones: estadisticasAviones,
                 vuelos: estadisticasVuelos
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" });
+        }
+    }
+
+    obtenerPasajeros = async (req: AuthRequest, res: Response) => {
+        try {
+            const pasajeros = await this.usuarioService.listarPasajeros();
+            res.json(pasajeros);
+        } catch (error) {
+            res.status(500).json({ error: "Error en servidor" });
+        }
+    }
+
+    editarEstadoUsuario = async (req: AuthRequest, res: Response) => {
+        try {
+            const { id } = req.params;
+
+            if(id !== req.user.id && req.user.tipo !== 'operaciones') {
+                return res.status(403).json({ error: "No tienes permisos para cambiar el estado de este usuario" });
+            }
+            
+            const usuarioActual = await this.usuarioService.obtenerUsuario(id);
+            if (!usuarioActual) {
+                return res.status(404).json({ error: "Usuario no encontrado" });
+            }
+
+            const nuevoEstado = !usuarioActual.activo; // Alternar el estado actual
+            const usuarioActualizado = await this.usuarioService.actualizarEstado(id, nuevoEstado);
+            res.json({
+                message: `El estado del usuario ha sido actualizado a ${nuevoEstado ? 'activo' : 'inactivo'}.`,
+                usuario: usuarioActualizado
             });
         } catch (error) {
             res.status(500).json({ error: "Error en servidor" });

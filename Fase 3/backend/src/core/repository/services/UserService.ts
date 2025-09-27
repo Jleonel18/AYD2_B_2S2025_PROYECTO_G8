@@ -33,6 +33,10 @@ export class UserService {
         return await this.userRepository.findAll()
     }
 
+    async listarPasajeros(): Promise<IUser[]> {
+        return await this.userRepository.findPassengers()
+    }
+
     async listarTrabajadores(): Promise<IUser[]> {
         return await this.userRepository.findWorkers()
     }
@@ -58,6 +62,10 @@ export class UserService {
 
     async editarPerfil(id: string, datos: Partial<IUser>): Promise<IUser | null> {
         return await this.userRepository.editProfile(id, datos)
+    }
+
+    async actualizarEstado(id: string, activo: boolean): Promise<IUser | null> {
+        return await this.userRepository.updateStatus(id, activo)
     }
 
     async actualizarTrabajador(id: string, datos: Partial<IUser>): Promise<IUser | null> {

@@ -11,7 +11,6 @@ import Sidebar from './components/Sidebar';
 import React, { useState } from 'react';
 import VuelosPage from './Pages/VuelosPage';
 import AvionesPage from './Pages/AvionesPage';
-import UsuariosPage from './Pages/UsuariosPage';
 import DashboardAdmin from './Pages/DashboardAdmin'
 import Tripulacion from './Pages/Tripulacion'
 import AeropuertosPage from './Pages/AeropuertosPage'
@@ -21,6 +20,7 @@ import Puntos from './Pages/Puntos'
 import Reservar from './Pages/Reservar'
 import Reserva from './Pages/Reserva'
 import PilotView from './Pages/Piloto'
+import Pasajeros from './Pages/Pasajeros'
 
 // Componente de layout para rutas autenticadas
 const AuthenticatedLayout = ({ children }) => {
@@ -85,7 +85,7 @@ function App() {
             path="/usuarios"
             element={
               <AuthenticatedLayout>
-                <UsuariosPage />
+                <Pasajeros />
               </AuthenticatedLayout>
             }
           />

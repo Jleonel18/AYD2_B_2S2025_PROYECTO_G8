@@ -7,6 +7,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const ProfileUser = () => {
   const [user, setUser] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false); // New state for cancel confirmation modal
   const [formData, setFormData] = useState({
     nombre: "",
     correo: "",
@@ -19,7 +20,6 @@ const ProfileUser = () => {
 
   useEffect(() => {
     if (hasToken) {
-      // const storedUser = JSON.parse(sessionStorage.getItem("user") || "{}");
       fetch(`${apiUrl}/users`, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -67,6 +67,14 @@ const ProfileUser = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const openCancelModal = () => {
+    setIsCancelModalOpen(true);
+  };
+
+  const closeCancelModal = () => {
+    setIsCancelModalOpen(false);
   };
 
   const handleInputChange = (e) => {
@@ -122,6 +130,50 @@ const ProfileUser = () => {
             theme: "colored",
           });
         });
+    }
+  };
+
+  const handleCancelAccount = () => {
+    if (hasToken) {
+      const storedUser = JSON.parse(sessionStorage.getItem("user") || "{}");
+      fetch(`${apiUrl}/users/${storedUser.id}/estado`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        }
+      })
+        .then((response) => {
+          if (response.ok) {
+            toast.success("Cuenta cancelada correctamente", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              theme: "colored",
+            });
+            sessionStorage.removeItem("token");
+            sessionStorage.removeItem("user");
+            window.location.href = "/login";
+          } else {
+            throw new Error("Error al cancelar la cuenta");
+          }
+        })
+        .catch((error) => {
+          console.error("Error cancelling account:", error);
+          toast.error("Error al cancelar la cuenta", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "colored",
+          });
+        });
+      closeCancelModal();
     }
   };
 
@@ -211,7 +263,7 @@ const ProfileUser = () => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-3 gap-4 mt-4">
           <button
             onClick={handleLogout}
             className="mt-2 bg-[#7F8CAA] text-white px-4 py-2 rounded hover:bg-[#333446] transition"
@@ -226,6 +278,12 @@ const ProfileUser = () => {
               Editar Perfil
             </button>
           )}
+          <button
+            onClick={openCancelModal}
+            className="mt-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+          >
+            Cancelar Cuenta
+          </button>
         </div>
       </div>
 
@@ -379,6 +437,35 @@ const ProfileUser = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {isCancelModalOpen && (
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4 text-[#333446]">
+              Confirmar Cancelación de Cuenta
+            </h2>
+            <p className="text-[#333446] mb-4">
+              ¿Estás seguro de que deseas cancelar tu cuenta? Esta acción no se puede deshacer.
+            </p>
+            <div className="flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={closeCancelModal}
+                className="bg-gray-300 text-[#333446] px-4 py-2 rounded hover:bg-gray-400 transition"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelAccount}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+              >
+                Confirmar
+              </button>
+            </div>
           </div>
         </div>
       )}
