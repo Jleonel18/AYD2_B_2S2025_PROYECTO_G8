@@ -21,6 +21,7 @@ import Reservar from './Pages/Reservar'
 import Reserva from './Pages/Reserva'
 import PilotView from './Pages/Piloto'
 import Pasajeros from './Pages/Pasajeros'
+import ProtectedRoute from './components/ProtectedRoute'
 
 // Componente de layout para rutas autenticadas
 const AuthenticatedLayout = ({ children }) => {
@@ -48,64 +49,72 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<ProfileUser />} />
+          <Route path="/profile" element={
+            <ProtectedRoute allowedRole={['pasajero']}>
+            <ProfileUser />
+          </ProtectedRoute>} 
+          />
           <Route path="/mainpage" element={<MainPage />} />
           <Route path="/" element={<MainPage />} />
           <Route path="/verify-account" element={<VerifyAccount />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/reserva/:id_reserva" element={<Reserva />} />
-          <Route path="/reservar" element={<Reservar />} />
-          <Route path="/reservas" element={<Reservas />} />
-          <Route path="/historial" element={<Historial />} />
-          <Route path="/puntos" element={<Puntos />} />
-          <Route path="/pilotos" element={<PilotView />} />
-
-          <Route path="/dashboard-admin" element={
-            <AuthenticatedLayout>
-              <DashboardAdmin />
-            </AuthenticatedLayout>
+          <Route path="/reserva/:id_reserva" element={
+            <ProtectedRoute allowedRole={['pasajero', 'operaciones']}>
+              <Reserva />
+            </ProtectedRoute>
           } />
+          <Route path="/reservar" element={<ProtectedRoute allowedRole={['pasajero']}>
+            <Reservar />
+          </ProtectedRoute>} />
+          <Route path="/reservas" element={<ProtectedRoute allowedRole={['pasajero']}>
+            <Reservas />
+          </ProtectedRoute>} />
+          <Route path="/historial" element={<ProtectedRoute allowedRole={['pasajero']}>
+            <Historial />
+          </ProtectedRoute>} />
+          <Route path="/puntos" element={<ProtectedRoute allowedRole={['pasajero']}>
+            <Puntos />
+          </ProtectedRoute>} />
+          <Route path="/pilotos" element={<ProtectedRoute allowedRole={['piloto']}>
+            <PilotView />
+          </ProtectedRoute>} />
+
+          <Route path="/dashboard-admin" element={<ProtectedRoute allowedRole={['operaciones']} layout={AuthenticatedLayout}>
+            <DashboardAdmin />
+          </ProtectedRoute>} /
+          >
           <Route
             path="/vuelos"
-            element={
-              <AuthenticatedLayout>
-                <VuelosPage />
-              </AuthenticatedLayout>
-            }
+            element={<ProtectedRoute allowedRole={['operaciones']} layout={AuthenticatedLayout}>
+              <VuelosPage />
+            </ProtectedRoute>}
           />
           <Route
             path="/aviones"
             element={
-              <AuthenticatedLayout>
+              <ProtectedRoute allowedRole={['operaciones']} layout={AuthenticatedLayout}>
                 <AvionesPage />
-              </AuthenticatedLayout>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/usuarios"
             element={
-              <AuthenticatedLayout>
+              <ProtectedRoute allowedRole={['operaciones']} layout={AuthenticatedLayout}>
                 <Pasajeros />
-              </AuthenticatedLayout>
+              </ProtectedRoute>
             }
           />
           <Route path="/tripulacion" element={
-            <AuthenticatedLayout>
+            <ProtectedRoute allowedRole={['operaciones']} layout={AuthenticatedLayout}>
               <Tripulacion />
-            </AuthenticatedLayout>
+            </ProtectedRoute>
           } />
           <Route path="/aeropuertos" element={
-            <AuthenticatedLayout>
+            <ProtectedRoute allowedRole={['operaciones']} layout={AuthenticatedLayout}>
               <AeropuertosPage />
-            </AuthenticatedLayout>
+            </ProtectedRoute>
           } />
-
-          <Route path="/pilotos" element={
-            <AuthenticatedLayout>
-              <PilotView />
-            </AuthenticatedLayout>
-          } />
-
         </Routes>
       </BrowserRouter>
     </>
