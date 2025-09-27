@@ -18,3 +18,22 @@ export function getUserInfo() {
         return null;
     }
 }
+
+export function getRolUser() {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        return null;
+    }
+
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.tipo;
+    } catch (error) {
+        console.error('Error decoding token:', error);
+        return null;
+    }
+}
+
+export function isAuthenticated() {
+    return !!sessionStorage.getItem('token');
+}
