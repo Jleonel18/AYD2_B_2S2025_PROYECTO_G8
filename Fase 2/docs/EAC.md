@@ -77,3 +77,34 @@
 - **Medida de Respuesta:**  
   - **100%** de correos enviados a través de protocolos seguros  
   - APIs externas consumidas con latencia < **2 segundos**  
+
+
+### 8. Confiabilidad
+- **Fuente:** Fallo en componente o evento externo  
+- **Estímulo:** Ocurre un fallo en el corredor de mensajes EDA o durante un deploy CI/CD  
+- **Entorno:** Operación en producción con tráfico real y simulaciones de fallos  
+- **Artefacto:** Arquitectura EDA, servicios desacoplados y pipelines CI/CD  
+- **Respuesta:** El sistema recupera automáticamente sin pérdida de datos o eventos, asegurando entrega de notificaciones  
+- **Medida de Respuesta:**  
+  - Tasa de éxito en entrega de eventos ≥ **99.5%** incluso en fallos  
+  - Recuperación de fallos en < **1 minuto**, validado en 5 pruebas de estrés  
+
+### 9. Probabilidad
+- **Fuente:** Equipo de desarrollo o pipeline automatizado  
+- **Estímulo:** Ejecuta pruebas unitarias, integración, carga, estrés o E2E  
+- **Entorno:** Entorno de desarrollo/pruebas con Docker y CI/CD  
+- **Artefacto:** Código fuente modular y frameworks de pruebas (e.g., Jest, Mocha)  
+- **Respuesta:** El sistema permite ejecutar y cubrir pruebas de manera eficiente sin dependencias externas complejas  
+- **Medida de Respuesta:**  
+  - Cobertura de código ≥ **80%** en pruebas unitarias e integración  
+  - Ejecución de al menos 25 pruebas (5 por tipo) en < **10 minutos** por pipeline  
+
+### 10. Portabilidad
+- **Fuente:** Cambio de entorno o proveedor cloud  
+- **Estímulo:** Migra el sistema a un nuevo servidor o cloud provider  
+- **Entorno:** De local a cloud o entre proveedores, usando contenedores Docker  
+- **Artefacto:** Backend y frontend Dockerizados, configuración CI/CD  
+- **Respuesta:** El sistema se ejecuta sin modificaciones mayores en el nuevo entorno, manteniendo funcionalidad  
+- **Medida de Respuesta:**  
+  - Tiempo de migración < **30 minutos** sin downtime  
+  - Compatibilidad 100% en al menos 2 entornos (local y cloud), validado en deploys
