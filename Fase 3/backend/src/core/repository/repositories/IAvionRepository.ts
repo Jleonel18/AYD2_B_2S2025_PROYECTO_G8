@@ -1,6 +1,7 @@
 import { IAvion } from "../models/Avion.js";
 
 export interface IAvionRepository {
+    updateEstado(id: string, arg1: string): unknown;
     create(avion: IAvion): Promise<IAvion>;
     findAll(): Promise<IAvion[]>;
     findById(id: string): Promise<IAvion | null>;

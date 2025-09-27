@@ -51,21 +51,30 @@ export class AvionController {
     }
 
     eliminarAvion = async (req: Request, res: Response) => {
-        try {
-            const eliminado = await this.avionService.deleteAvion(req.params.id);
-            if (!eliminado) {
-                return res.status(404).json({ error: "Avión no encontrado" });
-            }
-            
-            if(await this.vueloService.avionEstaAsignadoAVuelo(req.params.id)) {
-                return res.status(400).json({ error: "No se puede eliminar el avión porque está asignado a uno o más vuelos." });
-            }
-            
-            res.status(204).send();
-        } catch (error) {
-            res.status(500).json({ error: "Error al eliminar avión" });
+    try {
+        const { id } = req.params;
+
+        // 1. Verifica que el avión exista
+        const asignado = await this.vueloService.avionEstaAsignadoAVuelo(id);
+        if (asignado) {
+        return res
+            .status(400)
+            .json({ error: "No se puede eliminar el avión porque está asignado a uno o más vuelos." });
         }
+
+        // 2. Cambia estado a "Eliminado"
+        const eliminado = await this.avionService.deleteAvion(id);
+        if (!eliminado) {
+        return res.status(404).json({ error: "Avión no encontrado" });
+        }
+
+        // 3. Respuesta
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ error: "Error al eliminar avión" });
     }
+    };
+
 
     sumarHorasVuelo = async (req: Request, res: Response) => {
         try {
