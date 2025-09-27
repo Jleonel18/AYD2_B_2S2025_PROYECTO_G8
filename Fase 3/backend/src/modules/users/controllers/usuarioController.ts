@@ -78,7 +78,13 @@ export class UsuarioController {
 
     obtenerUsuario = async (req: AuthRequest, res: Response) => {
         try {
-            const usuario = await this.usuarioService.obtenerUsuario(req.user.id)
+            const { id } = req.params
+
+            if(id && id !== req.user.id && req.user.tipo !== 'operaciones') {
+                return res.status(403).json({ error: "No tienes permisos para ver este usuario" })
+            }
+
+            const usuario = await this.usuarioService.obtenerUsuario(id)
             if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" })
             //console.log(usuario)
             res.json(usuario)

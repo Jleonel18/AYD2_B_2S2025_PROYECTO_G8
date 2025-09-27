@@ -19,11 +19,12 @@ export class UserRepository implements IUserRepository {
     }
 
     async findPassengers(): Promise<IUser[]> {
-        return await UserModel.find({ tipo: 'pasajero' });
+        // Validar que esten activos
+        return await UserModel.find({ tipo: 'pasajero', activo: true });
     }
 
     async findWorkers(): Promise<IUser[]> {
-        return await UserModel.find({ tipo: { $in: ['piloto', 'sobrecargo'] } });
+        return await UserModel.find({ tipo: { $in: ['piloto', 'sobrecargo'] }, activo: true });
     }
 
     async update(id: string, user: Partial<IUser>): Promise<IUser | null> {
@@ -82,7 +83,7 @@ export class UserRepository implements IUserRepository {
     }
 
     async deleteWorker(id: string): Promise<void> {
-        await UserModel.findByIdAndDelete(id);
+        await UserModel.findByIdAndUpdate(id, { activo: false });
     }
 
     async saveTokenForgotPassword(userId: string, token: string, expiration: Date): Promise<IUser | null> {
@@ -164,9 +165,10 @@ export class UserRepository implements IUserRepository {
     }
 
     async getStatisticsUsers(): Promise<{ totalUsers: number; totalPilots: number; totalFlightAttendants: number; }> {
-        const totalUsers = await UserModel.countDocuments({tipo: 'pasajero' });
-        const totalPilots = await UserModel.countDocuments({ tipo: 'piloto' });
-        const totalFlightAttendants = await UserModel.countDocuments({ tipo: 'sobrecargo' });
+        // Validar si estan activos
+        const totalUsers = await UserModel.countDocuments({tipo: 'pasajero', activo: true });
+        const totalPilots = await UserModel.countDocuments({ tipo: 'piloto', activo: true });
+        const totalFlightAttendants = await UserModel.countDocuments({ tipo: 'sobrecargo', activo: true });
         return { totalUsers, totalPilots, totalFlightAttendants };
     }
 }
