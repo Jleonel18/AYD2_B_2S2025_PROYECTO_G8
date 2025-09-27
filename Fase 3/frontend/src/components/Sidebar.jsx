@@ -46,6 +46,16 @@ const Sidebar = () => {
           </li>
         </NavLink>
         <NavLink
+          to="/usuarios"
+          className={({ isActive }) =>
+            `text-white block ${isActive ? 'bg-[#7F8CAA]' : ''}`
+          }
+        >
+          <li className="px-4 py-2 hover:bg-[#7F8CAA]">
+            Usuarios
+          </li>
+        </NavLink>
+        <NavLink
           to="/aviones"
           className={({ isActive }) =>
             `text-white block ${isActive ? 'bg-[#7F8CAA]' : ''}`
