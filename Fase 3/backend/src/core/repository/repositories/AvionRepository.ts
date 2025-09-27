@@ -20,6 +20,10 @@ export class AvionRepository implements IAvionRepository {
         return await AvionModel.findByIdAndUpdate(id, avion, { new: true }).exec();
     }
 
+    async updateEstado(id: string, estado: string): Promise<IAvion | null> {
+        return AvionModel.findByIdAndUpdate(id, { estado }, { new: true }).exec();
+    }
+
     async delete(id: string): Promise<boolean> {
         const result = await AvionModel.findByIdAndDelete(id).exec();
         return result !== null;
