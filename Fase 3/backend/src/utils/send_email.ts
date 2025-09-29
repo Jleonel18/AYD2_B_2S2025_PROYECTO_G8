@@ -37,8 +37,7 @@ export async function notificarMantenimientoAAllOperaciones(params: EnviarCorreo
         const { airplaneId, hours } = params;
 
         // 2. Obtener todos los usuarios de tipo "operaciones"
-        const usuariosOperaciones: IUser[] = await userRepository.findWorkers(); // Asumo que 'findWorkers' filtra por tipo "operaciones"; ajusta si es 'findAll' con filtro { tipo: "operaciones" }
-        // Alternativa si no tienes 'findWorkers': await userRepository.findAll({ tipo: "operaciones" });
+        const usuariosOperaciones: IUser[] = await userRepository.findOperaciones();
 
         if (usuariosOperaciones.length === 0) {
             console.log('No se encontraron usuarios de tipo "operaciones".');
