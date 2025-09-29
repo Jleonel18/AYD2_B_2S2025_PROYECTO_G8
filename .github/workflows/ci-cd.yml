@@ -1,0 +1,119 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - develop
+      - 'release/**'
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # -----------------------
+  # BUILD
+  # -----------------------
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Contruyendo imagen y subiendo a GHCR BACKEND
+        run: |
+          IMAGE=ghcr.io/${{ github.repository_owner }}/backend
+          docker build -f "./Fase 3/backend/Dockerfile" -t ${IMAGE}:latest ./backend
+          docker push ${IMAGE}:latest
+
+      - name: Contruyendo imagen y subiendo a GHCR FRONTEND
+        run: |
+          IMAGE=ghcr.io/${{ github.repository_owner }}/frontend
+          docker build -f "./Fase 3/frontend/Dockerfile" -t ${IMAGE}:latest ./frontend
+          docker push ${IMAGE}:latest
+
+  # -----------------------
+  # TEST
+  # -----------------------
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Haciendo test de Backend
+        run: |
+          cd "Fase 3/backend"
+          npm ci
+          npm run build
+          echo "No hay tests por ahora"
+
+  # -----------------------
+  # DEPLOY
+  # -----------------------
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy a VM en Azure
+        uses: appleboy/ssh-action@v1.6.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          port: ${{ secrets.VM_SSH_PORT || 22 }}
+          script: |
+            set -e
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            docker pull ghcr.io/${{ github.repository_owner }}/backend:latest
+            docker pull ghcr.io/${{ github.repository_owner }}/frontend:latest
+
+            cat > docker-compose.yml <<'EOF'
+            version: "3.9"
+            services:
+              backend:
+                image: ghcr.io/${{ github.repository_owner }}/backend:latest
+                container_name: backend
+                restart: unless-stopped
+                ports:
+                  - "3000:3000"
+                env_file:
+                  - .env.backend
+                networks:
+                  - proyecto_network
+
+              frontend:
+                image: ghcr.io/${{ github.repository_owner }}/frontend:latest
+                container_name: frontend
+                restart: unless-stopped
+                ports:
+                  - "8080:8080"
+                env_file:
+                  - .env.frontend
+                networks:
+                  - proyecto_network
+                depends_on:
+                  - backend
+            networks:
+              proyecto_network:
+            EOF
+
+            docker compose down || true
+            docker compose up -d --remove-orphans
