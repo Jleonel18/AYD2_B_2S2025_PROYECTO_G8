@@ -21,6 +21,7 @@ app.get("/api/", (req: Request, res: Response) => {
 });
 
 flotaService.initListener().catch(console.error);
+notificacionService.initListener().catch(console.error);
 
 // Rutas de usuarios
 const usuarioRoutes = new UsuarioRoutes();
