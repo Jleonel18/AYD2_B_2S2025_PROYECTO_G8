@@ -1,4 +1,4 @@
-import "dotenv/config.js";
+import "dotenv/config";
 import express, { Application, Request, Response } from "express";
 import { connectDB } from "./config/database.js";
 import { UsuarioRoutes } from "./routes/usuarioRoutes.js";
@@ -8,12 +8,9 @@ import { AeropuertoRoutes } from "./routes/aeropuertoRoutes.js";
 import cors from "cors";
 import { ReservaRoutes } from "./routes/reservaRoutes.js";
 
-
 const app: Application = express();
-const PORT = process.env.PORT || 4000;
 
 app.use(cors());
-
 app.use(express.json());
 
 // Ruta raíz
@@ -33,7 +30,7 @@ app.use("/api/aviones", avionRoutes.router);
 const vueloRoutes = new VueloRoutes();
 app.use("/api/vuelos", vueloRoutes.router);
 
-//Rutas de aeropuertos
+// Rutas de aeropuertos
 const aeropuertoRoutes = new AeropuertoRoutes();
 app.use("/api/aeropuertos", aeropuertoRoutes.router);
 
@@ -41,15 +38,23 @@ app.use("/api/aeropuertos", aeropuertoRoutes.router);
 const reservaRoutes = new ReservaRoutes();
 app.use("/api/reservas", reservaRoutes.router);
 
-const startServer = async () => {
-    try {
-        await connectDB();
-        app.listen(PORT, () => {
-            console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
-        });
-    } catch (error) {
-        console.error("❌ No se pudo iniciar el servidor:", error);
-    }
-};
+// IMPORTANTE: Exporta la app
+export default app;
 
-startServer();
+// Solo inicia el servidor si NO estamos en pruebas
+if (process.env.NODE_ENV !== 'test') {
+    const PORT = process.env.PORT || 4000;
+    
+    const startServer = async () => {
+        try {
+            await connectDB();
+            app.listen(PORT, () => {
+                console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+            });
+        } catch (error) {
+            console.error("❌ No se pudo iniciar el servidor:", error);
+        }
+    };
+    
+    startServer();
+}
