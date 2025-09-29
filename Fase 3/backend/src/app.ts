@@ -7,6 +7,8 @@ import { VueloRoutes } from "./routes/vueloRoutes.js";
 import { AeropuertoRoutes } from "./routes/aeropuertoRoutes.js";
 import cors from "cors";
 import { ReservaRoutes } from "./routes/reservaRoutes.js";
+import { flotaService } from "./core/repository/services/FlotaService.js";
+import { notificacionService } from "./core/repository/services/NotificacionService.js";
 
 
 const app: Application = express();
@@ -20,6 +22,8 @@ app.use(express.json());
 app.get("/api/", (req: Request, res: Response) => {
     res.send("🚀 Servidor funcionando con Singleton en la DB y patrón Repository!");
 });
+
+flotaService.initListener().catch(console.error);
 
 // Rutas de usuarios
 const usuarioRoutes = new UsuarioRoutes();

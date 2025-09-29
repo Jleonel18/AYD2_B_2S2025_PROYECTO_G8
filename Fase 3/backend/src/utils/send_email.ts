@@ -1,5 +1,8 @@
 import nodemailer from 'nodemailer'
 import { EstadoReserva } from '../types/reservas';
+import { IUser } from '../core/repository/models/User';
+import { IAvionRepository } from '../core/repository/repositories/IAvionRepository';
+import { IUserRepository } from '../core/repository/repositories/IUserRepository';
 
 
 interface EnviarCorreoParams {
@@ -22,6 +25,95 @@ interface EnviarCorreoReservaParams {
     codigo_reserva: string;
     qrCode: string;
     estado: EstadoReserva
+}
+
+interface EnviarCorreoMantenimientoParams {
+    airplaneId: string;
+    hours: number;
+}
+
+export async function notificarMantenimientoAAllOperaciones(params: EnviarCorreoMantenimientoParams, userRepository: IUserRepository, avionRepository: IAvionRepository): Promise<boolean> {
+    try {
+        const { airplaneId, hours } = params;
+
+        // 2. Obtener todos los usuarios de tipo "operaciones"
+        const usuariosOperaciones: IUser[] = await userRepository.findWorkers(); // Asumo que 'findWorkers' filtra por tipo "operaciones"; ajusta si es 'findAll' con filtro { tipo: "operaciones" }
+        // Alternativa si no tienes 'findWorkers': await userRepository.findAll({ tipo: "operaciones" });
+
+        if (usuariosOperaciones.length === 0) {
+            console.log('No se encontraron usuarios de tipo "operaciones".');
+            return false;
+        }
+
+        // 3. Configurar transporte Nodemailer
+        const transport = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        // 4. Plantilla HTML del correo (similar a tus otros correos)
+        const htmlMensaje = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8" />
+            <title>Alerta de Mantenimiento de Avión</title>
+        </head>
+        <body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color:#f4f6f8; color:#333;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:auto; background-color:#fff; border-radius:8px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                <tr>
+                    <td style="background-color:#0e1d30; padding:20px; text-align:center; color:#ffffff;">
+                        <img src="https://i.imgur.com/9Tp4bis.jpeg" alt="AirFlow Logo" width="240" style="display:block; margin:auto;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:30px;">
+                        <h2 style="margin:0; color:#0e1d30;">Alerta de Mantenimiento</h2>
+                        <p style="font-size:16px;">Estimado equipo de operaciones,</p>
+                        <p style="font-size:16px; line-height:1.5;">
+                            Se requiere mantenimiento para el avión con ID <strong>${airplaneId}</strong>. 
+                            Este avión ha alcanzado <strong>${hours}</strong> horas de vuelo, superando el límite establecido.
+                        </p>
+                        <p style="font-size:16px; line-height:1.5;">
+                            Por favor, programa el mantenimiento lo antes posible y actualiza el estado del avión en el sistema.
+                        </p>
+                        <p style="font-size:14px; color:#777;">Para más detalles, contáctanos en soporte@airflowsystem.com.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color:#f0f0f0; text-align:center; padding:15px; font-size:12px; color:#888;">
+                        © ${new Date().getFullYear()} AirFlow System - Todos los derechos reservados
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        `;
+
+        // 5. Enviar correo a cada usuario de operaciones
+        let correosEnviados = 0;
+        for (const usuario of usuariosOperaciones) {
+            const info = await transport.sendMail({
+                from: `"AirFlow System" <${process.env.EMAIL_USER}>`,
+                to: usuario.correo, // Asume que el modelo IUser tiene 'correo'
+                subject: "Alerta de Mantenimiento de Avión",
+                html: htmlMensaje
+            });
+
+            console.log(`Correo de mantenimiento enviado a ${usuario.correo}:`, info.messageId);
+            correosEnviados++;
+        }
+
+        console.log(`Correos enviados a ${correosEnviados} usuarios de operaciones.`);
+        return true;
+
+    } catch (error) {
+        console.error("Error al notificar mantenimiento a operaciones:", error);
+        return false;
+    }
 }
 
 export async function enviarCorreoCancelacion({ correoDestino, nombre, reservaId, codigo_reserva }: EnviarCorreoCancelacionParams) {
