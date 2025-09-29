@@ -20,9 +20,6 @@ app.get("/api/", (req: Request, res: Response) => {
     res.send("🚀 Servidor funcionando con Singleton en la DB y patrón Repository!");
 });
 
-flotaService.initListener().catch(console.error);
-notificacionService.initListener().catch(console.error);
-
 // Rutas de usuarios
 const usuarioRoutes = new UsuarioRoutes();
 app.use("/api/users", usuarioRoutes.router);
@@ -53,6 +50,8 @@ if (process.env.NODE_ENV !== 'test') {
     const startServer = async () => {
         try {
             await connectDB();
+            await flotaService.initListener();
+            await notificacionService.initListener();
             app.listen(PORT, () => {
                 console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
             });
