@@ -30,13 +30,13 @@ jobs:
 
       - name: Contruyendo imagen y subiendo a GHCR BACKEND
         run: |
-          IMAGE=ghcr.io/${{ github.repository_owner }}/backend
+          IMAGE=ghcr.io/jleonel18/backend
           docker build -f "./Fase 3/backend/Dockerfile" -t ${IMAGE}:latest ./backend
           docker push ${IMAGE}:latest
 
       - name: Contruyendo imagen y subiendo a GHCR FRONTEND
         run: |
-          IMAGE=ghcr.io/${{ github.repository_owner }}/frontend
+          IMAGE=ghcr.io/jleonel18/frontend
           docker build -f "./Fase 3/frontend/Dockerfile" -t ${IMAGE}:latest ./frontend
           docker push ${IMAGE}:latest
 
@@ -82,14 +82,14 @@ jobs:
             set -e
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            docker pull ghcr.io/${{ github.repository_owner }}/backend:latest
-            docker pull ghcr.io/${{ github.repository_owner }}/frontend:latest
+            docker pull ghcr.io/jleonel18/backend:latest
+            docker pull ghcr.io/jleonel18/frontend:latest
 
             cat > docker-compose.yml <<'EOF'
             version: "3.9"
             services:
               backend:
-                image: ghcr.io/${{ github.repository_owner }}/backend:latest
+                image: ghcr.io/jleonel18/backend:latest
                 container_name: backend
                 restart: unless-stopped
                 ports:
@@ -100,7 +100,7 @@ jobs:
                   - proyecto_network
 
               frontend:
-                image: ghcr.io/${{ github.repository_owner }}/frontend:latest
+                image: ghcr.io/jleonel18/frontend:latest
                 container_name: frontend
                 restart: unless-stopped
                 ports:
