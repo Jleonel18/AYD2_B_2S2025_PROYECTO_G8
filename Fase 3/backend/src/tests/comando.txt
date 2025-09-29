@@ -1,0 +1,2 @@
+//Correr la prueba unitaria de login
+npm test login.test.ts
