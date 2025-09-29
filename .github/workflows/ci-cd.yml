@@ -31,13 +31,13 @@ jobs:
       - name: Contruyendo imagen y subiendo a GHCR BACKEND
         run: |
           IMAGE=ghcr.io/jleonel18/backend
-          docker build -f "./Fase 3/backend/Dockerfile" -t ${IMAGE}:latest ./backend
+          docker build -f "./Fase 3/backend/Dockerfile" -t ${IMAGE}:latest "./Fase 3/backend"
           docker push ${IMAGE}:latest
 
       - name: Contruyendo imagen y subiendo a GHCR FRONTEND
         run: |
           IMAGE=ghcr.io/jleonel18/frontend
-          docker build -f "./Fase 3/frontend/Dockerfile" -t ${IMAGE}:latest ./frontend
+          docker build -f "./Fase 3/frontend/Dockerfile" -t ${IMAGE}:latest "./Fase 3/frontend"
           docker push ${IMAGE}:latest
 
   # -----------------------
