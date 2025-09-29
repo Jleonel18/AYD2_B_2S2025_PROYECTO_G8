@@ -76,3 +76,44 @@ https://drive.google.com/file/d/10QCABLNkX7CJJrs8Sr1xbb4CoSZD8S0o/view?usp=shari
 - **Qué haré el día de hoy:** Hoy hare todas las tareas que me asignaron, que seria agregar las cosas que nos faltaron en la Fase 2, como la gestión de pasajeros de parte del administrador, la opción para cancelar la cuenta de parte del pasajero, también las notificaciones por medio de correo por cualquier cambio en el estado de la reserva y las rutas protegidas de parte del frontend.
 - **Se tiene algún de impedimento:** No, todo ha estado bien.
 
+# Daily 2:
+
+## Link de la grabación:
+
+https://drive.google.com/file/d/1j12rOzOCACAfWpDPqed-KsmWQDthTFJF/view?usp=sharing
+
+## Kanban durante el Daily:
+
+![alt text](image-5.png)
+
+## Kanban después del Daily:
+
+![alt text](image-6.png)
+
+## Captura del Meet:
+
+![alt text](image-7.png)
+
+### José Manuel López Lemus
+
+- Qué hice el día de ayer: Ayer corregí el diagrama de componentes con lo solicitado, lo envia para revision y fue aprobado
+- Qué haré el día de hoy: Hoy realizare la prueba unitaria para el apartado de Registrar Usuarios
+- Se tiene algún de impedimento: No hay ningún impedimento para poder realizar mi tarea
+
+### Franklin Orlando Noj Perez
+
+- Qué hice el día de ayer: Realice la prueba unitaria del login usando jest, los datos que utiliza la prueba son datos mockeados, por lo que mongo no se toca para nada.
+- Qué haré el día de hoy: Hoy realizare la prueba unitaria de Crear Vuelo y tambien la de Reservar Vuelo.
+- Se tiene algún de impedimento: Hasta el momento nada me impide poder seguir trabajando con mis tareas.
+
+### José David Góngora Olmedo
+
+- **Qué hice el día de ayer:** Ayer hice todos los arreglos de la fase 2, todo lo que teniamos que corregir, como la gestion de pasajeros de parte del administrador y la parte de cancelar la cuenta desde el pasajero. Tambien agregar mas notificaciones a los pasajeros por medio del correo cuando cambie el estado de su reserva y tambien agregar lo de las rutas protegidas del lado del frontend.
+- **Qué haré el día de hoy:** Hoy hare lo que es la parte de ci/cd para ya empezar a automatizar lo que es la creación de las imágenes y los test.
+- **Se tiene algún de impedimento:** No, todo ha estado bien.
+
+### José Leonel López Ajvix
+
+- **Qué hice el día de ayer:** El día de ayer se hizo la verificación para eliminar avión y pasarlo de estado en vez de eliminarlo, además de cambiar las cosas de retroalimentación
+- **Qué haré el día de hoy:** El día de hoy se aplicará la nueva arquitectura, basado en redis para el sistema asíncrono.
+- **Se tiene algún de impedimento:** Por el momento no. Todo está bien.
