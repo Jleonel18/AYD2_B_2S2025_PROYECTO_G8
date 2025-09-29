@@ -7,15 +7,9 @@ COPY package*.json ./
 # Instalar dependencias
 RUN npm install
 
-# Copiar el archivo .env explícitamente (si existe)
-COPY .env* ./
 
 # Copiar el resto del código fuente
 COPY . .
-
-# Usar ARG para VITE_API_URL en tiempo de build
-ARG VITE_API_URL
-ENV VITE_API_URL=${VITE_API_URL}
 
 # Ejecutar el build de Vite
 RUN npm run build
