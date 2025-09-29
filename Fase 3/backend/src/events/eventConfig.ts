@@ -1,6 +1,9 @@
 // eventConfig.ts
 import { createClient } from 'redis';
 
+export const publisher = createClient();
+export const subscriber = createClient({ url: 'redis://localhost:6379' });
+
 interface FlightEventData {
   flightId: string;
   newStatus: string;
@@ -13,7 +16,7 @@ interface MaintenanceEventData {
   maintenanceStatus: string;
 }
 
-const publisher = createClient();
-const subscriber = createClient();
+//const publisher = createClient();
+//const subscriber = createClient();
 
-export { publisher, subscriber, FlightEventData, MaintenanceEventData };
+export { FlightEventData, MaintenanceEventData };

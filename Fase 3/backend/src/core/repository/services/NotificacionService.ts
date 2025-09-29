@@ -1,9 +1,14 @@
-import { subscriber, FlightEventData } from '../../../events/eventConfig'; // Ajusta la ruta
+import { subscriber, FlightEventData } from '../../../events/eventConfig';
 
 export class NotificacionService {
+  private initialized = false;
+
   async initListener(): Promise<void> {
+    if (this.initialized) return; // Evita inicializaciones múltiples
     try {
-      await subscriber.connect();
+      if (!subscriber.isOpen) {
+        await subscriber.connect();
+      }
       subscriber.subscribe('estado-vuelo', (message: string) => {
         try {
           const data: FlightEventData = JSON.parse(message);
@@ -16,11 +21,14 @@ export class NotificacionService {
           console.error('Error al parsear mensaje de cambio de estado de vuelo:', parseError);
         }
       });
-    } catch (connectError) {
+      this.initialized = true;
+    } catch (connectError: any) {
       console.error('Error al conectar al subscriber para notificaciones:', connectError);
+      if (connectError.message.includes('ECONNREFUSED')) {
+        console.error('Asegúrate de que Redis esté corriendo en localhost:6379');
+      }
     }
   }
 }
 
 export const notificacionService = new NotificacionService();
-notificacionService.initListener().catch(console.error);
