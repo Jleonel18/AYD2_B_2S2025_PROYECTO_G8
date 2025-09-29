@@ -7,6 +7,8 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const ProfileUser = () => {
   const [user, setUser] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const usuarioStorage = sessionStorage.getItem("user")
+  const idUsuario = usuarioStorage ? JSON.parse(usuarioStorage).id : null;
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false); // New state for cancel confirmation modal
   const [formData, setFormData] = useState({
     nombre: "",
@@ -20,7 +22,7 @@ const ProfileUser = () => {
 
   useEffect(() => {
     if (hasToken) {
-      fetch(`${apiUrl}/users`, {
+      fetch(`${apiUrl}/users/${idUsuario}`, {
         headers: {
           Authorization: `Bearer ${sessionStorage.getItem("token")}`,
         },

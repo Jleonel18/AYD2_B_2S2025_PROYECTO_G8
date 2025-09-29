@@ -7,6 +7,7 @@ export interface IUserRepository {
     findAll(): Promise<IUser[]>;
     findPassengers(): Promise<IUser[]>;
     findWorkers(): Promise<IUser[]>;
+    findOperaciones(): Promise<IUser[]>;
     update(id: string, user: Partial<IUser>): Promise<IUser | null>;
     delete(id: string): Promise<void>;
     verifyAndSetPassword(userId: string, plainPassword: string): Promise<IUser | null>;

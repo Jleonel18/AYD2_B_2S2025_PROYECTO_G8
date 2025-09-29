@@ -34,7 +34,10 @@ const PilotView = () => {
   const fetchPilotInfo = async () => {
     const token = sessionStorage.getItem('token');
     try {
-      const response = await fetch(`${apiUrl}/users/`, {
+      let id = sessionStorage.getItem('user');
+      id = JSON.parse(id).id;
+      console.log('Fetching info for user ID:', id);
+      const response = await fetch(`${apiUrl}/users/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -63,8 +66,11 @@ const PilotView = () => {
       });
 
       if (response.ok) {
+        let id = sessionStorage.getItem('user');
+        id = JSON.parse(id).id;
+        console.log('Fetching flights for user ID:', id);
         const allFlights = await response.json();
-        const userResponse = await fetch(`${apiUrl}/users/`, {
+        const userResponse = await fetch(`${apiUrl}/users/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',

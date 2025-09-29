@@ -27,6 +27,10 @@ export class UserRepository implements IUserRepository {
         return await UserModel.find({ tipo: { $in: ['piloto', 'sobrecargo'] }, activo: true });
     }
 
+    async findOperaciones(): Promise<IUser[]> {
+        return await UserModel.find({ tipo: 'operaciones', activo: true });
+    }
+
     async update(id: string, user: Partial<IUser>): Promise<IUser | null> {
         return await UserModel.findByIdAndUpdate(id, user, { new: true });
     }
