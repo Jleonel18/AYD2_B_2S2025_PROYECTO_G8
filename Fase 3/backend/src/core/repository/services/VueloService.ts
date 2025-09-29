@@ -2,6 +2,7 @@ import { IVueloRepository } from '../repositories/IVueloRepository.js';
 import { VueloModel, IVuelo } from '../models/Vuelo.js';
 import { Types } from 'mongoose';
 import { EstadoVuelo } from '../../observer/observador.js';
+import { publisher, FlightEventData } from '../../../events/eventConfig.js';
 
 export class VueloService {
     private vueloRepository: IVueloRepository;
@@ -38,11 +39,41 @@ export class VueloService {
 
     async actualizarEstadoVuelo(id: string, nuevoEstado: string): Promise<IVuelo | null> {
         const vuelo = await this.vueloRepository.updateEstado(id, nuevoEstado);
+        if(vuelo) {
+            try{
+                await publisher.connect();
+                const eventData: FlightEventData = {
+                    flightId: vuelo._id.toString(),
+                    newStatus: nuevoEstado
+                };
+                await publisher.publish('estado-vuelo', JSON.stringify(eventData));
+            }catch(error){
+                console.error('Error al publicar el evento de estado de vuelo:', error);
+            }finally{
+                await publisher.quit();
+            }
+            
+        }
         return vuelo;
     }
 
     async cancelarVuelo(id: string): Promise<IVuelo | null> {
         const vuelo = await this.vueloRepository.cancel(id);
+        if(vuelo) {
+            try{
+                await publisher.connect();
+                const eventData: FlightEventData = {
+                    flightId: id,
+                    newStatus: EstadoVuelo.CANCELADO
+                };
+                await publisher.publish('estado-vuelo', JSON.stringify(eventData));
+            }catch(error){
+                console.error('Error al publicar el evento de estado de vuelo:', error);
+            }finally{
+                await publisher.quit();
+            }
+            
+        }
         return vuelo;
     }
 

@@ -7,6 +7,8 @@ import { VueloRoutes } from "./routes/vueloRoutes.js";
 import { AeropuertoRoutes } from "./routes/aeropuertoRoutes.js";
 import cors from "cors";
 import { ReservaRoutes } from "./routes/reservaRoutes.js";
+import { flotaService } from "./core/repository/services/FlotaService.js";
+import { notificacionService } from "./core/repository/services/NotificacionService.js";
 
 const app: Application = express();
 
@@ -48,6 +50,8 @@ if (process.env.NODE_ENV !== 'test') {
     const startServer = async () => {
         try {
             await connectDB();
+            await flotaService.initListener();
+            await notificacionService.initListener();
             app.listen(PORT, () => {
                 console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
             });

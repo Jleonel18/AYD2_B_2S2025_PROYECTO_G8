@@ -1,5 +1,6 @@
 import { IAvionRepository } from "../repositories/IAvionRepository.js";
 import { IAvion } from "../models/Avion.js";
+import { publisher, MaintenanceEventData } from '../../../events/eventConfig.js';
 
 export class AvionService {
     constructor(private avionRepository: IAvionRepository) {}
@@ -37,11 +38,28 @@ export class AvionService {
     }
     
     const avion = await this.avionRepository.findById(id);
-    if (!avion) {
-        throw new Error("Avión no encontrado");
-    }
-    
-    return await this.avionRepository.addFlightHours(id, hours);
+        if (!avion) {
+            throw new Error("Avión no encontrado");
+        }
+        const updatedAvion = await this.avionRepository.addFlightHours(id, hours);
+
+        if(updatedAvion && updatedAvion.horas_Vuelo >= updatedAvion.limite_horas) {
+            try {
+                await publisher.connect();
+                const eventData: MaintenanceEventData = {
+                    airplaneId: id,
+                    hours: updatedAvion.horas_Vuelo,
+                    limitExceeded: true,
+                    maintenanceStatus: 'Requiere Mantenimiento'
+                };
+                await publisher.publish('mantenimiento-avion', JSON.stringify(eventData));
+            } catch (error) {
+                console.error('Error al publicar el evento de mantenimiento de avión:', error);
+            } finally {
+                await publisher.quit();
+            }
+        }
+        return updatedAvion;
     } 
     
     async getEstadoAvion(id: string): Promise<string | null> {
