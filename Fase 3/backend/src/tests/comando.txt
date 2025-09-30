@@ -1,2 +1,8 @@
 //Correr la prueba unitaria de login
 npm test login.test.ts
+
+//Crear vuelo
+npm test crearVuelo.test.ts
+
+//Reservar vuelo
+npm test reservarVuelo.test.ts
