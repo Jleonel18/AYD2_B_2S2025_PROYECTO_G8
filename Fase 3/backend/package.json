@@ -5,10 +5,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "set NODE_ENV=test && jest --forceExit --detectOpenHandles",
+    "test": "set NODE_ENV=test && jest --forceExit --detectOpenHandles --verbose",
     "test:watch": "set NODE_ENV=test && jest --watch",
     "test:coverage": "set NODE_ENV=test && jest --coverage --forceExit",
-    "dev": "tsx watch src/app.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "ts-node src/app.ts",
     "start-node": "node dist/app.js"

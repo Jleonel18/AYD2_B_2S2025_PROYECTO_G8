@@ -1,14 +1,14 @@
 import "dotenv/config";
 import express, { Application, Request, Response } from "express";
-import { connectDB } from "./config/database.js";
+// import { connectDB } from "./config/database.js";
 import { UsuarioRoutes } from "./routes/usuarioRoutes.js";
 import { AvionRoutes } from "./routes/avionRoutes.js";
 import { VueloRoutes } from "./routes/vueloRoutes.js";
 import { AeropuertoRoutes } from "./routes/aeropuertoRoutes.js";
 import cors from "cors";
 import { ReservaRoutes } from "./routes/reservaRoutes.js";
-import { flotaService } from "./core/repository/services/FlotaService.js";
-import { notificacionService } from "./core/repository/services/NotificacionService.js";
+// import { flotaService } from "./core/repository/services/FlotaService.js";
+// import { notificacionService } from "./core/repository/services/NotificacionService.js";
 
 const app: Application = express();
 
@@ -41,24 +41,24 @@ const reservaRoutes = new ReservaRoutes();
 app.use("/api/reservas", reservaRoutes.router);
 
 // IMPORTANTE: Exporta la app
-export default app;
+export default app
 
 // Solo inicia el servidor si NO estamos en pruebas
-if (process.env.NODE_ENV !== 'test') {
-    const PORT = process.env.PORT || 4000;
+// if (process.env.NODE_ENV !== 'test') {
+//     const PORT = process.env.PORT || 4000;
     
-    const startServer = async () => {
-        try {
-            await connectDB();
-            await flotaService.initListener();
-            await notificacionService.initListener();
-            app.listen(PORT, () => {
-                console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
-            });
-        } catch (error) {
-            console.error("❌ No se pudo iniciar el servidor:", error);
-        }
-    };
+//     const startServer = async () => {
+//         try {
+//             await connectDB();
+//             await flotaService.initListener();
+//             await notificacionService.initListener();
+//             app.listen(PORT, () => {
+//                 console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+//             });
+//         } catch (error) {
+//             console.error("❌ No se pudo iniciar el servidor:", error);
+//         }
+//     };
     
-    startServer();
-}
+//     startServer();
+// }
