@@ -15,4 +15,5 @@ export default {
     '!src/**/*.d.ts',
     '!src/**/*.test.ts',
   ],
+  silent: true, 
 };
