@@ -117,3 +117,103 @@ https://drive.google.com/file/d/1j12rOzOCACAfWpDPqed-KsmWQDthTFJF/view?usp=shari
 - **Qué hice el día de ayer:** El día de ayer se hizo la verificación para eliminar avión y pasarlo de estado en vez de eliminarlo, además de cambiar las cosas de retroalimentación
 - **Qué haré el día de hoy:** El día de hoy se aplicará la nueva arquitectura, basado en redis para el sistema asíncrono.
 - **Se tiene algún de impedimento:** Por el momento no. Todo está bien.
+
+# Daily 3:
+
+## Link de la Grabación:
+
+https://drive.google.com/file/d/1bVoj6coGBO3aezMSJxf-g8R8msQ_igTp/view?usp=sharing
+
+## Captura del Meet:
+
+![alt text](image-8.png)
+
+## Kanban durante el Daily:
+
+![alt text](image-9.png)
+
+## Kanban al final del Daily:
+
+![alt text](image-10.png)
+
+### José Manuel López Lemus
+
+- **Qué hice el día de ayer:** Ayer realice las pruebas unitarias para el apartado de registrar usuarios todo mockeado y haciendo uso de jest
+- **Qué haré el día de hoy:** Hoy realizare las pruebas unitarias para la parte de mantenimiento, que serian los cambios de estado, igualmente todo mockeado y haciendo uso de jest
+- **Se tiene algún de impedimento:** No tengo ningún impedimento  para realizar mi tarea
+
+### José Leonel López Ajvix:
+
+- **Qué hice el día de ayer:** Ayer se realizó la arquitectura, se usó redis para la nueva arquitectura
+- **Qué haré el día de hoy:** Hoy se verificará el flujo y funcionamiento correcto de la App con la nueva arquitectura.
+- **Se tiene algún de impedimento:** No existe ningún impedimento.
+
+### José David Góngora Olmedo
+
+- **Qué hice el día de ayer:** Hice la implementación del ci/cd para la parte del build para que se creen las imágenes de los contenedores
+- **Qué haré el día de hoy:** Hoy hare lo que es la parte de ci/cd pero la integración con los test que hicieron mis compañeros para que así pueda pasar por las etapas necesarias
+- **Se tiene algún de impedimento:** No, todo ha estado bien.
+
+### Franklin Orlando Noj Perez
+
+- **Qué hice el día de ayer:** Realice la prueba unitaria de crear vuelo y el de reservar vuelo usando jest, los datos que utiliza la prueba son datos mockeados, por lo que mongo no se toca para nada.
+- **Qué haré el día de hoy:** Revisare las pruebas unitarias anteriormente realizadas para asegurarme de su correcta implementacion.
+- **Se tiene algún de impedimento:** Hasta el momento nada me impide poder seguir trabajando con mis tareas.
+
+# Sprint Retrospective:
+
+## Link de la Grabación:
+
+https://drive.google.com/file/d/1-1HjUwjWZ6IxcMBrJbIyjZrAeCf-5YvT/view?usp=sharing
+
+## Captura del Meet:
+
+![alt text](image-11.png)
+
+## Kanban al final del sprint:
+
+![alt text](image-12.png)
+
+### José Manuel López Lemus:
+
+- **¿Qué se hizo bien durante el Sprint?:** Mejoramos demasiado comparando el sprint anterior, estamos mas coordinados, realizando las tareas a la brevedad, lo cual nos da tiempo de probar y dejar todo al 100%
+- **¿Qué se hizo mal durante el Sprint?:** Seguimos teniendo problemas con la puntualidad, pero es debido a que todos tenemos mas compromisos y es dificultoso establecer un horario fijo donde todos podamos estar
+- **¿Qué mejoras se deben implementar para el próximo sprint?:** Abarcar mas tareas, las tareas abarcadas son muy cortas, lo cual se terminan en poco tiempo, se podria dar pasos más largos
+
+### José David Góngora Olmedo:
+
+- **¿Qué se hizo bien durante el Sprint?** Siento que este Sprint todo se hizo bien, logramos tener un kanban mas ordenado y con tareas especificas para que entendiéramos bien que nos correspondía hacer.
+- **¿Qué se hizo mal durante el Sprint?** Siento que todo se hizo bien en este sprint ya que todo fue mejoras a comparación de los anteriores entonces pues todo bien.
+- **¿Qué mejoras se deben implementar para el próximo sprint?** Como dije antes desde mi punto de vista todo se hizo bien logramos mejorar en muchos aspectos entonces lo único pues seria que siguiéramos así para sentir todo mas tranquilo y lograr terminar de mejor manera.
+
+### Franklin Orlando Noj Perez:
+
+- ¿**Qué se hizo bien durante el Sprint?** Todo estuvo muy bien organizado, con tareas bien especificadas y siempre hubo comunicacion efectiva
+- **¿Qué se hizo mal durante el Sprint?** A mi criterio no tengo ninguna observacion sobre algo que se haya hecho mal.
+- **¿Qué mejoras se deben implementar para el próximo sprint?** Creo que solo recomendar que se siga trabajando como se trabajo en este primer sprint para terminar todo a tiempo.
+
+### José Leonel López Ajvix:
+
+- **¿Qué se hizo bien durante el Sprint?:** Se mejoró mucho el tema de la puntualidad, el límite para las tareas y el trabajo en equipo.
+- **¿Qué se hizo mal durante el Sprint?** En mi opinión siento que no hubo algún punto debil, en este Sprint se trabajó de una buena manera todo
+- **¿Qué mejoras se deben implementar para el próximo sprint?** Seguir trabajando de la misma manera.
+
+| ID | Story Points | Finalizado | Justificación |
+| --- | --- | --- | --- |
+| 1 | 2 | Sí |  |
+| 2 | 2 | Sí |  |
+| 3 | 3 | Sí |  |
+| 4 | 3 | Sí |  |
+| 5 | 5 | Sí |  |
+| 6 | 5 | Sí |  |
+| 7 | 8 | Sí |  |
+| 8 | 5 | Sí |  |
+| 9 | 5 | Sí |  |
+| 10 | 8 | Sí |  |
+| 11 | 3 | Sí |  |
+| 12 | 5 | Sí |  |
+| 13 | 5 | Sí |  |
+| 14 | 8 | Sí |  |
+| 15 | 5 | Sí |  |
+
+**Total: 72 Story Points**
