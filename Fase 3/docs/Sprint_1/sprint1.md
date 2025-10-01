@@ -138,6 +138,7 @@ https://drive.google.com/file/d/1bVoj6coGBO3aezMSJxf-g8R8msQ_igTp/view?usp=shari
 
 ### José Manuel López Lemus
 
+
 - **Qué hice el día de ayer:** Ayer realice las pruebas unitarias para el apartado de registrar usuarios todo mockeado y haciendo uso de jest
 - **Qué haré el día de hoy:** Hoy realizare las pruebas unitarias para la parte de mantenimiento, que serian los cambios de estado, igualmente todo mockeado y haciendo uso de jest
 - **Se tiene algún de impedimento:** No tengo ningún impedimento  para realizar mi tarea
