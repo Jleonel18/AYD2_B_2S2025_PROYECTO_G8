@@ -31,7 +31,7 @@ const Sidebar = () => {
             `text-white block ${isActive ? 'bg-[#7F8CAA]' : ''}`
           }
         >
-          <li className="px-4 py-2 hover:bg-[#7F8CAA]">
+          <li data-cy="sidebar-vuelos" className="px-4 py-2 hover:bg-[#7F8CAA]">
             Vuelos
           </li>
         </NavLink>
