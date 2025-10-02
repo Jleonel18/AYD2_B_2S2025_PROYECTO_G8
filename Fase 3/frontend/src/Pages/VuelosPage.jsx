@@ -274,7 +274,7 @@ const VuelosPage = () => {
       <div className="flex flex-col mb-6">
         <div className='flex justify-between'>
           <h1 className="text-3xl font-bold text-gray-800">Lista de Vuelos</h1>
-          <button onClick={() => setShowForm(true)} className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+          <button onClick={() => setShowForm(true)} data-cy="open-vuelo-button" className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
             + Nuevo Vuelo
           </button>
         </div>
@@ -329,7 +329,7 @@ const VuelosPage = () => {
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Nuevo Vuelo</h2>
             {errorMessage && (
               <div className="mb-4 p-4 bg-yellow-50 text-yellow-700 border border-yellow-200 rounded-lg flex justify-between items-center">
-                <span>{errorMessage}</span>
+                <span data-cy="error-message">{errorMessage}</span>
                 <button
                   onClick={() => setErrorMessage('')}
                   className="ml-4 text-yellow-700 hover:text-yellow-900"
@@ -467,7 +467,7 @@ const VuelosPage = () => {
                           onChange={(e) => handleSobrecargoChange(index, e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                          <option value="">Selecciona un sobrecargo</option>
+                          <option data-cy="select-sobrecargo" value="">Selecciona un sobrecargo</option>
                           {availableCrew.map((crew) => (
                             <option key={crew._id} value={crew._id}>
                               {crew.nombre}
