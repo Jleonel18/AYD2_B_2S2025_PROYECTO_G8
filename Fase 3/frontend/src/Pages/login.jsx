@@ -129,6 +129,7 @@ const Login = () => {
           <button
             className="w-full bg-[#333446] text-white p-2 rounded hover:bg-[#7F8CAA] transition"
             onClick={handleLogin}
+            data-cy="login-button"
           >
             Iniciar sesión
           </button>
