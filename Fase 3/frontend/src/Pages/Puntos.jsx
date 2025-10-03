@@ -21,11 +21,12 @@ const Puntos = () => {
     const fetchData = async () => {
       try {
         const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+        const id = JSON.parse(sessionStorage.getItem('user')).id;
         if (!token) {
           throw new Error('No se encontró el token de autenticación');
         }
 
-        const userResponse = await fetch(`${apiUrl}/users`, {
+        const userResponse = await fetch(`${apiUrl}/users/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!userResponse.ok) {
