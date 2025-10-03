@@ -128,7 +128,6 @@ jobs:
 
             networks:
               proyecto_network:
-                driver: bridge
             EOF
 
             docker compose down || true
