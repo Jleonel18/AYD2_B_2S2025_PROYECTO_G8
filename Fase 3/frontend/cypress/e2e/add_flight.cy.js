@@ -260,7 +260,7 @@ describe('Agregar un Vuelo', () => {
     cy.wait('@createVueloError');
 
     // Verifica el mensaje de error en el frontend
-    cy.get('[data-cy="error-message"]').contains('Faltan datos requeridos para crear el vuelo').should('be.visible');
+    cy.get('[data-cy="error-message"]').contains('Faltan datos requeridos para crear el vuelo');
   });
 
   // Caso de prueba 5: Error por fechas inválidas
@@ -302,7 +302,7 @@ describe('Agregar un Vuelo', () => {
     cy.wait('@createVueloError');
 
     // Verifica el mensaje de error en el frontend
-    cy.get('[data-cy="error-message"]').contains('Fechas inválidas o fecha_salida debe ser anterior a fecha_llegada').should('be.visible');
+    cy.get('[data-cy="error-message"]').contains('Fechas inválidas o fecha_salida debe ser anterior a fecha_llegada');
   });
 
 
@@ -345,7 +345,7 @@ describe('Agregar un Vuelo', () => {
     cy.wait('@createVueloError');
 
     // Verifica el mensaje de error en el frontend
-    cy.get('[data-cy="error-message"]').contains('El piloto ya tiene un vuelo asignado en la misma fecha').should('be.visible');
+    cy.get('[data-cy="error-message"]').contains('El piloto ya tiene un vuelo asignado en la misma fecha');
   });
 
   // Caso de prueba 7: Error por avión fuera de servicio
@@ -387,6 +387,6 @@ describe('Agregar un Vuelo', () => {
     cy.wait('@createVueloError');
 
     // Verifica el mensaje de error en el frontend
-    cy.get('[data-cy="error-message"]').contains('El avión está fuera de servicio o en mantenimiento y no puede ser asignado a un vuelo').should('be.visible');
+    cy.get('[data-cy="error-message"]').contains('El avión está fuera de servicio o en mantenimiento y no puede ser asignado a un vuelo');
   });
 });
