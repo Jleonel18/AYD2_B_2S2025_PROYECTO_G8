@@ -17,6 +17,8 @@ jobs:
   # -----------------------
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_API_URL: ${{ github.ref == 'refs/heads/main' && 'http://48.217.184.85:3000/api' || 'http://localhost:3000/api' }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -72,7 +74,7 @@ jobs:
     # if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy a VM en Azure
-        uses: appleboy/ssh-action@v1.6.0
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
