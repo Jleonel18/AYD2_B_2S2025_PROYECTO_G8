@@ -11,7 +11,7 @@ RUN npm install
 COPY . .
 
 # Inyectar VITE_API_URL durante el build
-ARG VITE_API_URL=http://backend:3000/api
+ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
 # Ejecutar el build de Vite
