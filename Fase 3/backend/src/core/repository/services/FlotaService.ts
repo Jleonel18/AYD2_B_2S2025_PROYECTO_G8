@@ -1,7 +1,7 @@
-import { subscriber, MaintenanceEventData } from '../../../events/eventConfig';
-import { notificarMantenimientoAAllOperaciones } from '../../../utils/send_email';
-import { UserRepository } from '../repositories/UserRepository';
-import { AvionRepository } from '../repositories/AvionRepository';
+import { subscriber, MaintenanceEventData } from '../../../events/eventConfig.js';
+import { notificarMantenimientoAAllOperaciones } from '../../../utils/send_email.js';
+import { UserRepository } from '../repositories/UserRepository.js';
+import { AvionRepository } from '../repositories/AvionRepository.js';
 
 export class FlotaService {
   private userRepository: UserRepository;

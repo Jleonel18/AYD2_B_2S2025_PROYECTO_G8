@@ -2,7 +2,7 @@
 import { createClient } from 'redis';
 
 export const publisher = createClient();
-export const subscriber = createClient({ url: 'redis://localhost:6379' });
+export const subscriber = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
 
 interface FlightEventData {
   flightId: string;
