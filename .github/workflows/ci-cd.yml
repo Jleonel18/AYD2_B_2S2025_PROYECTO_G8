@@ -69,7 +69,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
     steps:
       - name: Deploy a VM en Azure
         uses: appleboy/ssh-action@v1.6.0
@@ -110,8 +110,8 @@ jobs:
                 restart: unless-stopped
                 ports:
                   - "8080:8080"
-                env_file:
-                  - .env.frontend
+                environment:
+                  - VITE_API_URL=http://localhost:3000/api
                 networks:
                   - proyecto_network
                 depends_on:
