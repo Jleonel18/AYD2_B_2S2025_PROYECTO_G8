@@ -24,7 +24,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - VITE_API_URL=http://localhost:3000/api
+      - VITE_API_URL=http://48.217.184.85:3000/api
     networks:
       - proyecto_network
     depends_on:
