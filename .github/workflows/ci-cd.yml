@@ -18,7 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      VITE_API_URL: ${{ github.ref == 'refs/heads/main' && 'http://48.217.184.85:3000/api' || 'http://localhost:3000/api' }}
+      VITE_API_URL: ${{ github.ref == 'refs/heads/main' && 'http://48.217.184.85:3000/api' || 'http://48.217.184.85:3000/api' }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -132,5 +132,5 @@ jobs:
               proyecto_network:
             EOF
 
-            docker compose down || true
-            docker compose up -d --remove-orphans
+            docker-compose down || true
+            docker-compose up -d --remove-orphans
