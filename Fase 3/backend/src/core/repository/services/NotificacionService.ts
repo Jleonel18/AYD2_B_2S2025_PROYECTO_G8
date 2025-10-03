@@ -1,4 +1,4 @@
-import { subscriber, FlightEventData } from '../../../events/eventConfig';
+import { subscriber, FlightEventData } from '../../../events/eventConfig.js';
 
 export class NotificacionService {
   private initialized = false;
