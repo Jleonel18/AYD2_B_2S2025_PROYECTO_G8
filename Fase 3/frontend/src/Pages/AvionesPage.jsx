@@ -209,6 +209,7 @@ const AvionesPage = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Gestión de Aviones</h1>
         <button
+          data-cy="nuevo-avion-button"
           onClick={() => setShowCreateForm(true)}
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
         >
@@ -506,6 +507,8 @@ const AvionesPage = () => {
                 </label>
                 <select
                   value={editingAvion.estado}
+                  name="estado"
+                  data-cy="select-estado"
                   onChange={(e) => setEditingAvion({ ...editingAvion, estado: e.target.value })}
                   className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                 >
