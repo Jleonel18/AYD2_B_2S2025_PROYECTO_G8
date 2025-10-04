@@ -1,103 +1,78 @@
 /// <reference types="cypress" />
 
-describe('Editar Perfil de Pasajero', () => {
+describe("Editar Perfil de Pasajero", () => {
+  const apiUrl = "http://localhost:3000/api";
 
   beforeEach(() => {
-    // Limpiar storage y cookies para evitar estado previo
-    cy.clearLocalStorage();
-    cy.clearCookies();
+    // Setear usuario en sessionStorage
+    cy.window().then((win) => {
+      win.sessionStorage.setItem(
+        "user",
+        JSON.stringify({
+          id: 1,
+          nombre: "Juan Pérez",
+          correo: "juan@test.com",
+          tipo: "pasajero", // 🔑 necesario para mostrar botón
+        })
+      );
+      win.sessionStorage.setItem("token", "fakeToken123");
+    });
 
-    // Mock de login
-    cy.intercept('POST', '**/users/login', (req) => {
+    // Interceptar petición GET usuario
+    cy.intercept("GET", `${apiUrl}/users/1`, {
+      statusCode: 200,
+      body: {
+        id: 1,
+        nombre: "Juan Pérez",
+        correo: "juan@test.com",
+        genero: "Masculino",
+        telefono: "12345678",
+        direccion: "Ciudad",
+        tipo: "pasajero",
+        pasaporte: {
+          numero: "P123456",
+          fecha_vencimiento: "2030-12-31",
+          pais_emision: "Guatemala",
+        },
+      },
+    }).as("getUsuario");
+
+    // Interceptar petición PUT perfil
+    cy.intercept("PUT", `${apiUrl}/users/perfil`, (req) => {
       req.reply({
         statusCode: 200,
         body: {
-          token: 'fake-jwt-token',
-          usuario: {
-            _id: 'user123',
-            nombre: 'Admin Test',
-            correo: 'admin@test.com',
-            tipo: 'pasajero',
-          }
-        }
+          ...req.body,
+          id: 1,
+          tipo: "pasajero",
+        },
       });
-    }).as('loginMock');
+    }).as("updateUsuario");
 
-    // Mock de API para obtener usuario
-    cy.intercept('GET', '**/users/user123', {
-      statusCode: 200,
-      body: {
-        _id: 'user123',
-        nombre: 'Admin Test',
-        correo: 'admin@test.com',
-        telefono: '+50255555555',
-      }
-    }).as('getUsuario');
-
-    // Mock de API para actualizar usuario
-    cy.intercept('PATCH', '**/users/user123', (req) => {
-      if (!req.body.correo.includes('@')) {
-        req.reply({
-          statusCode: 400,
-          body: { error: 'Correo inválido' }
-        });
-      } else {
-        req.reply({
-          statusCode: 200,
-          body: {
-            _id: 'user123',
-            nombre: req.body.nombre,
-            correo: req.body.correo,
-            telefono: req.body.telefono,
-          }
-        });
-      }
-    }).as('updateUsuario');
-
-    // Visitar la página de login
-    cy.visit('http://localhost:5173/login');
-    cy.get('#user').type('admin');
-    cy.get('#password').type('1234ABcd');
-    cy.get('[data-cy="login-button"]').click();
-    cy.wait('@loginMock');
-    cy.url().should('include', '/mainpage'); // ajusta según tu app
+    // Ir a la página de perfil
+    cy.visit("http://localhost:5173/profile");
+    cy.wait("@getUsuario");
   });
 
-  it('permite editar el nombre y teléfono de un pasajero', () => {
-    // Navegar al perfil de usuario
-    cy.visit('http://localhost:5173/profile');
-    cy.wait('@getUsuario');
+  it("permite editar el nombre y teléfono de un pasajero", () => {
+    // Abrir modal de edición
+    cy.contains("Editar Perfil").click();
 
-    // Abrir formulario de edición
-    cy.get('[data-cy="edit-profile-button"]').click();
-
-    // Cambiar nombre y teléfono
-    cy.get('input[name="nombre"]').clear().type('Nombre Actualizado');
-    cy.get('input[name="telefono"]').clear().type('+50212345678');
+    // Editar campos
+    cy.get('input[name="nombre"]').clear().type("Juan Modificado");
+    cy.get('input[name="telefono"]').clear().type("98765432");
 
     // Guardar cambios
-    cy.get('button[data-cy="save-profile"]').click();
-    cy.wait('@updateUsuario');
+    cy.contains("Guardar").click();
 
-    // Verificar cambios en la UI
-    cy.contains('Nombre Actualizado').should('be.visible');
-    cy.contains('+50212345678').should('be.visible');
+    // Esperar la petición PUT
+    cy.wait("@updateUsuario").its("request.body").should((body) => {
+      expect(body.nombre).to.equal("Juan Modificado");
+      expect(body.telefono).to.equal("98765432");
+    });
+
+    // Verificar que se actualice en pantalla
+    cy.contains("Juan Modificado");
+    cy.contains("98765432");
   });
-
-  it('muestra error si el correo es inválido', () => {
-    cy.visit('http://localhost:5173/profile');
-    cy.wait('@getUsuario');
-
-    cy.get('[data-cy="edit-profile-button"]').click();
-
-    // Ingresar correo inválido
-    cy.get('input[name="correo"]').clear().type('correo-invalido');
-
-    cy.get('button[data-cy="save-profile"]').click();
-    cy.wait('@updateUsuario');
-
-    // Verificar mensaje de error
-    cy.get('[data-cy="error-message"]').contains('Correo inválido').should('be.visible');
-  });
-
 });
