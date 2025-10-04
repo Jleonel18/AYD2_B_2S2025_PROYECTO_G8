@@ -126,6 +126,7 @@ const NavbarComponent = () => {
                 <div className="absolute right-0 mt-2 w-48 bg-[#333446] rounded-lg shadow-lg z-50">
                   <NavLink
                     to="/profile"
+                    data-cy="profile-link"
                     end
                     className={({ isActive }) => {
                       console.log('NavLink /profile isActive:', isActive);

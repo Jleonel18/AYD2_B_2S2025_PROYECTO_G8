@@ -7,9 +7,9 @@ const apiUrl = import.meta.env.VITE_API_URL;
 const ProfileUser = () => {
   const [user, setUser] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const usuarioStorage = sessionStorage.getItem("user")
+  const usuarioStorage = sessionStorage.getItem("user");
   const idUsuario = usuarioStorage ? JSON.parse(usuarioStorage).id : null;
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false); // New state for cancel confirmation modal
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     nombre: "",
     correo: "",
@@ -143,7 +143,7 @@ const ProfileUser = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-        }
+        },
       })
         .then((response) => {
           if (response.ok) {
@@ -194,10 +194,10 @@ const ProfileUser = () => {
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2 mt-2">
-              <div className="bg-[#B8CFCE] h-8 flex items-center px-2">
+              <div data-cy="nombre-display" className="bg-[#B8CFCE] h-8 flex items-center px-2">
                 {user.nombre || "No especificado"}
               </div>
-              <div className="bg-[#B8CFCE] h-8 flex items-center px-2">
+              <div data-cy="correo-display" className="bg-[#B8CFCE] h-8 flex items-center px-2">
                 {user.correo || "No especificado"}
               </div>
             </div>
@@ -212,10 +212,10 @@ const ProfileUser = () => {
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2 mt-2">
-              <div className="bg-[#B8CFCE] h-8 flex items-center px-2">
+              <div data-cy="fecha-nacimiento-display" className="bg-[#B8CFCE] h-8 flex items-center px-2">
                 {formatDate(user.fecha_nacimiento) || "No especificada"}
               </div>
-              <div className="bg-[#B8CFCE] h-8 flex items-center px-2">
+              <div data-cy="genero-display" className="bg-[#B8CFCE] h-8 flex items-center px-2">
                 {user.genero || "No especificado"}
               </div>
             </div>
@@ -231,10 +231,10 @@ const ProfileUser = () => {
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                <div className="bg-[#B8CFCE] h-8 flex items-center px-2">
+                <div data-cy="pasaporte-numero" className="bg-[#B8CFCE] h-8 flex items-center px-2">
                   {user.pasaporte?.numero || "No especificado"}
                 </div>
-                <div className="bg-[#B8CFCE] h-8 flex items-center px-2">
+                <div data-cy="pasaporte-fecha-vencimiento-display" className="bg-[#B8CFCE] h-8 flex items-center px-2">
                   {formatDate(user.pasaporte?.fecha_vencimiento) || "No especificado"}
                 </div>
               </div>
@@ -247,10 +247,10 @@ const ProfileUser = () => {
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                <div className="bg-[#B8CFCE] h-8 flex items-center px-2">
+                <div data-cy="pasaporte-pais-emision-display" className="bg-[#B8CFCE] h-8 flex items-center px-2">
                   {user.pasaporte?.pais_emision || "No especificado"}
                 </div>
-                <div className="bg-[#B8CFCE] h-8 flex items-center px-2">
+                <div data-cy="telefono-display" className="bg-[#B8CFCE] h-8 flex items-center px-2">
                   {user.telefono || "No especificado"}
                 </div>
               </div>
@@ -291,7 +291,7 @@ const ProfileUser = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-4 text-[#333446]">
               Actualizar Perfil
             </h2>
@@ -432,6 +432,7 @@ const ProfileUser = () => {
                   Cancelar
                 </button>
                 <button
+                  data-cy="save-profile-button"
                   type="submit"
                   className="bg-[#7F8CAA] text-white px-4 py-2 rounded hover:bg-[#B8CFCE] transition"
                 >
@@ -445,7 +446,7 @@ const ProfileUser = () => {
 
       {isCancelModalOpen && (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
+          <div className="bg-white p-6 rounded-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-4 text-[#333446]">
               Confirmar Cancelación de Cuenta
             </h2>
