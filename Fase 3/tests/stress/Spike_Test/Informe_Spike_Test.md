@@ -59,6 +59,7 @@ Se usarán los siguientes escenarios:
 
 ![alt text](image.png)
 
+
 **Análisis**:
 
 - **Carga Base (50 usuarios)**: Estable con RT P95 ~320ms (login), ~100ms (vuelos), 0% errores, RPS ~20, similar a Carga Moderada.
