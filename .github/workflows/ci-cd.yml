@@ -39,7 +39,7 @@ jobs:
       - name: Contruyendo imagen y subiendo a Docker Hub FRONTEND
         run: |
           IMAGE=docker.io/${{ secrets.DOCKERHUB_USERNAME }}/frontend
-          docker build -f "./Fase 3/frontend/Dockerfile" -t ${IMAGE}:latest --build-arg VITE_API_URL=http://localhost:3000/api "./Fase 3/frontend"
+          docker build -f "./Fase 3/frontend/Dockerfile" -t ${IMAGE}:latest --build-arg VITE_API_URL=http://172.174.210.25:3000/api "./Fase 3/frontend"
           docker push ${IMAGE}:latest
 
   # -----------------------
