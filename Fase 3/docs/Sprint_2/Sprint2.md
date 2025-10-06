@@ -150,3 +150,58 @@ https://drive.google.com/file/d/15meP68BGGxDvYcag56atyXAbCNJTs2IP/view?usp=drive
 - Qué haré el día de hoy: Lo que se hará el día de hoy es trabajar la prueba de estrés clásico con Locust.
 - Se tiene algún de impedimento: No, todo está bien por el momento.
 
+### José Manuel López Lemus
+
+- Qué hice el día de ayer: Ayer realice las correciones de la prueba E2E y ahora si esta correctamente
+- Qué haré el día de hoy: Hoy realizare la prueba de estrés o bien soak test que también se le conoce como prueba de remojo
+- Se tiene algún de impedimento: No tengo ningún impedimento para realizar la tarea.
+
+# Sprint Retrospective:
+
+## Link de la Grabación:
+
+https://drive.google.com/file/d/1YvutMEG6N_bg1nQLEMbkpz1oX2zxrtT-/view?usp=sharing
+
+## Captura del Meet:
+
+![alt text](image-11.png)
+
+## Kanban al Final del Sprint:
+
+![alt text](image-12.png)
+
+### José Leonel López Ajvix:
+
+- **¿Qué se hizo bien durante el sprint a nivel arquitectónico?:** Este sprint se logró mantener una buena arquitectura como ibamos trabajando. Se logró completar y ver las pruebas a nivel arquitectónico, probando el flujo en las pruebas E2E.
+- **¿Qué se hizo mal durante el sprint a nivel arquitectónico?:** Este sprint se vio afectado por el uso de una máquina virtual gratis. Esto hacía que hubiera problemas al levantar la máquina virtual y mantener una consistencia de datos. Sin embargo, se logró trabajar bien.
+- **¿Qué mejoras arquitectónicas se deben mejorar para el próximo sprint?:** Se debe mejorar la consistencia de la máquina virtual, ver como se puede mejorar el uso de la capa gratuita en el proveedor de Hosts.
+
+### José David Góngora Olmedo:
+
+- **¿Qué se hizo bien durante el sprint a nivel arquitectónico?:** Durante el sprint, logramos mantener la estructura de capas en la aplicación, lo que facilitó integrar nuevas funcionalidades.
+- **¿Qué se hizo mal durante el sprint a nivel arquitectónico?:** Faltó documentar algunos endpoints y la comunicación entre servicios, lo que complicó algunas cosas.
+- **¿Qué mejoras arquitectónicas se deben mejorar para el próximo sprint?:** Para el próximo sprint, planeamos documentar mejor los endpoints y establecer convenciones claras de codificación
+
+### José Manuel López Lemus
+
+- **¿Qué se hizo bien durante el sprint a nivel arquitectónico?:** Durante el sprint, arquitectonicamente hablando, hubo mucho apoyo por parte del equipo en investigar la manera adecuada de implementar las nuevas tecnologías
+- **¿Qué se hizo mal durante el sprint a nivel arquitectónico?:** Es complejo saber en que se falló, debido a que realizamos las implementaciones en base a lo que investigamos, y aún no sabemos si como lo trabajamos es la manera adecuada.
+- **¿Qué mejoras arquitectónicas se deben mejorar para el próximo sprint?:** Acesorarnos más o indagar más en las tecnologias a utilizar para saber si son las mejores opciones en base a la estructura del proyecto
+
+| ID | Story Points | Finalizado | Justificación |
+| --- | --- | --- | --- |
+| 1 | 3 | Sí |  |
+| 2 | 5 | Sí |  |
+| 3 | 3 | Sí |  |
+| 4 | 3 | Sí |  |
+| 5 | 5 | Sí |  |
+| 6 | 5 | Sí |  |
+| 7 | 2 | Sí |  |
+| 8 | 3 | Sí |  |
+| 9 | 5 | Sí |  |
+| 10 | 5 | Sí |  |
+| 11 | 3 | Sí |  |
+
+**Total:** 42 Story Points.
+
+
