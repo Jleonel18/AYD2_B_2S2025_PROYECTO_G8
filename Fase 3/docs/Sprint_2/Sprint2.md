@@ -182,6 +182,12 @@ https://drive.google.com/file/d/1YvutMEG6N_bg1nQLEMbkpz1oX2zxrtT-/view?usp=shari
 - **¿Qué se hizo mal durante el sprint a nivel arquitectónico?:** Faltó documentar algunos endpoints y la comunicación entre servicios, lo que complicó algunas cosas.
 - **¿Qué mejoras arquitectónicas se deben mejorar para el próximo sprint?:** Para el próximo sprint, planeamos documentar mejor los endpoints y establecer convenciones claras de codificación
 
+### Franklin Orlando Noj Perez
+
+- **¿Qué se realizó correctamente durante el sprint a nivel arquitectónico?:** En este sprint conseguimos preservar la organización por capas dentro de la aplicación, lo que permitió incorporar nuevas funcionalidades de forma ordenada y eficiente.
+- **¿Qué aspectos se manejaron de forma deficiente durante el sprint a nivel arquitectónico?:** No se registraron adecuadamente algunos endpoints ni se detalló del todo la comunicación entre servicios, lo que generó ciertas dificultades.
+- **¿Qué ajustes arquitectónicos se deben implementar en el próximo sprint?:** En el siguiente sprint se buscará mejorar la documentación de los endpoints y definir normas claras de codificación para todo el equipo.
+
 ### José Manuel López Lemus
 
 - **¿Qué se hizo bien durante el sprint a nivel arquitectónico?:** Durante el sprint, arquitectonicamente hablando, hubo mucho apoyo por parte del equipo en investigar la manera adecuada de implementar las nuevas tecnologías
