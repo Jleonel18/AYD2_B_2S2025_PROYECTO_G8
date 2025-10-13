@@ -6,3 +6,6 @@ npm test crearVuelo.test.ts
 
 //Reservar vuelo
 npm test reservarVuelo.test.ts
+
+//Fidelizacion
+npm test integracionFidelizacion.test.ts
