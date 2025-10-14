@@ -1,7 +1,7 @@
 // eventConfig.ts
 import { createClient } from 'redis';
 
-export const publisher = createClient();
+export const publisher = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
 export const subscriber = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
 
 interface FlightEventData {
