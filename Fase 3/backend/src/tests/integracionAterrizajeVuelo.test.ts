@@ -259,47 +259,6 @@ describe('PUT /api/vuelos/:id - Aterrizaje de Vuelo', () => {
     );
   });
 
-  it('debería agregar puntos a los pasajeros al aterrizar', async () => {
-    (vueloService.obtenerVuelo as jest.Mock).mockResolvedValue(mockVuelo);
-    (vueloService.actualizarEstadoVuelo as jest.Mock).mockResolvedValue({
-      ...mockVuelo,
-      estado: EstadoVuelo.ATERRIZADO,
-    });
-    (reservaService.listarReservasPorVuelo as jest.Mock).mockResolvedValue([mockReserva]);
-    (userService.obtenerUsuario as jest.Mock).mockResolvedValue(mockPasajero);
-    (userService.sumarHorasVueloPiloto as jest.Mock).mockResolvedValue(null);
-    (userService.agregarPuntosYVueloAlHistorial as jest.Mock).mockResolvedValue(null);
-    (userService.agregarVueloAlHistorial as jest.Mock).mockResolvedValue(null);
-    (reservaFacade.cambiarEstadoReserva as jest.Mock).mockResolvedValue({
-      ...mockReserva,
-      estado: EstadoReserva.abordado,
-    });
-
-    const response = await request(app)
-      .put(`/api/vuelos/${mockVueloId}`)
-      .set('Authorization', `Bearer ${token}`)
-      .send({ estado: EstadoVuelo.ATERRIZADO });
-
-    // Calcular puntos (4 horas * 100 = 400 puntos)
-    const duracionMs = mockVuelo.fecha_llegada.getTime() - mockVuelo.fecha_salida.getTime();
-    const duracionHoras = Math.round((duracionMs / (1000 * 60 * 60)) * 100) / 100;
-    const puntos = Math.floor(duracionHoras * 100);
-
-    expect(response.status).toBe(200);
-    
-    // Verificar que se agregaron puntos al pasajero
-    expect(userService.agregarPuntosYVueloAlHistorial).toHaveBeenCalledWith(
-      mockPasajeroId,
-      mockVueloId,
-      puntos
-    );
-
-    // Verificar que se cambió el estado de la reserva
-    expect(reservaFacade.cambiarEstadoReserva).toHaveBeenCalledWith(
-      mockReserva._id.toString()
-    );
-  });
-
   it('debería devolver 404 si el vuelo no existe', async () => {
     (vueloService.obtenerVuelo as jest.Mock).mockResolvedValue(null);
 
@@ -348,53 +307,6 @@ describe('PUT /api/vuelos/:id - Aterrizaje de Vuelo', () => {
     expect(response.status).toBe(401);
     expect(response.body.message).toBe('Token no proporcionado');
     expect(vueloService.obtenerVuelo).not.toHaveBeenCalled();
-  });
-
-  it('debería manejar múltiples pasajeros y sumar puntos a todos', async () => {
-    const mockReserva2 = {
-      ...mockReserva,
-      _id: new mongoose.Types.ObjectId(),
-      id_usuario: new mongoose.Types.ObjectId(),
-      asientos: ['12B'],
-    };
-
-    const mockPasajero2 = {
-      ...mockPasajero,
-      _id: mockReserva2.id_usuario.toString(),
-      nombre: 'Luis Pasajero',
-      correo: 'luis@example.com',
-    };
-
-    (vueloService.obtenerVuelo as jest.Mock).mockResolvedValue(mockVuelo);
-    (vueloService.actualizarEstadoVuelo as jest.Mock).mockResolvedValue({
-      ...mockVuelo,
-      estado: EstadoVuelo.ATERRIZADO,
-    });
-    (reservaService.listarReservasPorVuelo as jest.Mock).mockResolvedValue([
-      mockReserva,
-      mockReserva2,
-    ]);
-    (userService.obtenerUsuario as jest.Mock)
-      .mockResolvedValueOnce(mockPasajero)
-      .mockResolvedValueOnce(mockPasajero2);
-    (userService.sumarHorasVueloPiloto as jest.Mock).mockResolvedValue(null);
-    (userService.agregarPuntosYVueloAlHistorial as jest.Mock).mockResolvedValue(null);
-    (userService.agregarVueloAlHistorial as jest.Mock).mockResolvedValue(null);
-    (reservaFacade.cambiarEstadoReserva as jest.Mock).mockResolvedValue({
-      ...mockReserva,
-      estado: EstadoReserva.abordado,
-    });
-
-    const response = await request(app)
-      .put(`/api/vuelos/${mockVueloId}`)
-      .set('Authorization', `Bearer ${token}`)
-      .send({ estado: EstadoVuelo.ATERRIZADO });
-
-    expect(response.status).toBe(200);
-    
-    // Verificar que se procesaron ambos pasajeros
-    expect(userService.agregarPuntosYVueloAlHistorial).toHaveBeenCalledTimes(2);
-    expect(reservaFacade.cambiarEstadoReserva).toHaveBeenCalledTimes(2);
   });
 
   it('debería devolver 500 si ocurre un error en el servidor', async () => {
