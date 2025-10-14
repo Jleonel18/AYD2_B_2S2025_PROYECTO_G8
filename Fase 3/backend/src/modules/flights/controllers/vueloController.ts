@@ -221,12 +221,12 @@ actualizarEstadoVuelo = async (req: Request, res: Response) => {
 
       for (const reserva of reservas) {
         await this.userService.agregarPuntosYVueloAlHistorial(reserva.id_usuario.toString(), id, puntosPorVuelo);
-        const reservaActualizada = await this.reservaFacade.cambiarEstadoReserva(reserva._id.toString());
-        if(!reservaActualizada) continue;
-        const qrCode = await generarCodigoQR(reservaActualizada._id.toString())
-        const user = await this.userService.obtenerUsuario(reserva.id_usuario.toString());
-        if(!user) continue;
-        await enviarCorreoReservaEstado({ correoDestino: user.correo, nombre: user.nombre, codigo_reserva: reservaActualizada.codigo_reserva, qrCode: qrCode, estado: reservaActualizada.estado as EstadoReserva });
+        // const reservaActualizada = await this.reservaFacade.cambiarEstadoReserva(reserva._id.toString());
+        // if(!reservaActualizada) continue;
+        // const qrCode = await generarCodigoQR(reservaActualizada._id.toString())
+        // const user = await this.userService.obtenerUsuario(reserva.id_usuario.toString());
+        // if(!user) continue;
+        // await enviarCorreoReservaEstado({ correoDestino: user.correo, nombre: user.nombre, codigo_reserva: reservaActualizada.codigo_reserva, qrCode: qrCode, estado: reservaActualizada.estado as EstadoReserva });
       }
   
       // Agregar vuelo al historial de la tripulación
