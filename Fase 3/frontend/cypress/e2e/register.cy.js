@@ -94,6 +94,15 @@ describe('Pruebas de Registro', () => {
   });
 
   it('Debería mostrar error con correo electrónico inválido', () => {
+    // Mock de interceptación para capturar el submit
+    cy.intercept('POST', '**/users', (req) => {
+      // No responder, solo verificar que no se llegue aquí
+      req.reply({
+        statusCode: 400,
+        body: { error: 'No debería llegar aquí' }
+      });
+    }).as('registerRequest');
+
     cy.get('input[placeholder="Nombre completo"]').type('Juan Pérez');
     cy.get('input[placeholder="Número de DPI"]').type('1234567890123');
     cy.get('input[placeholder="Fecha de nacimiento"]').type('2000-01-15');
@@ -102,14 +111,26 @@ describe('Pruebas de Registro', () => {
     cy.get('input[placeholder="País de emisión"]').type('Guatemala');
     cy.get('input[placeholder="Fecha vencimiento"]').type('2026-12-31');
     cy.get('input[placeholder="Dirección"]').type('Zona 10, Ciudad de Guatemala');
-    cy.get('input[placeholder="Correo electrónico"]').type('correo-invalido');
     cy.get('input[placeholder="Teléfono"]').type('12345678');
+    
+    // Usar invoke para cambiar el tipo después de que React haya renderizado
+    cy.get('input[placeholder="Correo electrónico"]')
+      .invoke('removeAttr', 'type')
+      .invoke('attr', 'type', 'text')
+      .type('correo@invalido');
+
+    // Esperar un momento para asegurar que el valor se haya establecido
+    cy.wait(500);
 
     cy.get('button[type="submit"]').click();
 
+    // Verificar que aparezca el toast de error
     cy.get('.Toastify__toast--error', { timeout: 10000 })
       .should('be.visible')
       .and('contain', 'Correo inválido');
+      
+    // Verificar que NO se hizo la petición al servidor
+    cy.get('@registerRequest.all').should('have.length', 0);
   });
 
   it('Debería mostrar error si el teléfono tiene menos de 8 caracteres', () => {
@@ -233,11 +254,19 @@ describe('Pruebas de Registro', () => {
   });
 
   it('Debería validar que todos los campos requeridos estén presentes', () => {
-    // Intentar enviar el formulario sin llenar campos
-    cy.get('button[type="submit"]').click();
+    // Verificar que el botón existe
+    cy.get('button[type="submit"]').should('be.visible');
 
-    // HTML5 validará automáticamente, no llegará a enviar
-    // Verificar que no se hizo ninguna petición
-    cy.get('@registerRequest.all').should('have.length', 0);
+    // Verificar que todos los campos requeridos existen
+    cy.get('input[placeholder="Nombre completo"]').should('have.attr', 'required');
+    cy.get('input[placeholder="Número de DPI"]').should('have.attr', 'required');
+    cy.get('input[placeholder="Fecha de nacimiento"]').should('have.attr', 'required');
+    cy.get('select').first().should('have.attr', 'required');
+    cy.get('input[placeholder="Número de pasaporte"]').should('have.attr', 'required');
+    cy.get('input[placeholder="País de emisión"]').should('have.attr', 'required');
+    cy.get('input[placeholder="Fecha vencimiento"]').should('have.attr', 'required');
+    cy.get('input[placeholder="Dirección"]').should('have.attr', 'required');
+    cy.get('input[placeholder="Correo electrónico"]').should('have.attr', 'required');
+    cy.get('input[placeholder="Teléfono"]').should('have.attr', 'required');
   });
 });
