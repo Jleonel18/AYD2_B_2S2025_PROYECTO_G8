@@ -1,5 +1,7 @@
 # Manual Técnico de Airflow System
 
+---
+
 A continuación, se presenta el manual técnico y las estrategias que se usarán para llevar a cabo la aplicación AirFlow System.
 
 Para el proyecto Airflow System se plantea usar dos estilos arquitectónicos: Arquitectura cliente-servidor con capas.
