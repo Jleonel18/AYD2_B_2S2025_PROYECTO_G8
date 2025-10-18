@@ -103,7 +103,7 @@ const Login = () => {
       </div>
       <div className="w-1/2 bg-[#EAEFEF] flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-          <h2 className="text-2xl font-bold text-[#333446] text-center mb-6">Iniciar Sesión</h2>
+          <h2 className="text-2xl font-bold text-[#333446] text-center mb-6">18 Octubre 2025</h2>
           <div className="mb-4">
             <label className="block text-[#333446] text-sm mb-2" htmlFor="user">Usuario</label>
             <input
